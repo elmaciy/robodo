@@ -26,6 +26,7 @@ public class ProcessDefinition {
 	Integer maxRetryCount;
 	Integer maxThreadCount;
 	boolean isSingleAtATime;
+	boolean isActive;
 
 	
 	@OneToMany(mappedBy = "processDefinition", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -85,6 +86,12 @@ public class ProcessDefinition {
 	}
 	public void setDiscovererClass(String discovererClass) {
 		this.discovererClass = discovererClass;
+	}
+	public boolean isActive() {
+		return isActive;
+	}
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 	
 	

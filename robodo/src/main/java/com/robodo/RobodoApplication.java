@@ -1,9 +1,7 @@
 package com.robodo;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -36,19 +34,30 @@ public class RobodoApplication {
 			processDef1.setSteps(steps);
 			processDef1.setSingleAtATime(true);
 			processDef1.setDiscovererClass("DiscoverProcess1");
+			processDef1.setActive(true);
 			
 			
 			
 			
 			ProcessDefinitionStep step1=new ProcessDefinitionStep();
 			step1.setCode("STEP1");
-			step1.setDescription("write to epats");
+			step1.setDescription("read from service");
 			step1.setOrderNo("01");
-			step1.setSingleAtATime(true);
-			step1.setCommands("runStepClass WriterSteps");
+			step1.setSingleAtATime(false);
+			step1.setCommands("runStepClass ReaderSteps");
 			step1.setProcessDefinition(processDef1);
 			
+
+			ProcessDefinitionStep step2=new ProcessDefinitionStep();
+			step2.setCode("STEP2");
+			step2.setDescription("write to epats");
+			step2.setOrderNo("02");
+			step2.setSingleAtATime(false);
+			step2.setCommands("runStepClass WriterSteps");
+			step2.setProcessDefinition(processDef1);
+			
 			processDef1.getSteps().add(step1);
+			processDef1.getSteps().add(step2);
 
 			
 			processDefinitionRepo.save(processDef1);
@@ -65,6 +74,7 @@ public class RobodoApplication {
 			processDef2.setMaxRetryCount(3);
 			List<ProcessDefinitionStep> steps2=new ArrayList<ProcessDefinitionStep>();			
 			processDef2.setSteps(steps2);
+			processDef2.setActive(true);
 			
 			
 			

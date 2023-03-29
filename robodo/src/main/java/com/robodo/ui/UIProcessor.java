@@ -18,6 +18,7 @@ import com.robodo.service.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -61,6 +62,20 @@ public class UIProcessor extends VerticalLayout {
 		gridProcess.addColumn(p -> p.getId()).setHeader("#").setWidth("100px");
 		gridProcess.addColumn(p -> p.getCode()).setHeader("Code").setWidth("200px");
 		gridProcess.addColumn(p -> p.getDescription()).setHeader("Description").setWidth("200px");
+		gridProcess.addComponentColumn(p -> {
+			Checkbox chActive=new Checkbox(p.isActive());
+			chActive.addValueChangeListener(e->{
+				boolean newVal = e.getValue();
+				p.setActive(newVal);
+				boolean isOk = processService.saveProcessDefinition(p);
+				if (!isOk) {
+					notifyError("Error saving");
+				} else {
+					notifySuccess("process is %s".formatted(newVal ? "active" : "pasive"));
+				}
+			});
+			return chActive;
+		}).setHeader("Active").setWidth("50px");
 		gridProcess.addColumn(p -> p.getMaxRetryCount()).setHeader("Max Retry").setWidth("200px");
 		gridProcess.addColumn(p -> p.getMaxThreadCount()).setHeader("Max Thread").setWidth("200px");
 		gridProcess.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer").setWidth("200px");
@@ -76,6 +91,7 @@ public class UIProcessor extends VerticalLayout {
 			});
 			return btnRun;
 		}).setHeader("Actions").setWidth("200px");
+		
 
 		gridProcess.addSelectionListener(p -> {
 			Optional<ProcessDefinition> selection = p.getFirstSelectedItem();
@@ -322,9 +338,7 @@ public class UIProcessor extends VerticalLayout {
 		String processId="DISCOVERY.%s".formatted(processDefinition.getCode());
 		boolean isRunning = RunnerSingleton.getInstance().hasRunningInstance(processId);
 		if (isRunning) {
-			Notification notification = Notification.show("Discovery is already running");
-            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-            notification.setPosition(Notification.Position.MIDDLE);
+			notifyError("Discovery is already running");
             return;
 		}
 		
@@ -343,13 +357,27 @@ public class UIProcessor extends VerticalLayout {
 	}
 	
 	
+	private void notifySuccess(String content) {
+		Notification notification = Notification.show(content);
+        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        notification.setPosition(Notification.Position.TOP_START);
+	}
+	
+	private void notifyError(String content) {
+		Notification notification = Notification.show(content);
+        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        notification.setPosition(Notification.Position.MIDDLE);		
+	}
+
+
+
+
+
 	private void runProcessInstance(ProcessInstance processInstance) {
 		RunnerUtil runner = new RunnerUtil(env);
 		ProcessInstance processInstanceAfterRun = runner.runProcessInstance(processInstance);
 		if (processInstanceAfterRun == null) {
-			Notification notification = Notification.show("Failed to start");
-            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            notification.setPosition(Notification.Position.MIDDLE);
+			notifySuccess("Failed to start");
 		}
 		
 		processService.saveProcessInstance(processInstanceAfterRun);

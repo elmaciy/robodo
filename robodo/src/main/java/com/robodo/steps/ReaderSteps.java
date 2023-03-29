@@ -1,6 +1,5 @@
 package com.robodo.steps;
 
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import com.robodo.runner.RunnerUtil;

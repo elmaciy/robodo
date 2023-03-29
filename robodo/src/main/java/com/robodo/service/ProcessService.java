@@ -30,4 +30,13 @@ public class ProcessService {
 		
 	}
 
+	public boolean saveProcessDefinition(ProcessDefinition p) {
+		try {
+			processDefinitionRepo.save(p);
+			return true;
+		} catch(Exception e) {
+			return false;
+		}
+	}
+
 }
