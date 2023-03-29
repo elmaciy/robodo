@@ -319,7 +319,7 @@ public class UIProcessor extends VerticalLayout {
 				return o1.getOrderNo().compareTo(o2.getOrderNo());
 			}
 		});
-		gridProcessSteps.setItems();
+		gridProcessSteps.setItems(definitionSteps);
 
 		List<ProcessInstance> instances = processDefinition.getInstances();
 		Collections.sort(instances, new Comparator<ProcessInstance>() {
