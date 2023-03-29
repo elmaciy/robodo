@@ -29,6 +29,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -59,9 +60,9 @@ public class UIProcessor extends VerticalLayout {
 		this.env = env;
 
 		gridProcess = new Grid<>(ProcessDefinition.class, false);
-		gridProcess.addColumn(p -> p.getId()).setHeader("#").setWidth("100px");
-		gridProcess.addColumn(p -> p.getCode()).setHeader("Code").setWidth("200px");
-		gridProcess.addColumn(p -> p.getDescription()).setHeader("Description").setWidth("200px");
+		gridProcess.addColumn(p -> p.getId()).setHeader("#");
+		gridProcess.addColumn(p -> p.getCode()).setHeader("Code");
+		gridProcess.addColumn(p -> p.getDescription()).setHeader("Description");
 		gridProcess.addComponentColumn(p -> {
 			Checkbox chActive=new Checkbox(p.isActive());
 			chActive.addValueChangeListener(e->{
@@ -75,13 +76,13 @@ public class UIProcessor extends VerticalLayout {
 				}
 			});
 			return chActive;
-		}).setHeader("Active").setWidth("50px");
-		gridProcess.addColumn(p -> p.getMaxRetryCount()).setHeader("Max Retry").setWidth("200px");
-		gridProcess.addColumn(p -> p.getMaxThreadCount()).setHeader("Max Thread").setWidth("200px");
-		gridProcess.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer").setWidth("200px");
+		}).setHeader("Active");
+		gridProcess.addColumn(p -> p.getMaxRetryCount()).setHeader("Max Retry");
+		gridProcess.addColumn(p -> p.getMaxThreadCount()).setHeader("Max Thread");
+		gridProcess.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer");
 
 		gridProcess.addComponentColumn(p -> {
-			Button btnRun = new Button("Run Discoverer", new Icon(VaadinIcon.PLAY));
+			Button btnRun = new Button("Discover", new Icon(VaadinIcon.SEARCH));
 			btnRun.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
 			btnRun.setDisableOnClick(true);
 			btnRun.addClickListener(e -> {
@@ -90,15 +91,20 @@ public class UIProcessor extends VerticalLayout {
 				btnRun.setEnabled(true);
 			});
 			return btnRun;
-		}).setHeader("Actions").setWidth("200px");
+		}).setHeader("Actions");
 		
 
 		gridProcess.addSelectionListener(p -> {
 			Optional<ProcessDefinition> selection = p.getFirstSelectedItem();
 			if (selection.isEmpty()) {
 				gridProcessSteps.setItems(Collections.emptyList());
+				gridProcessInstance.setItems(Collections.emptyList());
 			} else {
+				/*
 				gridProcessSteps.setItems(selection.get().getSteps());
+				gridProcessInstance.setItems(selection.get().getInstances());
+				*/
+				setData(selection.get());
 			}
 		});
 		
@@ -106,23 +112,18 @@ public class UIProcessor extends VerticalLayout {
 		//--------------------------------------------------------------------
 
 		gridProcessSteps = new Grid<>(ProcessDefinitionStep.class, false);
-		gridProcessSteps.addColumn(p -> p.getId()).setHeader("#").setFlexGrow(0);
-		gridProcessSteps.addColumn(p -> p.getCode()).setHeader("Code").setFlexGrow(1);
-		gridProcessSteps.addColumn(p -> p.getOrderNo()).setHeader("Order").setFlexGrow(2);
+		gridProcessSteps.addColumn(p -> p.getId()).setHeader("#");
+		gridProcessSteps.addColumn(p -> p.getCode()).setHeader("Code");
+		gridProcessSteps.addColumn(p -> p.getOrderNo()).setHeader("Order");
 		gridProcessSteps.addColumn(p -> p.getDescription()).setHeader("Description");
-		gridProcessSteps.addComponentColumn(p -> {
-			TextField edtCommand = new TextField();
-			edtCommand.setWidth("100%");
-			edtCommand.setValue(p.getCommands());
-			return edtCommand;
-		}).setHeader("Command to run").setWidth("600px");
+		gridProcessSteps.addColumn(p -> p.getCommands()).setHeader("Command to run");
 		
 		
 		//--------------------------------------------------------------------
 
 		gridProcessInstance = new Grid<>(ProcessInstance.class, false);
-		gridProcessInstance.addColumn(p -> p.getId()).setHeader("#").setFlexGrow(0);
-		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code").setFlexGrow(1);
+		gridProcessInstance.addColumn(p -> p.getId()).setHeader("#");
+		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code");
 		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description");
 		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status");
 		gridProcessInstance.addColumn(p -> p.getCurrentStepCode()).setHeader("Latest Step");
@@ -140,7 +141,7 @@ public class UIProcessor extends VerticalLayout {
 				btnShowVars.setEnabled(true);
 			});
 			return btnShowVars;
-		}).setHeader("Vars").setWidth("200px");
+		}).setHeader("Vars");
 		gridProcessInstance.addComponentColumn(p -> {
 			Button btnShowSteps = new Button("", new Icon(VaadinIcon.OPEN_BOOK));
 			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
@@ -151,7 +152,7 @@ public class UIProcessor extends VerticalLayout {
 				btnShowSteps.setEnabled(true);
 			});
 			return btnShowSteps;
-		}).setHeader("Steps").setWidth("200px");
+		}).setHeader("Steps");
 		
 		
 		gridProcessInstance.addComponentColumn(p -> {
@@ -174,7 +175,7 @@ public class UIProcessor extends VerticalLayout {
 				btnApprove.setEnabled(true);
 			});
 			return btnApprove;
-		}).setHeader("Release").setWidth("200px");
+		}).setHeader("Release");
 		
 		
 		gridProcessInstance.addComponentColumn(p -> {
@@ -188,37 +189,27 @@ public class UIProcessor extends VerticalLayout {
 			});
 			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.END));
 			return btnRun;
-		}).setHeader("Run").setWidth("200px");
+		}).setHeader("Run");
 
-		gridProcessSteps.setSizeFull();
-		gridProcessInstance.setSizeFull();
-
-
-		Tab instances = new Tab(gridProcessInstance);
-		instances.setLabel("INSTANCES");
-		Tab steps = new Tab(gridProcessSteps);
-		steps.setLabel("STEPS");
-
-		Tabs tabs = new Tabs(steps, instances);
-		tabs.setHeightFull();
-		tabs.setWidthFull();
-		tabs.add(instances,steps);
-
-		gridProcess.addThemeVariants(GridVariant.LUMO_COMPACT);
-		gridProcessSteps.addThemeVariants(GridVariant.LUMO_COMPACT);
-		gridProcessInstance.addThemeVariants(GridVariant.LUMO_COMPACT);
+		
+		gridProcess.setWidthFull();
+		gridProcessSteps.setWidthFull();
+		gridProcessInstance.setWidthFull();
+		
+		
+		HorizontalLayout horizontalLay = new HorizontalLayout(gridProcess,gridProcessSteps);
+		horizontalLay.setWidthFull();
+		horizontalLay.setFlexGrow(.7, gridProcess);
+		
 
 
 		VerticalLayout verticalLay = new VerticalLayout();
 		verticalLay.setWidthFull();
 		verticalLay.setHeightFull();
 		verticalLay.add(new H3("Processes"));
-		verticalLay.add(gridProcess);
-		//verticalLay.add(new H4("Steps"));
-		//verticalLay.add(gridProcessSteps);
+		verticalLay.add(horizontalLay);
 		verticalLay.add(new H4("Instances"));
 		verticalLay.add(gridProcessInstance);
-		
 		add(verticalLay);
 		setSizeFull();
 

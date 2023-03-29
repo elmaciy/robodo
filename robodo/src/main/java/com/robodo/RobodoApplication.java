@@ -54,12 +54,22 @@ public class RobodoApplication {
 			step2.setCode("PATENT_YILLIK_UCRET_ODE");
 			step2.setDescription("Patent yıllık ücretin kredi kartı ile okunması");
 			step2.setOrderNo("02");
-			step2.setSingleAtATime(false);
+			step2.setSingleAtATime(true);
 			step2.setCommands("runStepClass YillikPatentUcretiOdeSteps");
 			step2.setProcessDefinition(processDef1);
 			
+			
+			ProcessDefinitionStep step3=new ProcessDefinitionStep();
+			step3.setCode("DEKONT_KAYDET");
+			step3.setDescription("Ödeme dekont bilgisini sisteme kaydet");
+			step3.setOrderNo("03");
+			step3.setSingleAtATime(false);
+			step3.setCommands("runStepClass DekontKaydetSteps");
+			step3.setProcessDefinition(processDef1);
+			
 			processDef1.getSteps().add(step1);
 			processDef1.getSteps().add(step2);
+			processDef1.getSteps().add(step3);
 
 			
 			processDefinitionRepo.save(processDef1);
