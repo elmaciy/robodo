@@ -50,6 +50,8 @@ public class ProcessService {
 		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
 		List<ProcessDefinition> processDefinitions = getProcessDefinitions();
 		for (ProcessDefinition processDefinition : processDefinitions) {
+			if (!processDefinition.isActive()) continue;
+			
 			List<ProcessInstance> newInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndRetryNoLessThan(processDefinition, ProcessInstance.STATUS_NEW, processDefinition.getMaxRetryCount());
 			for (ProcessInstance instance : newInstances) {
 				if (instances.size()>=maxInstance) break;

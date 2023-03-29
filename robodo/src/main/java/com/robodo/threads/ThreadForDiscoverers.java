@@ -24,6 +24,8 @@ public class ThreadForDiscoverers implements Runnable {
 	public void run() {
 		List<ProcessDefinition> processDefinitions=processService.getProcessDefinitions();
 		for (ProcessDefinition processDefinition : processDefinitions) {
+			if (!processDefinition.isActive()) continue;
+			
 			String processId="DISCOVERY.%s".formatted(processDefinition.getCode());
 			
 			boolean isRunning = RunnerSingleton.getInstance().hasRunningInstance(processId);
