@@ -6,14 +6,14 @@ import com.robodo.pages.PageEpatsHome;
 import com.robodo.pages.PageEpatsMenu;
 import com.robodo.runner.RunnerUtil;
 
-public class WriterSteps extends BaseSteps {
+public class YillikPatentUcretiOdeSteps extends BaseSteps {
 	
 	PageEpatsHome home;
 	PageEdevletLogin edevletLogin;
 	PageEpatsMenu  epatsMenu;
 	PageEpatsBenimSayfam epatsBenimSayfam;
 	
-	public WriterSteps(RunnerUtil runnerUtil) {
+	public YillikPatentUcretiOdeSteps(RunnerUtil runnerUtil) {
 		super(runnerUtil);
 	
 	}

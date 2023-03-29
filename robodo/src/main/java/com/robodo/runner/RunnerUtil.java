@@ -24,37 +24,35 @@ import com.robodo.steps.BaseSteps;
 
 public class RunnerUtil {
 
-	
 	WebElement locatedWebElement;
 	Environment env;
 	String valueExtracted;
-	HashMap<String, String> hmExtractedValues=new HashMap<>();
+	HashMap<String, String> hmExtractedValues = new HashMap<>();
 	ProcessInstance processInstance;
 	ProcessDefinition processDefinition;
 	String runningCommand;
-	StringBuilder logs=new StringBuilder();
-	
+	StringBuilder logs = new StringBuilder();
 
 	public RunnerUtil(Environment env) {
 		this.env = env;
 	}
 
 	public ProcessInstance runProcessInstance(ProcessInstance processInstance) {
-		
+
 		this.processDefinition = processInstance.getProcessDefinition();
 		this.processInstance = processInstance;
-		
-		boolean eligibleToRun=isEligibleToRunProcessDefinition(processDefinition);
+
+		boolean eligibleToRun = isEligibleToRunProcessDefinition(processDefinition);
 		if (!eligibleToRun) {
 			logger("not eligible for run");
 			return null;
 		}
-		
+
 		RunnerSingleton.getInstance().start(processDefinition.getCode());
-				
+
 		processInstance.setStatus(ProcessInstance.STATUS_RUNNING);
 		
-		
+
 		List<ProcessInstanceStep> steps = processInstance.getSteps();
 
 		Collections.sort(steps, new Comparator<ProcessInstanceStep>() {
@@ -63,17 +61,16 @@ public class RunnerUtil {
 			public int compare(ProcessInstanceStep o1, ProcessInstanceStep o2) {
 				return o1.getOrderNo().compareTo(o2.getOrderNo());
 			}
-			
+
 		});
-		
-		
+
 		for (ProcessInstanceStep step : processInstance.getSteps()) {
 			if (step.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)) {
 				logger("skipping already completed step %s".formatted(step.getStepCode()));
 				continue;
 			}
 			logs.setLength(0);
-			if (step.getLogs()!=null) {
+			if (step.getLogs() != null) {
 				logs.append(step.getLogs());
 			}
 			processInstance.setCurrentStepCode(step.getStepCode());
@@ -84,46 +81,46 @@ public class RunnerUtil {
 					step.setLogs(logs.toString());
 					break;
 				}
-			} catch(Exception e) {
+			} catch (Exception e) {
 				String message = e.getMessage();
-				logger("exception at step [%s] at command [%s] : %s".formatted(step.getStepCode(), runningCommand, message));
+				logger("exception at step [%s] at command [%s] : %s".formatted(step.getStepCode(), runningCommand,
+						message));
 				step.setLogs(logs.toString());
 				break;
 			}
-			
-			
+
 			step.setLogs(logs.toString());
-			
+
 		}
-		
+
 		hmExtractedValues.put("processInstance.id", processInstance.getId().toString());
 		hmExtractedValues.put("processInstance.code", processInstance.getCode());
 		hmExtractedValues.put("processInstance.currentStepCode", processInstance.getCurrentStepCode());
-		
+
 		printHmExtractedValues();
 		persistHmapValues();
-		
-		
-		boolean allStepsCompleted = processInstance.getSteps().stream().allMatch(p->p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED));
 
+		boolean allStepsCompleted = processInstance.getSteps().stream()
+				.allMatch(p -> p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED));
 
-		
 		processInstance.setStatus(allStepsCompleted ? ProcessInstance.END : ProcessInstance.STATUS_RUNNING);
 		if (allStepsCompleted) {
 			processInstance.setFinished(LocalDateTime.now());
 		} else {
-			boolean isInHumanIntegration = processInstance.getSteps().stream().filter(p->!p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)).findFirst().get().getCommands().contains("waitHumanInteraction");
+			boolean isInHumanIntegration = processInstance.getSteps().stream()
+					.filter(p -> !p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)).findFirst().get()
+					.getCommands().contains("waitHumanInteraction");
 			if (isInHumanIntegration) {
 				processInstance.setCurrentStepCode(ProcessInstance.STATUS_HUMAN);
 
 			}
 		}
-		 
+
 		RunnerSingleton.getInstance().stop(processDefinition.getCode());
 		return this.processInstance;
 
 	}
-	
+
 	public boolean isEligibleToRunProcessDefinition(ProcessDefinition processDefinition) {
 		boolean isSingleton = processDefinition.isSingleAtATime();
 		if (isSingleton) {
@@ -133,11 +130,9 @@ public class RunnerUtil {
 				return false;
 			}
 		}
-		
-		
+
 		return true;
 	}
-	
 
 	private boolean runCommand(ProcessInstanceStep step, String command) {
 
@@ -146,30 +141,26 @@ public class RunnerUtil {
 
 		logger("%s (%s)".formatted(arg0, arg1));
 
-		
-		
 		if (arg0.equalsIgnoreCase("runStepClass")) {
 			try {
 				runStepClass(arg1);
 				return true;
-			} catch(Exception e) {
+			} catch (Exception e) {
 				return false;
 			}
-		}
-		else if (arg0.equalsIgnoreCase("sleep")) {
+		} else if (arg0.equalsIgnoreCase("sleep")) {
 			LocalDateTime started = step.getStarted();
 			LocalDateTime now = LocalDateTime.now();
 			var secondToWait = Long.valueOf(arg1);
 			LocalDateTime tobeFinishedAt = started.plusSeconds(secondToWait);
 
-			boolean isOk= now.isAfter(tobeFinishedAt);
+			boolean isOk = now.isAfter(tobeFinishedAt);
 			if (!isOk) {
 				logger("Process will be waited till %s".formatted(tobeFinishedAt));
 			}
-			
+
 			return isOk;
-		}
-		else if (arg0.equalsIgnoreCase("waitHumanInteraction")) {
+		} else if (arg0.equalsIgnoreCase("waitHumanInteraction")) {
 			boolean isApproved = step.isApproved();
 			if (isApproved) {
 				logger("approved by : %s at [%s]".formatted(step.getApprovedBy(), step.getApprovalDate()));
@@ -178,23 +169,21 @@ public class RunnerUtil {
 			}
 			return isApproved;
 		}
-		
+
 		return false;
 	}
 
-
-	
 	String getTargetPath() {
 		String workingDir = env.getProperty("working.dir");
-		String executionDir=workingDir+File.separator+"executions";
-		int year = processInstance.getCreated().getYear(); 
+		String executionDir = workingDir + File.separator + "executions";
+		int year = processInstance.getCreated().getYear();
 		int month = processInstance.getCreated().getMonthValue();
 		int day = processInstance.getCreated().getDayOfMonth();
-		String subDir="%d%s%02d%s%02d%s%s%s%s".formatted(year,File.separator,month,File.separator,day,File.separator,processInstance.getCode(),File.separator,processInstance.getCurrentStepCode());
-		String targetDir=executionDir+File.separator+subDir;
+		String subDir = "%d%s%02d%s%02d%s%s%s%s".formatted(year, File.separator, month, File.separator, day,
+				File.separator, processInstance.getCode(), File.separator, processInstance.getCurrentStepCode());
+		String targetDir = executionDir + File.separator + subDir;
 		return targetDir;
 	}
-
 
 	private ProcessInstanceStep runStep(ProcessInstanceStep step) {
 		if (step.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
@@ -204,15 +193,15 @@ public class RunnerUtil {
 		}
 
 		String normalizedCommand = normalize(step.getCommands());
-		this.runningCommand=normalizedCommand;
-		boolean isOk = runCommand(step,  normalizedCommand);
-		step.setStatus(isOk ?  ProcessInstanceStep.STATUS_COMPLETED : ProcessInstanceStep.STATUS_RUNNING);
+		this.runningCommand = normalizedCommand;
+		boolean isOk = runCommand(step, normalizedCommand);
+		step.setStatus(isOk ? ProcessInstanceStep.STATUS_COMPLETED : ProcessInstanceStep.STATUS_RUNNING);
 		step.setFinished(LocalDateTime.now());
 		return step;
 
 	}
 
-	private  void printHmExtractedValues() {
+	private void printHmExtractedValues() {
 		if (hmExtractedValues.isEmpty()) {
 			logger("no hash value collected so far");
 			return;
@@ -221,20 +210,19 @@ public class RunnerUtil {
 		logger("----------------------------------");
 		logger("---- HASH VALUES COLLECTED   -----");
 		logger("----------------------------------");
-		hmExtractedValues.keySet().iterator().forEachRemaining(k->{
+		hmExtractedValues.keySet().iterator().forEachRemaining(k -> {
 			String v = hmExtractedValues.get(k);
-			logger("%s \t= \t[%s]".formatted(k,v));
+			logger("%s \t= \t[%s]".formatted(k, v));
 		});
 		logger("----------------------------------");
-	
-		
+
 	}
 
 	private void persistHmapValues() {
 		if (hmExtractedValues.isEmpty()) {
 			return;
 		}
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			String json = mapper.writeValueAsString(hmExtractedValues);
@@ -243,18 +231,15 @@ public class RunnerUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		/*
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			String json = mapper.writeValueAsString(hmExtractedValues);
-			String fileToWrite=getTargetPath()+File.separator+"hashValues.json";
-			FileUtil.writeAsString(new File(fileToWrite), json);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
+		 * ObjectMapper mapper = new ObjectMapper(); try { String json =
+		 * mapper.writeValueAsString(hmExtractedValues); String
+		 * fileToWrite=getTargetPath()+File.separator+"hashValues.json";
+		 * FileUtil.writeAsString(new File(fileToWrite), json); } catch
+		 * (JsonProcessingException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); }
+		 */
 	}
 
 	private String normalize(String command) {
@@ -283,12 +268,10 @@ public class RunnerUtil {
 		return StringUtils.substringAfter(command, " ").strip();
 	}
 
-	
-
 	private void runStepClass(String className) {
 		try {
-			String packageName=env.getProperty("steps.package");
-			Class<?> clazz = Class.forName(packageName+"."+className);
+			String packageName = env.getProperty("steps.package");
+			Class<?> clazz = Class.forName(packageName + "." + className);
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class);
 			BaseSteps stepClassInstance = (BaseSteps) constructor.newInstance(this);
 			stepClassInstance.run();
@@ -296,22 +279,20 @@ public class RunnerUtil {
 			e.printStackTrace();
 			throw new RuntimeException("exception : %s".formatted(e.getMessage()));
 		}
-		
+
 	}
 
 	public void logger(String logStr) {
-		String str="%s - %s".formatted(new Date().toString(), logStr);
+		String str = "%s - %s".formatted(new Date().toString(), logStr);
 		System.err.println(str);
-		logs.append(str+"\n");
+		logs.append(str + "\n");
 
 	}
 
-
-
-	public List<ProcessInstance> runProcessDiscovery(ProcessDefinition processDefinition) {		
+	public List<ProcessInstance> runProcessDiscovery(ProcessDefinition processDefinition) {
 		try {
-			String packageName=env.getProperty("discovery.package");
-			Class<?> clazz = Class.forName(packageName+"."+processDefinition.getDiscovererClass());
+			String packageName = env.getProperty("discovery.package");
+			Class<?> clazz = Class.forName(packageName + "." + processDefinition.getDiscovererClass());
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class);
 			BaseDiscoverer discovererInstance = (BaseDiscoverer) constructor.newInstance(this);
 			return discovererInstance.discover(processDefinition);
@@ -319,7 +300,7 @@ public class RunnerUtil {
 			e.printStackTrace();
 			return new ArrayList<ProcessInstance>();
 		}
-		
+
 	}
 
 }

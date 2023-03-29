@@ -14,7 +14,7 @@ import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.runner.RunnerUtil;
-import com.robodo.service.ProcessService;
+import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -22,8 +22,8 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -101,6 +101,9 @@ public class UIProcessor extends VerticalLayout {
 				gridProcessSteps.setItems(selection.get().getSteps());
 			}
 		});
+		
+		
+		//--------------------------------------------------------------------
 
 		gridProcessSteps = new Grid<>(ProcessDefinitionStep.class, false);
 		gridProcessSteps.addColumn(p -> p.getId()).setHeader("#").setFlexGrow(0);
@@ -113,38 +116,41 @@ public class UIProcessor extends VerticalLayout {
 			edtCommand.setValue(p.getCommands());
 			return edtCommand;
 		}).setHeader("Command to run").setWidth("600px");
+		
+		
+		//--------------------------------------------------------------------
 
 		gridProcessInstance = new Grid<>(ProcessInstance.class, false);
 		gridProcessInstance.addColumn(p -> p.getId()).setHeader("#").setFlexGrow(0);
 		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code").setFlexGrow(1);
 		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description");
 		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status");
-		gridProcessInstance.addColumn(p -> p.getCurrentStepCode()).setHeader("CurrenStep");
+		gridProcessInstance.addColumn(p -> p.getCurrentStepCode()).setHeader("Latest Step");
 		gridProcessInstance.addColumn(p -> p.getCreated()).setHeader("Created");
 		gridProcessInstance.addColumn(p -> p.getStarted()).setHeader("Started");
 		gridProcessInstance.addColumn(p -> p.getFinished()).setHeader("Finished");
 		gridProcessInstance.addComponentColumn(p -> {
-			Button btnRun = new Button("", new Icon(VaadinIcon.LIST));
-			btnRun.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.END));
-			btnRun.setDisableOnClick(true);
-			btnRun.addClickListener(e -> {
+			Button btnShowVars = new Button("", new Icon(VaadinIcon.LIST));
+			btnShowVars.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+			btnShowVars.setEnabled(!p.getStatus().equals(ProcessInstance.END));
+			btnShowVars.setDisableOnClick(true);
+			btnShowVars.addClickListener(e -> {
 				gridProcessInstance.select(p);
 				showVariables("instance variable for %s".formatted(p.getCode()),p.getInstanceVariables());
-				btnRun.setEnabled(true);
+				btnShowVars.setEnabled(true);
 			});
-			return btnRun;
+			return btnShowVars;
 		}).setHeader("Vars").setWidth("200px");
 		gridProcessInstance.addComponentColumn(p -> {
-			Button btnRun = new Button("", new Icon(VaadinIcon.OPEN_BOOK));
-			btnRun.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-			btnRun.setDisableOnClick(true);
-			btnRun.addClickListener(e -> {
+			Button btnShowSteps = new Button("", new Icon(VaadinIcon.OPEN_BOOK));
+			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+			btnShowSteps.setDisableOnClick(true);
+			btnShowSteps.addClickListener(e -> {
 				gridProcessInstance.select(p);
 				showProcessInstanceSteps("instance variable for %s".formatted(p.getCode()),p.getSteps());
-				btnRun.setEnabled(true);
+				btnShowSteps.setEnabled(true);
 			});
-			return btnRun;
+			return btnShowSteps;
 		}).setHeader("Steps").setWidth("200px");
 		
 		
@@ -180,37 +186,39 @@ public class UIProcessor extends VerticalLayout {
 				runProcessInstance(p);
 				btnRun.setEnabled(true);
 			});
+			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.END));
 			return btnRun;
 		}).setHeader("Run").setWidth("200px");
 
 		gridProcessSteps.setSizeFull();
 		gridProcessInstance.setSizeFull();
 
-		Tab steps = new Tab(gridProcessSteps);
-		steps.setLabel("STEPS");
 
 		Tab instances = new Tab(gridProcessInstance);
 		instances.setLabel("INSTANCES");
+		Tab steps = new Tab(gridProcessSteps);
+		steps.setLabel("STEPS");
 
 		Tabs tabs = new Tabs(steps, instances);
 		tabs.setHeightFull();
 		tabs.setWidthFull();
+		tabs.add(instances,steps);
 
 		gridProcess.addThemeVariants(GridVariant.LUMO_COMPACT);
 		gridProcessSteps.addThemeVariants(GridVariant.LUMO_COMPACT);
 		gridProcessInstance.addThemeVariants(GridVariant.LUMO_COMPACT);
 
+
 		VerticalLayout verticalLay = new VerticalLayout();
 		verticalLay.setWidthFull();
 		verticalLay.setHeightFull();
-		verticalLay.add(new H2("PROCESS"));
+		verticalLay.add(new H3("Processes"));
 		verticalLay.add(gridProcess);
-		verticalLay.add(new H3("STEPS"));
-		verticalLay.add(gridProcessSteps);
-		verticalLay.add(new H3("INSTANCES"));
+		//verticalLay.add(new H4("Steps"));
+		//verticalLay.add(gridProcessSteps);
+		verticalLay.add(new H4("Instances"));
 		verticalLay.add(gridProcessInstance);
-		// verticalLay.add(tabs);
-
+		
 		add(verticalLay);
 		setSizeFull();
 

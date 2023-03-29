@@ -7,12 +7,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.repo.ProcessDefinitionRepo;
 
 @SpringBootApplication
+@EnableScheduling
 public class RobodoApplication {
 
 	public static void main(String[] args) {
@@ -26,34 +28,34 @@ public class RobodoApplication {
 			
 			ProcessDefinition processDef1=new ProcessDefinition();
 			//processDef1.setId(1L);
-			processDef1.setCode("PROCESS1");
-			processDef1.setDescription("PROCESS FOR TEST");
+			processDef1.setCode("PATENT_YILLIK_UCRET");
+			processDef1.setDescription("Yıllık patent ücreti ödeme süreci");
 			processDef1.setMaxRetryCount(1);
 			processDef1.setMaxThreadCount(1);
 			List<ProcessDefinitionStep> steps=new ArrayList<ProcessDefinitionStep>();			
 			processDef1.setSteps(steps);
 			processDef1.setSingleAtATime(true);
-			processDef1.setDiscovererClass("DiscoverProcess1");
+			processDef1.setDiscovererClass("DiscoverOdenecekYillikPatentUcretleri");
 			processDef1.setActive(true);
 			
 			
 			
 			
 			ProcessDefinitionStep step1=new ProcessDefinitionStep();
-			step1.setCode("STEP1");
-			step1.setDescription("read from service");
+			step1.setCode("PATENT_DOSYASINI_OKU");
+			step1.setDescription("Ücreti ödenecek patent dosyasının okunması");
 			step1.setOrderNo("01");
 			step1.setSingleAtATime(false);
-			step1.setCommands("runStepClass ReaderSteps");
+			step1.setCommands("runStepClass PatentUcretDosyasiOkuSteps");
 			step1.setProcessDefinition(processDef1);
 			
 
 			ProcessDefinitionStep step2=new ProcessDefinitionStep();
-			step2.setCode("STEP2");
-			step2.setDescription("write to epats");
+			step2.setCode("PATENT_YILLIK_UCRET_ODE");
+			step2.setDescription("Patent yıllık ücretin kredi kartı ile okunması");
 			step2.setOrderNo("02");
 			step2.setSingleAtATime(false);
-			step2.setCommands("runStepClass WriterSteps");
+			step2.setCommands("runStepClass YillikPatentUcretiOdeSteps");
 			step2.setProcessDefinition(processDef1);
 			
 			processDef1.getSteps().add(step1);
@@ -71,10 +73,13 @@ public class RobodoApplication {
 			//processDef1.setId(1L);
 			processDef2.setCode("PROCESS2");
 			processDef2.setDescription("PROCESS FOR TEST 2");
-			processDef2.setMaxRetryCount(3);
+			processDef2.setMaxRetryCount(1);
+			processDef2.setMaxThreadCount(1);
 			List<ProcessDefinitionStep> steps2=new ArrayList<ProcessDefinitionStep>();			
 			processDef2.setSteps(steps2);
-			processDef2.setActive(true);
+			processDef2.setSingleAtATime(true);
+			processDef2.setDiscovererClass("DiscoverProcess2");
+			processDef2.setActive(false);
 			
 			
 			

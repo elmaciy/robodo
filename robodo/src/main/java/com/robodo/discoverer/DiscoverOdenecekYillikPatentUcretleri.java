@@ -9,24 +9,25 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.runner.RunnerUtil;
 
-public class DiscoverProcess1 extends BaseDiscoverer {
+public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
 
-	public DiscoverProcess1(RunnerUtil runnerUtil) {
+	public DiscoverOdenecekYillikPatentUcretleri(RunnerUtil runnerUtil) {
 		super(runnerUtil);
 	}
 
 	@Override
 	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {
 		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
-		for (int i=0;i<10;i++) {
+		for (int i=0;i<3;i++) {
 			ProcessInstance instance =new ProcessInstance();
 			instance=new ProcessInstance();
-			instance.setCode(processDefinition.getCode()+"_"+System.currentTimeMillis());
+			//instance.setCode(processDefinition.getCode()+"_"+System.currentTimeMillis());
+			instance.setCode(processDefinition.getCode()+"_"+i);
 			instance.setDescription(processDefinition.getDescription());
 			instance.setCreated(LocalDateTime.now());
 			instance.setStarted(LocalDateTime.now());
 			instance.setFinished(null);
-			instance.setRetryNo(1);
+			instance.setRetryNo(0);
 			instance.setStatus(ProcessInstance.STATUS_NEW);
 			instance.setCurrentStepCode(ProcessInstance.BEGIN);
 			instance.setProcessDefinition(processDefinition);

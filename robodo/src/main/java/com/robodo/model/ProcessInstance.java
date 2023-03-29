@@ -39,7 +39,7 @@ public class ProcessInstance {
 	@Column(length = 65000)
 	String instanceVariables;
 	
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "process_definition_id", nullable = false)
 	ProcessDefinition processDefinition;
 	
