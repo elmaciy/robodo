@@ -75,8 +75,8 @@ public class RobodoApplication {
 			step4.setCommands("runStepClass GenelDekontKaydetSteps");
 			step4.setProcessDefinition(processDef1);
 			
-			//processDef1.getSteps().add(step1);
-			//processDef1.getSteps().add(step2);
+			processDef1.getSteps().add(step1);
+			processDef1.getSteps().add(step2);
 			processDef1.getSteps().add(step3);
 			//processDef1.getSteps().add(step4);
 

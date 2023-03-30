@@ -7,9 +7,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.json.JSONParser;
 import org.openqa.selenium.WebElement;
 import org.springframework.core.env.Environment;
 
@@ -57,6 +59,8 @@ public class RunnerUtil {
 		processInstance.setStatus(ProcessInstance.STATUS_RUNNING);
 		processService.saveProcessInstance(processInstance);
 		
+		hmExtractedValues = String2HashMap(processInstance.getInstanceVariables());
+		
 
 		List<ProcessInstanceStep> steps = processInstance.getSteps();
 
@@ -101,12 +105,8 @@ public class RunnerUtil {
 
 		}
 
-		hmExtractedValues.put("processInstance.id", processInstance.getId().toString());
-		hmExtractedValues.put("processInstance.code", processInstance.getCode());
-		hmExtractedValues.put("processInstance.currentStepCode", processInstance.getCurrentStepCode());
-
-		printHmExtractedValues();
-		persistHmapValues();
+		
+		
 
 		boolean allStepsCompleted = processInstance.getSteps().stream()
 				.allMatch(p -> p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED));
@@ -123,6 +123,9 @@ public class RunnerUtil {
 
 			}
 		}
+		
+		hmExtractedValues.put("processInstance.currentStepCode", processInstance.getCurrentStepCode());
+		this.processInstance.setInstanceVariables(hashMap2String(hmExtractedValues));
 
 		processService.saveProcessInstance(processInstance);
 		
@@ -156,6 +159,7 @@ public class RunnerUtil {
 				runStepClass(arg1);
 				return true;
 			} catch (Exception e) {
+				logger("Exception on running step %s : %s".formatted(arg1, e.getMessage()));
 				return false;
 			}
 		} else if (arg0.equalsIgnoreCase("sleep")) {
@@ -210,47 +214,35 @@ public class RunnerUtil {
 		return step;
 
 	}
-
-	private void printHmExtractedValues() {
-		if (hmExtractedValues.isEmpty()) {
-			logger("no hash value collected so far");
-			return;
-		}
-
-		logger("----------------------------------");
-		logger("---- HASH VALUES COLLECTED   -----");
-		logger("----------------------------------");
-		hmExtractedValues.keySet().iterator().forEachRemaining(k -> {
-			String v = hmExtractedValues.get(k);
-			logger("%s \t= \t[%s]".formatted(k, v));
-		});
-		logger("----------------------------------");
-
-	}
-
-	private void persistHmapValues() {
-		if (hmExtractedValues.isEmpty()) {
-			return;
-		}
-
+	
+	public static String hashMap2String(HashMap<String,String> hm) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			String json = mapper.writeValueAsString(hmExtractedValues);
-			this.processInstance.setInstanceVariables(json);
+			String json = mapper.writeValueAsString(hm);
+			return json;
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		/*
-		 * ObjectMapper mapper = new ObjectMapper(); try { String json =
-		 * mapper.writeValueAsString(hmExtractedValues); String
-		 * fileToWrite=getTargetPath()+File.separator+"hashValues.json";
-		 * FileUtil.writeAsString(new File(fileToWrite), json); } catch
-		 * (JsonProcessingException e) { // TODO Auto-generated catch block
-		 * e.printStackTrace(); }
-		 */
+		return null;
 	}
+	
+	public static HashMap<String,String>  String2HashMap(String data) {
+		
+		HashMap<String,String> hm= new HashMap<String,String>();
+		try {
+			JSONParser parser = new JSONParser(data);
+			LinkedHashMap<String, Object> linkedList = parser.parseObject();
+			linkedList.keySet().stream().forEach(key->{
+				hm.put(key, (String) linkedList.get(key));
+			});
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new HashMap<String,String>();
+	}
+
 
 	private String normalize(String command) {
 		if (command == null || command.strip().length() == 0) {
@@ -313,8 +305,16 @@ public class RunnerUtil {
 
 	}
 
-	public String getParameter(String key) {
+	public String getEnvironmentParameter(String key) {
 		return this.env.getProperty(key);
+	}
+
+	public void setVariable(String key, String value) {
+		hmExtractedValues.put(key, value);
+	}
+	
+	public String getVariable(String key) {
+		return hmExtractedValues.get(key);
 	}
 
 }

@@ -17,10 +17,10 @@ public class GenelTahakkukOdeme extends BaseEpatsSteps {
 	public void run() {
 		sistemeGiris();
 		epatsMenu.gotoTahakkuklarim();
-		epatsTahakkuklarim.tahakkukNoArama("2166777");
-		selenium.sleep(10L);
+		String tahakkukNo=getVariable("tahakkukNo");
+		epatsTahakkuklarim.tahakkukNoArama(tahakkukNo);
+		selenium.sleep(5L);
 		epatsMenu.cikis();
-		selenium.sleep(10L);
 		
 		selenium.stopDriver();
 	}

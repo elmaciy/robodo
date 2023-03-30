@@ -31,6 +31,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -113,19 +114,25 @@ public class UIProcessor extends VerticalLayout {
 
 		gridProcessSteps = new Grid<>(ProcessDefinitionStep.class, false);
 		gridProcessSteps.addColumn(p -> p.getId()).setHeader("#");
-		gridProcessSteps.addColumn(p -> p.getCode()).setHeader("Code");
 		gridProcessSteps.addColumn(p -> p.getOrderNo()).setHeader("Order");
+		gridProcessSteps.addColumn(p -> p.getCode()).setHeader("Code");
 		gridProcessSteps.addColumn(p -> p.getDescription()).setHeader("Description");
 		gridProcessSteps.addColumn(p -> p.getCommands()).setHeader("Command to run");
 		
 		
 		//--------------------------------------------------------------------
-
 		gridProcessInstance = new Grid<>(ProcessInstance.class, false);
 		gridProcessInstance.addColumn(p -> p.getId()).setHeader("#");
 		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code");
 		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description");
 		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status");
+		gridProcessInstance.addComponentColumn(p -> {
+			ProgressBar progress = new ProgressBar();
+			progress.setMax(Double.valueOf(p.getSteps().size()));
+			var step=p.getSteps().stream().filter(s->s.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)).count();
+			progress.setValue(Double.valueOf(step));
+			return progress;
+		}).setHeader("Progress");
 		gridProcessInstance.addColumn(p -> p.getCurrentStepCode()).setHeader("Latest Step");
 		gridProcessInstance.addColumn(p -> p.getRetryNo()).setHeader("Retried#");
 		gridProcessInstance.addColumn(p -> p.getCreated()).setHeader("Created");

@@ -29,8 +29,8 @@ public class BaseEpatsSteps extends BaseSteps {
 	public void sistemeGiris() {
 		home.open();
 		home.clickEdevlet();
-		String tckno=runnerUtil.getParameter("tckno");
-		String sifre=runnerUtil.getParameter("sifre");
+		String tckno=runnerUtil.getEnvironmentParameter("tckno");
+		String sifre=runnerUtil.getEnvironmentParameter("sifre");
 		edevletLogin.girisEdevlet(tckno, sifre);
 		
 	}
