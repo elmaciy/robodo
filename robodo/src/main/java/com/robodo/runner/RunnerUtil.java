@@ -19,11 +19,13 @@ import com.robodo.discoverer.BaseDiscoverer;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
+import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.steps.BaseSteps;
 
 public class RunnerUtil {
 
+	ProcessService processService;
 	WebElement locatedWebElement;
 	Environment env;
 	String valueExtracted;
@@ -33,7 +35,8 @@ public class RunnerUtil {
 	String runningCommand;
 	StringBuilder logs = new StringBuilder();
 
-	public RunnerUtil(Environment env) {
+	public RunnerUtil(ProcessService processService,  Environment env) {
+		this.processService = processService;
 		this.env = env;
 	}
 
@@ -50,7 +53,9 @@ public class RunnerUtil {
 
 		RunnerSingleton.getInstance().start(processDefinition.getCode());
 
+		processInstance.setRetryNo(processInstance.getRetryNo()+1);
 		processInstance.setStatus(ProcessInstance.STATUS_RUNNING);
+		processService.saveProcessInstance(processInstance);
 		
 
 		List<ProcessInstanceStep> steps = processInstance.getSteps();
@@ -74,6 +79,8 @@ public class RunnerUtil {
 				logs.append(step.getLogs());
 			}
 			processInstance.setCurrentStepCode(step.getStepCode());
+			processService.saveProcessInstance(processInstance);
+			
 			try {
 				runStep(step);
 				if (step.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)) {
@@ -90,6 +97,7 @@ public class RunnerUtil {
 			}
 
 			step.setLogs(logs.toString());
+			processService.saveProcessInstance(processInstance);
 
 		}
 
@@ -116,6 +124,8 @@ public class RunnerUtil {
 			}
 		}
 
+		processService.saveProcessInstance(processInstance);
+		
 		RunnerSingleton.getInstance().stop(processDefinition.getCode());
 		return this.processInstance;
 
@@ -301,6 +311,10 @@ public class RunnerUtil {
 			return new ArrayList<ProcessInstance>();
 		}
 
+	}
+
+	public String getParameter(String key) {
+		return this.env.getProperty(key);
 	}
 
 }

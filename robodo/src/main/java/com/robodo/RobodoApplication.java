@@ -46,30 +46,39 @@ public class RobodoApplication {
 			step1.setDescription("Ücreti ödenecek patent dosyasının okunması");
 			step1.setOrderNo("01");
 			step1.setSingleAtATime(false);
-			step1.setCommands("runStepClass PatentUcretDosyasiOkuSteps");
+			step1.setCommands("runStepClass YillikPatentUcretDosyasiOkuSteps");
 			step1.setProcessDefinition(processDef1);
 			
 
 			ProcessDefinitionStep step2=new ProcessDefinitionStep();
-			step2.setCode("PATENT_YILLIK_UCRET_ODE");
-			step2.setDescription("Patent yıllık ücretin kredi kartı ile okunması");
+			step2.setCode("PATENT_YILLIK_UCRET_TAHAKKUK");
+			step2.setDescription("Patent yıllık ücreti tahakkuk oluşturma");
 			step2.setOrderNo("02");
 			step2.setSingleAtATime(true);
-			step2.setCommands("runStepClass YillikPatentUcretiOdeSteps");
+			step2.setCommands("runStepClass YillikPatentUcretiTahakkukOlustur");
 			step2.setProcessDefinition(processDef1);
 			
-			
 			ProcessDefinitionStep step3=new ProcessDefinitionStep();
-			step3.setCode("DEKONT_KAYDET");
-			step3.setDescription("Ödeme dekont bilgisini sisteme kaydet");
+			step3.setCode("TAHAKKUK_ODE");
+			step3.setDescription("Tahakkuk ödeme");
 			step3.setOrderNo("03");
 			step3.setSingleAtATime(false);
-			step3.setCommands("runStepClass DekontKaydetSteps");
+			step3.setCommands("runStepClass GenelTahakkukOdeme");
 			step3.setProcessDefinition(processDef1);
 			
-			processDef1.getSteps().add(step1);
-			processDef1.getSteps().add(step2);
+			
+			ProcessDefinitionStep step4=new ProcessDefinitionStep();
+			step4.setCode("DEKONT_KAYDET");
+			step4.setDescription("Ödeme dekont bilgisini sisteme kaydet");
+			step4.setOrderNo("04");
+			step4.setSingleAtATime(false);
+			step4.setCommands("runStepClass GenelDekontKaydetSteps");
+			step4.setProcessDefinition(processDef1);
+			
+			//processDef1.getSteps().add(step1);
+			//processDef1.getSteps().add(step2);
 			processDef1.getSteps().add(step3);
+			//processDef1.getSteps().add(step4);
 
 			
 			processDefinitionRepo.save(processDef1);

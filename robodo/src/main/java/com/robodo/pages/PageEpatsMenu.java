@@ -3,15 +3,13 @@ package com.robodo.pages;
 import java.util.List;
 import java.util.Optional;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.robodo.runner.SeleniumUtil;
 
 public class PageEpatsMenu extends BasePage {
-	
-	@FindBy(css = "div.form-item-control div.btn")
-	List<WebElement> elClickables;
 
 	public PageEpatsMenu(SeleniumUtil selenium) {
 		super(selenium);
@@ -20,7 +18,7 @@ public class PageEpatsMenu extends BasePage {
 
 	private void clickableAction(String title) {
 		selenium.logger("menü aç => %s".formatted(title));
-		Optional<WebElement> opt = elClickables.stream().filter(p->p.getText().strip().equals(title)).findAny();
+		Optional<WebElement> opt = selenium.getWebDriver().findElements(By.xpath("//div[text()='%s']".formatted(title))).stream().findAny();
 		if (opt.isEmpty()) {
 			throw new RuntimeException("menü bulunamadı : %s".formatted(title));
 		}
@@ -38,9 +36,17 @@ public class PageEpatsMenu extends BasePage {
 		clickableAction("Belgelerim");		
 	}
 	
+	public void gotoTahakkuklarim() {
+		clickableAction("Tahakkuklarım");	
+		
+	}
+	
+	
 	public void cikis() {
 		clickableAction("Sistemden Çıkış");		
 	}
+
+
 	
 	
 

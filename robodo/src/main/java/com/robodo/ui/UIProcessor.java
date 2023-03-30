@@ -127,6 +127,7 @@ public class UIProcessor extends VerticalLayout {
 		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description");
 		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status");
 		gridProcessInstance.addColumn(p -> p.getCurrentStepCode()).setHeader("Latest Step");
+		gridProcessInstance.addColumn(p -> p.getRetryNo()).setHeader("Retried#");
 		gridProcessInstance.addColumn(p -> p.getCreated()).setHeader("Created");
 		gridProcessInstance.addColumn(p -> p.getStarted()).setHeader("Started");
 		gridProcessInstance.addColumn(p -> p.getFinished()).setHeader("Finished");
@@ -159,10 +160,15 @@ public class UIProcessor extends VerticalLayout {
 			Button btnApprove = new Button("Release", new Icon(VaadinIcon.CHECK));
 			btnApprove.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
 			if (p.getStatus().equals(ProcessInstance.STATUS_RUNNING)) {
-				ProcessInstanceStep instance =  p.getSteps().stream().filter(i->i.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)).findFirst().get();
+				Optional<ProcessInstanceStep> instanceStepOpt =  p.getSteps().stream().filter(i->i.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)).findFirst();
+				if (instanceStepOpt.isEmpty()) {
+					btnApprove.setEnabled(false);
+				} else {
+					ProcessInstanceStep instanceStep = instanceStepOpt.get();
+					boolean enabled = instanceStepOpt.get().getCommands().contains("waitHumanInteraction") && !instanceStep.isApproved();
+					btnApprove.setEnabled(enabled);
+				}
 				
-				boolean enabled = instance.getCommands().contains("waitHumanInteraction") && !instance.isApproved();
-				btnApprove.setEnabled(enabled);
 			} else {
 				btnApprove.setEnabled(false);
 			}
@@ -341,7 +347,7 @@ public class UIProcessor extends VerticalLayout {
             return;
 		}
 		
-		RunnerUtil runner = new RunnerUtil(env);
+		RunnerUtil runner = new RunnerUtil(processService, env);
 		
 		RunnerSingleton.getInstance().start(processId);
 		List<ProcessInstance> discoveredInstances = runner.runProcessDiscovery(processDefinition);
@@ -373,7 +379,7 @@ public class UIProcessor extends VerticalLayout {
 
 
 	private void runProcessInstance(ProcessInstance processInstance) {
-		RunnerUtil runner = new RunnerUtil(env);
+		RunnerUtil runner = new RunnerUtil(processService, env);
 		ProcessInstance processInstanceAfterRun = runner.runProcessInstance(processInstance);
 		if (processInstanceAfterRun == null) {
 			notifySuccess("Failed to start");

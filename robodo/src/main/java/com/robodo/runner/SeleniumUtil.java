@@ -161,4 +161,9 @@ public class SeleniumUtil {
 		
 	}
 
+	public void enter() {
+		pressKey("ENTER");
+		
+	}
+
 }

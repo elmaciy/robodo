@@ -7,11 +7,14 @@ import com.robodo.runner.SeleniumUtil;
 
 public class PageEpatsBenimSayfam extends BasePage {
 	
+	private static final String ROOT_XPATH_DOSYALARIM="//div[text()='Dosyalarım']/../../../../..";
+	
 	public PageEpatsMenu menu;
 	
-	@FindBy(css="[placeholder='Başvurularınız arasında arama yapın']")
+	
+	@FindBy(css="input[placeholder='Başvurularınız arasında arama yapın']")
 	WebElement elArama;
-	@FindBy(css="i.fa-search")
+	@FindBy(xpath=ROOT_XPATH_DOSYALARIM+"//i[@class='fa fa-search']/..")
 	WebElement elBtnAra;
 
 	
@@ -22,7 +25,7 @@ public class PageEpatsBenimSayfam extends BasePage {
 
 
 
-	public void basvuruArama(String basvuru) {
+	public void dosyaArama(String basvuru) {
 		selenium.setValue(elArama, basvuru);
 		selenium.click(elBtnAra);
 		

@@ -4,9 +4,9 @@ import org.openqa.selenium.WebElement;
 
 import com.robodo.runner.RunnerUtil;
 
-public class PatentUcretDosyasiOkuSteps extends BaseSteps {
+public class YillikPatentUcretDosyasiOkuSteps extends BaseEpatsSteps {
 
-	public PatentUcretDosyasiOkuSteps(RunnerUtil runnerUtil) {
+	public YillikPatentUcretDosyasiOkuSteps(RunnerUtil runnerUtil) {
 		super(runnerUtil);
 	}
 

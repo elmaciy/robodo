@@ -34,7 +34,7 @@ public class ThreadForDiscoverers implements Runnable {
 	            continue;
 			}
 			
-			RunnerUtil runner = new RunnerUtil(env);
+			RunnerUtil runner = new RunnerUtil(processService, env);
 			
 			RunnerSingleton.getInstance().start(processId);
 			

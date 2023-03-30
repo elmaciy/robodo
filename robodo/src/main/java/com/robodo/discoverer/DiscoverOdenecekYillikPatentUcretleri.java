@@ -18,7 +18,7 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
 	@Override
 	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {
 		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
-		for (int i=0;i<3;i++) {
+		for (int i=0;i<1;i++) {
 			ProcessInstance instance =new ProcessInstance();
 			instance=new ProcessInstance();
 			//instance.setCode(processDefinition.getCode()+"_"+System.currentTimeMillis());

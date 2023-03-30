@@ -2,9 +2,9 @@ package com.robodo.steps;
 
 import com.robodo.runner.RunnerUtil;
 
-public class DekontKaydetSteps extends BaseSteps {
+public class GenelDekontKaydetSteps extends BaseEpatsSteps {
 
-	public DekontKaydetSteps(RunnerUtil runnerUtil) {
+	public GenelDekontKaydetSteps(RunnerUtil runnerUtil) {
 		super(runnerUtil);
 	}
 
