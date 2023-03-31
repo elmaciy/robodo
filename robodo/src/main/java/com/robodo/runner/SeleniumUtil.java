@@ -67,8 +67,9 @@ public class SeleniumUtil {
 		return webDriver.findElement(By.xpath(xpathSelector));
 	}
 
-	public void setValue(WebElement locatedWebElement, String value) {
-		locatedWebElement.sendKeys(value);	
+	public void setValue(WebElement el, String value) {
+		el.clear();
+		el.sendKeys(value);	
 	}
 	
 	private Keys encodeKey(String key) {
@@ -173,6 +174,11 @@ public class SeleniumUtil {
 
 	public void enter() {
 		pressKey("ENTER");
+		
+	}
+
+	public void tab() {
+		pressKey("TAB");
 		
 	}
 

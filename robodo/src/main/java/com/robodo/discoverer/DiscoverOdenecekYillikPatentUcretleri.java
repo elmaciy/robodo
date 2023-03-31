@@ -37,6 +37,7 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
 			HashMap<String, String> hmVars=new HashMap<String, String>();
 			hmVars.put("processInstance.code", instance.getCode());
 			hmVars.put("dosyaNumarasi", "2019/06601");
+			hmVars.put("takipNumarasi", "TTuu20029SSSa112");
 			hmVars.put("basvuruTuru", "PATENT");
 			hmVars.put("islemAdi", "Yıllık Ücret Ödeme");
 			instance.setInstanceVariables(RunnerUtil.hashMap2String(hmVars));

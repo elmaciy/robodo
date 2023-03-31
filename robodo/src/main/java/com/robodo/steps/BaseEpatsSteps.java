@@ -1,6 +1,7 @@
 package com.robodo.steps;
 
 import com.robodo.pages.PageEdevletLogin;
+import com.robodo.pages.PageEpatsBasvuruYapan;
 import com.robodo.pages.PageEpatsBenimSayfam;
 import com.robodo.pages.PageEpatsHome;
 import com.robodo.pages.PageEpatsMenu;
@@ -14,6 +15,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	PageEpatsMenu  epatsMenu;
 	PageEpatsBenimSayfam epatsBenimSayfam;
 	PageEpatsTahakkuklarim epatsTahakkuklarim;
+	PageEpatsBasvuruYapan epatsBasvuruYapan;
 	
 	public BaseEpatsSteps(RunnerUtil runnerUtil) {
 		super(runnerUtil);
@@ -23,6 +25,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		this.epatsMenu=new PageEpatsMenu(selenium);
 		this.epatsBenimSayfam=new PageEpatsBenimSayfam(selenium);
 		this.epatsTahakkuklarim=new PageEpatsTahakkuklarim(selenium);
+		this.epatsBasvuruYapan=new PageEpatsBasvuruYapan(selenium);
 	
 	}
 
@@ -33,6 +36,23 @@ public class BaseEpatsSteps extends BaseSteps {
 		String sifre=runnerUtil.getEnvironmentParameter("sifre");
 		edevletLogin.girisEdevlet(tckno, sifre);
 		
+	}
+	
+	public void dosyaAraIslemSec() {
+		epatsMenu.gotoVekillikSayfam();
+		String dosyaNo=getVariable("dosyaNumarasi");
+		String basvuruTuru=getVariable("basvuruTuru");
+		String islemAdi=getVariable("islemAdi");
+		epatsBenimSayfam.dosyaArama(dosyaNo,basvuruTuru);
+		epatsBenimSayfam.islemSec(islemAdi);
+	}
+	
+	public void basvuruYap() {
+		String eposta=runnerUtil.getEnvironmentParameter("eposta");;
+		String cepTel=runnerUtil.getEnvironmentParameter("ceptel");
+		String referansNo=getVariable("takipNumarasi");
+		epatsBasvuruYapan.basvuruBilgileriniDoldur(eposta, cepTel, referansNo);
+		epatsBasvuruYapan.devamEt();
 	}
 	
 	@Override

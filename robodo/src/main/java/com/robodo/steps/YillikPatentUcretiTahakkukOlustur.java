@@ -15,19 +15,17 @@ public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 	@Override
 	public void run() {
 		sistemeGiris();
-
-		epatsMenu.gotoVekillikSayfam();
-		String dosyaNo=getVariable("dosyaNumarasi");
-		String basvuruTuru=getVariable("basvuruTuru");
-		String islemAdi=getVariable("islemAdi");
-		epatsBenimSayfam.dosyaArama(dosyaNo,basvuruTuru);
-		epatsBenimSayfam.islemSec(islemAdi);
+		dosyaAraIslemSec();
+		basvuruYap();
 		setVariable("tahakkukNo", "2166777");
 		selenium.sleep(60L);
 		epatsMenu.cikis();
 		
 		selenium.stopDriver();
 	}
+
+
+	
 
 
 

@@ -30,6 +30,10 @@ public class PageEpatsBenimSayfam extends BasePage {
 	@FindBy(css="#selectbox218 input[type=search]")
 	WebElement elIslemComboSearchInput;
 	
+	@FindBy(xpath=ROOT_XPATH_DOSYALARIM+"//div[@class='btn btn-default' and text()='Git']")
+	WebElement elIslemeGit;
+	
+	
 	
 
 	public PageEpatsBenimSayfam(SeleniumUtil selenium) {
@@ -54,6 +58,8 @@ public class PageEpatsBenimSayfam extends BasePage {
 	public void islemSec(String islemAdi) {
 		selenium.click(elIslemCombo);
 		selenium.setValue(elIslemComboSearchInput, islemAdi);
+		selenium.tab();
+		selenium.click(elIslemeGit);
 		
 	}
 }
