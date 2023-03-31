@@ -16,11 +16,14 @@ public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 	public void run() {
 		sistemeGiris();
 
-		epatsMenu.gotoBenimSayfam();
+		epatsMenu.gotoVekillikSayfam();
 		String dosyaNo=getVariable("dosyaNumarasi");
-		epatsBenimSayfam.dosyaArama(dosyaNo);
+		String basvuruTuru=getVariable("basvuruTuru");
+		String islemAdi=getVariable("islemAdi");
+		epatsBenimSayfam.dosyaArama(dosyaNo,basvuruTuru);
+		epatsBenimSayfam.islemSec(islemAdi);
 		setVariable("tahakkukNo", "2166777");
-		selenium.sleep(5L);
+		selenium.sleep(60L);
 		epatsMenu.cikis();
 		
 		selenium.stopDriver();

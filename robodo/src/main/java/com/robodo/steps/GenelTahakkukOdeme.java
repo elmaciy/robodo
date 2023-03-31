@@ -19,7 +19,6 @@ public class GenelTahakkukOdeme extends BaseEpatsSteps {
 		epatsMenu.gotoTahakkuklarim();
 		String tahakkukNo=getVariable("tahakkukNo");
 		epatsTahakkuklarim.tahakkukNoArama(tahakkukNo);
-		selenium.sleep(5L);
 		epatsMenu.cikis();
 		
 		selenium.stopDriver();

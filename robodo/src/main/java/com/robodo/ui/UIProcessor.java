@@ -1,14 +1,17 @@
 package com.robodo.ui;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
+import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
@@ -21,7 +24,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Label;
@@ -32,10 +34,7 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -295,10 +294,23 @@ public class UIProcessor extends VerticalLayout {
 	private void showVariables(String title, String data) {
 		Dialog dialog = new Dialog();
 		dialog.setHeaderTitle(title);
+		
 		VerticalLayout dialogLayout = new VerticalLayout();
-		Label content=new Label(data==null ? ""  : data);
-		content.setSizeFull();
-		dialogLayout.add(content);
+		
+		
+		HashMap<String, String> hmVars = RunnerUtil.String2HashMap(data);
+		Grid<KeyValue> gridVars=new Grid<>(KeyValue.class, false);
+		gridVars.addColumn(p -> p.getKey()).setHeader("Variable Name").setAutoWidth(true);
+		gridVars.addColumn(p -> p.getValue()).setHeader("Value");
+
+		List<KeyValue> items=new ArrayList<KeyValue>();
+		hmVars.keySet().stream().forEach(key->{
+			items.add(new KeyValue(key,(String) hmVars.get(key)));
+		});
+		gridVars.setItems(items);
+		dialogLayout.add(gridVars);
+		
+		
 		dialog.add(dialogLayout);
 		Button cancelButton = new Button("Cancel", e -> dialog.close());
 		dialog.getFooter().add(cancelButton);

@@ -142,6 +142,16 @@ public class SeleniumUtil {
 		}
 		
 	}
+	
+	public void executeJavascript(WebElement el, String javaScript, String arguments)  {
+		JavascriptExecutor executor = (JavascriptExecutor) webDriver;
+		
+		Object[] valuesExtracted =Splitter.on(",").trimResults().splitToList(arguments).stream().filter(p->p!=null && !p.isBlank()).map(p->{
+			return this.runnerUtil.hmExtractedValues.get(p);
+		}).toArray();
+		
+		executor.executeScript(javaScript,el,  valuesExtracted);
+	}
 
 	public void executeJavascript(String arguments)  {
 		JavascriptExecutor executor = (JavascriptExecutor) webDriver;

@@ -47,6 +47,12 @@ public class PageEpatsMenu extends BasePage {
 	}
 
 
+	public void gotoVekillikSayfam() {
+		clickableAction("Vekillik Sayfam");		
+		
+	}
+
+
 	
 	
 

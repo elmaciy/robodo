@@ -236,6 +236,7 @@ public class RunnerUtil {
 			linkedList.keySet().stream().forEach(key->{
 				hm.put(key, (String) linkedList.get(key));
 			});
+			return hm;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

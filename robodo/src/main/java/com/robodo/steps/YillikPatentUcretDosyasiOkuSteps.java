@@ -10,7 +10,7 @@ public class YillikPatentUcretDosyasiOkuSteps extends BaseEpatsSteps {
 
 	@Override
 	public void run() {
-		setVariable("dosyaNumarasi","2019/06601");
+		selenium.stopDriver();
 
 	}
 
