@@ -18,51 +18,50 @@ import org.springframework.core.env.Environment;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.robodo.discoverer.BaseDiscoverer;
+import com.robodo.model.ExecutionResultsForInstance;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
+import com.robodo.singleton.SingletonForUIUpdate;
 import com.robodo.steps.BaseSteps;
 
 public class RunnerUtil {
 
 	ProcessService processService;
 	WebElement locatedWebElement;
-	Environment env;
 	String valueExtracted;
 	HashMap<String, String> hmExtractedValues = new HashMap<>();
-	ProcessInstance processInstance;
-	ProcessDefinition processDefinition;
-	String runningCommand;
 	StringBuilder logs = new StringBuilder();
 
-	public RunnerUtil(ProcessService processService,  Environment env) {
+	public RunnerUtil(ProcessService processService) {
 		this.processService = processService;
-		this.env = env;
 	}
 
-	public ProcessInstance runProcessInstance(ProcessInstance processInstance) {
+	public ExecutionResultsForInstance runProcessInstance(ProcessInstance processInstance) {
+		
+		ExecutionResultsForInstance result=new ExecutionResultsForInstance(processInstance);
 
-		this.processDefinition = processInstance.getProcessDefinition();
-		this.processInstance = processInstance;
-
-		boolean eligibleToRun = isEligibleToRunProcessDefinition(processDefinition);
+		boolean eligibleToRun = isEligibleToRunProcessDefinition(processInstance.getProcessDefinition());
 		if (!eligibleToRun) {
-			logger("not eligible for run");
-			return null;
+			String msg="not eligible for runing";
+			logger(msg);
+			result.setMessage(msg);
+			result.setStatus(ExecutionResultsForInstance.STATUS_NOT_ELIGIBLE);
+			return result;
 		}
 
-		RunnerSingleton.getInstance().start(processDefinition.getCode());
+		RunnerSingleton.getInstance().start(processInstance.getProcessDefinition().getCode());
 
-		processInstance.setRetryNo(processInstance.getRetryNo()+1);
-		processInstance.setStatus(ProcessInstance.STATUS_RUNNING);
-		processService.saveProcessInstance(processInstance);
+		result.getProcessInstance().setRetryNo(processInstance.getRetryNo()+1);
+		result.getProcessInstance().setStatus(ProcessInstance.STATUS_RUNNING);
+		processService.saveProcessInstance(result.getProcessInstance());
 		
-		hmExtractedValues = String2HashMap(processInstance.getInstanceVariables());
+		hmExtractedValues = String2HashMap(result.getProcessInstance().getInstanceVariables());
 		
 
-		List<ProcessInstanceStep> steps = processInstance.getSteps();
+		List<ProcessInstanceStep> steps = result.getProcessInstance().getSteps();
 
 		Collections.sort(steps, new Comparator<ProcessInstanceStep>() {
 
@@ -73,7 +72,7 @@ public class RunnerUtil {
 
 		});
 
-		for (ProcessInstanceStep step : processInstance.getSteps()) {
+		for (ProcessInstanceStep step : result.getProcessInstance().getSteps()) {
 			if (step.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)) {
 				logger("skipping already completed step %s".formatted(step.getStepCode()));
 				continue;
@@ -82,26 +81,29 @@ public class RunnerUtil {
 			if (step.getLogs() != null) {
 				logs.append(step.getLogs());
 			}
-			processInstance.setCurrentStepCode(step.getStepCode());
-			processService.saveProcessInstance(processInstance);
+			result.getProcessInstance().setCurrentStepCode(step.getStepCode());
+			processService.saveProcessInstance(result.getProcessInstance());
 			
 			try {
 				runStep(step);
 				if (step.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)) {
-					logger("stopped at step [%s] at command [%s]".formatted(step.getStepCode(), runningCommand));
+					logger("stopped at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
 					step.setLogs(logs.toString());
 					break;
 				}
 			} catch (Exception e) {
 				String message = e.getMessage();
-				logger("exception at step [%s] at command [%s] : %s".formatted(step.getStepCode(), runningCommand,
+				logger("exception at step [%s] at command [%s] : %s".formatted(step.getStepCode(), step.getCommands(),
 						message));
 				step.setLogs(logs.toString());
 				break;
 			}
 
 			step.setLogs(logs.toString());
-			processService.saveProcessInstance(processInstance);
+			processService.saveProcessInstance(result.getProcessInstance());
+			
+			result.setStatus(ExecutionResultsForInstance.STATUS_SUCCESS);
+			return result;
 
 		}
 
@@ -125,12 +127,12 @@ public class RunnerUtil {
 		}
 		
 		hmExtractedValues.put("processInstance.currentStepCode", processInstance.getCurrentStepCode());
-		this.processInstance.setInstanceVariables(hashMap2String(hmExtractedValues));
+		result.getProcessInstance().setInstanceVariables(hashMap2String(hmExtractedValues));
 
-		processService.saveProcessInstance(processInstance);
+		processService.saveProcessInstance(result.getProcessInstance());
 		
-		RunnerSingleton.getInstance().stop(processDefinition.getCode());
-		return this.processInstance;
+		RunnerSingleton.getInstance().stop(result.getProcessInstance().getProcessDefinition().getCode());
+		return result;
 
 	}
 
@@ -187,8 +189,8 @@ public class RunnerUtil {
 		return false;
 	}
 
-	String getTargetPath() {
-		String workingDir = env.getProperty("working.dir");
+	String getTargetPath(ProcessInstance processInstance) {
+		String workingDir = processService.getEnv().getProperty("working.dir");
 		String executionDir = workingDir + File.separator + "executions";
 		int year = processInstance.getCreated().getYear();
 		int month = processInstance.getCreated().getMonthValue();
@@ -207,7 +209,6 @@ public class RunnerUtil {
 		}
 
 		String normalizedCommand = normalize(step.getCommands());
-		this.runningCommand = normalizedCommand;
 		boolean isOk = runCommand(step, normalizedCommand);
 		step.setStatus(isOk ? ProcessInstanceStep.STATUS_COMPLETED : ProcessInstanceStep.STATUS_RUNNING);
 		step.setFinished(LocalDateTime.now());
@@ -221,7 +222,6 @@ public class RunnerUtil {
 			String json = mapper.writeValueAsString(hm);
 			return json;
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -238,7 +238,6 @@ public class RunnerUtil {
 			});
 			return hm;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return new HashMap<String,String>();
@@ -273,7 +272,7 @@ public class RunnerUtil {
 
 	private void runStepClass(String className) {
 		try {
-			String packageName = env.getProperty("steps.package");
+			String packageName = processService.getEnv().getProperty("steps.package");
 			Class<?> clazz = Class.forName(packageName + "." + className);
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class);
 			BaseSteps stepClassInstance = (BaseSteps) constructor.newInstance(this);
@@ -294,10 +293,11 @@ public class RunnerUtil {
 
 	public List<ProcessInstance> runProcessDiscovery(ProcessDefinition processDefinition) {
 		try {
-			String packageName = env.getProperty("discovery.package");
+			String packageName = processService.getEnv().getProperty("discovery.package");
 			Class<?> clazz = Class.forName(packageName + "." + processDefinition.getDiscovererClass());
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class);
 			BaseDiscoverer discovererInstance = (BaseDiscoverer) constructor.newInstance(this);
+			SingletonForUIUpdate.getInstance().setLastUpdate();
 			return discovererInstance.discover(processDefinition);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -307,7 +307,7 @@ public class RunnerUtil {
 	}
 
 	public String getEnvironmentParameter(String key) {
-		return this.env.getProperty(key);
+		return this.processService.getEnv().getProperty(key);
 	}
 
 	public void setVariable(String key, String value) {

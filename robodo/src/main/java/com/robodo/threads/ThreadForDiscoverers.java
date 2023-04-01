@@ -34,16 +34,16 @@ public class ThreadForDiscoverers implements Runnable {
 	            continue;
 			}
 			
-			RunnerUtil runner = new RunnerUtil(processService, env);
+			RunnerUtil runner = new RunnerUtil(processService);
 			
 			RunnerSingleton.getInstance().start(processId);
 			
 			List<ProcessInstance> discoveredInstances = runner.runProcessDiscovery(processDefinition);
 			for (ProcessInstance discoveredInstance : discoveredInstances) {
-				System.err.println("discovered : new instance [%s] of process [%s]".formatted(processDefinition.getCode(),discoveredInstance.getCode()));
+				runner.logger("discovered : new instance [%s] of process [%s]".formatted(processDefinition.getCode(),discoveredInstance.getCode()));
 				boolean isExists=processService.isProcessInstanceAlreadyExists(discoveredInstance);
 				if (isExists) {
-					System.err.println("skip process [%s]/%s".formatted(processDefinition.getCode(),discoveredInstance.getCode(), processDefinition.getCode()));
+					runner.logger("skip process [%s]/%s".formatted(processDefinition.getCode(),discoveredInstance.getCode(), processDefinition.getCode()));
 					continue;
 				}
 				processService.saveProcessInstance(discoveredInstance);

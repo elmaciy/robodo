@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.robodo.model.ProcessDefinition;
@@ -15,6 +16,9 @@ import com.robodo.repo.ProcessInstanceRepo;
 
 @Service
 public class ProcessService {
+	
+	@Autowired
+	Environment env;
 	
 	@Autowired
 	ProcessDefinitionRepo processDefinitionRepo;
@@ -68,6 +72,14 @@ public class ProcessService {
 		
 	
 		return instances;
+	}
+	
+	public Environment getEnv() {
+		return env;
+	}
+
+	public List<ProcessInstance> getProcessInstancesByProcessDefinition(ProcessDefinition processDefinition) {
+		return processInstanceRepo.findByProcessDefinition(processDefinition);
 	}
 
 }

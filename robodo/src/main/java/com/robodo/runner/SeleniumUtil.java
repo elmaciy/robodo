@@ -22,6 +22,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 
 import com.google.common.base.Splitter;
+import com.robodo.model.ProcessInstance;
 
 public class SeleniumUtil {
 	RunnerUtil runnerUtil;
@@ -33,8 +34,8 @@ public class SeleniumUtil {
 	}
 	
 	public void startWebDriver() {
-		String path=this.runnerUtil.env.getProperty("selenium.webdriver.path");
-		String imlicitWaitStr=this.runnerUtil.env.getProperty("selenium.webdriver.implicitwait");
+		String path=this.runnerUtil.getEnvironmentParameter("selenium.webdriver.path");
+		String imlicitWaitStr=this.runnerUtil.getEnvironmentParameter("selenium.webdriver.implicitwait");
 		System.setProperty("webdriver.chrome.driver",path);
 		
 		ChromeOptions ops = new ChromeOptions();
@@ -109,8 +110,8 @@ public class SeleniumUtil {
 		return el.getAttribute(attributeName);
 	}
 
-	public void screenShot() {
-		String targetDir=runnerUtil.getTargetPath();
+	public void screenShot(ProcessInstance processInstance) {
+		String targetDir=runnerUtil.getTargetPath(processInstance);
 		TakesScreenshot scrShot =((TakesScreenshot) webDriver);
 		File SrcFile=scrShot.getScreenshotAs(OutputType.FILE);
 		new File(targetDir).mkdirs();
@@ -125,7 +126,7 @@ public class SeleniumUtil {
 	}
 	
 	public void loadJavascript(String scriptFile) {
-		String scriptHome=this.runnerUtil.env.getProperty("working.dir")+File.separator+"scripts";
+		String scriptHome=this.runnerUtil.getEnvironmentParameter("working.dir")+File.separator+"scripts";
 		String scriptFilePath=scriptHome+File.separator+scriptFile;
 		if (!scriptFilePath.toLowerCase().endsWith(".js")) {
 			scriptFilePath=scriptFilePath+".js";

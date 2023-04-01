@@ -10,6 +10,7 @@ import com.robodo.model.ProcessInstance;
 public interface ProcessInstanceRepo extends CrudRepository<ProcessInstance, Long> {
 	
 	List<ProcessInstance> findByCode(String code);
+	List<ProcessInstance>  findByProcessDefinition(ProcessDefinition processDefinition);
 	List<ProcessInstance>  findByProcessDefinitionAndStatusAndRetryNoLessThan(ProcessDefinition processDefinition,String status, int retryNo);
 
 }
