@@ -26,62 +26,72 @@ public class RobodoApplication {
 		return (args) -> {
 
 			
-			ProcessDefinition processDef1=new ProcessDefinition();
+			ProcessDefinition yillikPatentUcreti=new ProcessDefinition();
 			//processDef1.setId(1L);
-			processDef1.setCode("PATENT_YILLIK_UCRET");
-			processDef1.setDescription("Yıllık patent ücreti ödeme süreci");
-			processDef1.setMaxRetryCount(1);
-			processDef1.setMaxThreadCount(1);
+			yillikPatentUcreti.setCode("PATENT_YILLIK_UCRET");
+			yillikPatentUcreti.setDescription("Yıllık patent ücreti ödeme süreci");
+			yillikPatentUcreti.setMaxRetryCount(1);
+			yillikPatentUcreti.setMaxThreadCount(2);
 			List<ProcessDefinitionStep> steps=new ArrayList<ProcessDefinitionStep>();			
-			processDef1.setSteps(steps);
-			processDef1.setSingleAtATime(true);
-			processDef1.setDiscovererClass("DiscoverOdenecekYillikPatentUcretleri");
-			processDef1.setActive(true);
+			yillikPatentUcreti.setSteps(steps);
+			yillikPatentUcreti.setSingleAtATime(true);
+			yillikPatentUcreti.setDiscovererClass("DiscoverOdenecekYillikPatentUcretleri");
+			yillikPatentUcreti.setActive(true);
 			
 			
 			
 			
-			ProcessDefinitionStep step1=new ProcessDefinitionStep();
-			step1.setCode("PATENT_DOSYASINI_OKU");
-			step1.setDescription("Ücreti ödenecek patent dosyasının okunması");
-			step1.setOrderNo("01");
-			step1.setSingleAtATime(false);
-			step1.setCommands("runStepClass YillikPatentUcretDosyasiOkuSteps");
-			step1.setProcessDefinition(processDef1);
+			ProcessDefinitionStep stepDosyaOku=new ProcessDefinitionStep();
+			stepDosyaOku.setCode("PATENT_DOSYASINI_OKU");
+			stepDosyaOku.setDescription("Ücreti ödenecek patent dosyasının okunması");
+			stepDosyaOku.setOrderNo("01");
+			stepDosyaOku.setSingleAtATime(false);
+			stepDosyaOku.setCommands("runStepClass YillikPatentUcretDosyasiOkuSteps");
+			stepDosyaOku.setProcessDefinition(yillikPatentUcreti);
 			
 
-			ProcessDefinitionStep step2=new ProcessDefinitionStep();
-			step2.setCode("PATENT_YILLIK_UCRET_TAHAKKUK");
-			step2.setDescription("Patent yıllık ücreti tahakkuk oluşturma");
-			step2.setOrderNo("02");
-			step2.setSingleAtATime(true);
-			step2.setCommands("runStepClass YillikPatentUcretiTahakkukOlustur");
-			step2.setProcessDefinition(processDef1);
+			ProcessDefinitionStep stepTahakkukOlustur=new ProcessDefinitionStep();
+			stepTahakkukOlustur.setCode("PATENT_YILLIK_UCRET_TAHAKKUK");
+			stepTahakkukOlustur.setDescription("Patent yıllık ücreti tahakkuk oluşturma");
+			stepTahakkukOlustur.setOrderNo("02");
+			stepTahakkukOlustur.setSingleAtATime(true);
+			stepTahakkukOlustur.setCommands("runStepClass YillikPatentUcretiTahakkukOlustur");
+			stepTahakkukOlustur.setProcessDefinition(yillikPatentUcreti);
 			
-			ProcessDefinitionStep step3=new ProcessDefinitionStep();
-			step3.setCode("TAHAKKUK_ODE");
-			step3.setDescription("Tahakkuk ödeme");
-			step3.setOrderNo("03");
-			step3.setSingleAtATime(false);
-			step3.setCommands("runStepClass GenelTahakkukOdeme");
-			step3.setProcessDefinition(processDef1);
+			ProcessDefinitionStep stepOnay=new ProcessDefinitionStep();
+			stepOnay.setCode("PATENT_ONAY_BEKLE");
+			stepOnay.setDescription("Patent yıllık ücreti ödeme için onay bekle");
+			stepOnay.setOrderNo("03");
+			stepOnay.setSingleAtATime(true);
+			stepOnay.setCommands("waitHumanInteraction");
+			stepOnay.setProcessDefinition(yillikPatentUcreti);
 			
 			
-			ProcessDefinitionStep step4=new ProcessDefinitionStep();
-			step4.setCode("DEKONT_KAYDET");
-			step4.setDescription("Ödeme dekont bilgisini sisteme kaydet");
-			step4.setOrderNo("04");
-			step4.setSingleAtATime(false);
-			step4.setCommands("runStepClass GenelDekontKaydetSteps");
-			step4.setProcessDefinition(processDef1);
+			ProcessDefinitionStep stepOde=new ProcessDefinitionStep();
+			stepOde.setCode("TAHAKKUK_ODE");
+			stepOde.setDescription("Tahakkuk ödeme");
+			stepOde.setOrderNo("04");
+			stepOde.setSingleAtATime(false);
+			stepOde.setCommands("runStepClass GenelTahakkukOdeme");
+			stepOde.setProcessDefinition(yillikPatentUcreti);
 			
-			processDef1.getSteps().add(step1);
-			processDef1.getSteps().add(step2);
-			processDef1.getSteps().add(step3);
-			//processDef1.getSteps().add(step4);
+			
+			ProcessDefinitionStep stepDekontIsle=new ProcessDefinitionStep();
+			stepDekontIsle.setCode("DEKONT_KAYDET");
+			stepDekontIsle.setDescription("Ödeme dekont bilgisini sisteme kaydet");
+			stepDekontIsle.setOrderNo("05");
+			stepDekontIsle.setSingleAtATime(false);
+			stepDekontIsle.setCommands("runStepClass GenelDekontKaydetSteps");
+			stepDekontIsle.setProcessDefinition(yillikPatentUcreti);
+			
+			//processDef1.getSteps().add(stepDosyaOku);
+			yillikPatentUcreti.getSteps().add(stepTahakkukOlustur);
+			yillikPatentUcreti.getSteps().add(stepOnay);
+			yillikPatentUcreti.getSteps().add(stepOde);
+			//processDef1.getSteps().add(stepDekontIsle);
 
 			
-			processDefinitionRepo.save(processDef1);
+			processDefinitionRepo.save(yillikPatentUcreti);
 			
 			
 			//--------------------------------------------

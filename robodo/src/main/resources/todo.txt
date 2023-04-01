@@ -18,7 +18,7 @@
 17. threshold belirle, bu aşılınca mail gitsin biryerlere, bu sayede bir problem olup olmadığını anlarız. 
 	a. uzun süredir hiçbir süreç discover edilmiyor
 	b. kuyruk azalmiyor
-18. human interaction adımında kime mail gideceği ile ilgili düzenleme yapılabilsin. tüm ilgili mailler tekrar oluşturulabilsin değişince. 
+18. human interaction adımında kime mail gideceği ile ilgili düzenleme yapılabilsin ya da email adresi komuta parametre olarak verilsin. tüm ilgili mailler tekrar oluşturulabilsin değişince. 
 19. H2DB yi diske alalım. 
 20. eski işi bitenleri silelim. 
 21. ekran görüntülerinin saklanması?
@@ -27,11 +27,13 @@
 24. locatorleri gözden geçir. değişebilecek id ler varsa bunlar düzelt çünkü deploymentten sonra değişirler. 
 25. islem yarıda selenium exception alınca (mesela karsilastirma hatası) browser açık kalıyor. 
 26. hata alınca ekran görüntüsü alınsı o anki. sonra selenium kapatılsın. 
-27. bir step fail olunca neden devam ediyor?
-
+28. human interaaction da onaylama olmazsa? ekranda da süreçte de onay ve red olacak. isApproved = isDone olacak. 
+29. human interactionda ilgili kişilere mail atılır. mailden de onaylanabilir, linklere tıklanarak da. 
 
 
 -------------------
 TAMAMLANANLAR 
 -------------------
 2. discovery ikincisinde aynı taskı gene discover ediyor
+27. bir step fail olunca neden devam ediyor?
+

@@ -96,6 +96,13 @@ public class RunnerUtil {
 					step.setLogs(logs.toString());
 					break;
 				}
+				
+				if (step.getStatus().equals(ProcessInstanceStep.STATUS_FAILED)) {
+					logger("failed at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
+					step.setLogs(logs.toString());
+					break;
+				}
+				
 				result.setStatus(ExecutionResultsForInstance.STATUS_SUCCESS);
 			} catch (Exception e) {
 				String message = e.getMessage();
@@ -113,28 +120,28 @@ public class RunnerUtil {
 		
 		
 
-		boolean allStepsCompleted = processInstance.getSteps().stream()
+		boolean allStepsCompleted = result.getProcessInstance().getSteps().stream()
 				.allMatch(p -> p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED));
 
-		processInstance.setStatus(allStepsCompleted ? ProcessInstance.END : ProcessInstance.STATUS_RUNNING);
+		result.getProcessInstance().setStatus(allStepsCompleted ? ProcessInstance.END : ProcessInstance.STATUS_RUNNING);
 		if (allStepsCompleted) {
-			processInstance.setFinished(LocalDateTime.now());
+			result.getProcessInstance().setFinished(LocalDateTime.now());
 		} else {
-			boolean isInHumanIntegration = processInstance.getSteps().stream()
+			boolean isInHumanIntegration = result.getProcessInstance().getSteps().stream()
 					.filter(p -> !p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)).findFirst().get()
 					.getCommands().contains("waitHumanInteraction");
 			if (isInHumanIntegration) {
-				processInstance.setCurrentStepCode(ProcessInstance.STATUS_HUMAN);
+				result.getProcessInstance().setCurrentStepCode(ProcessInstance.STATUS_HUMAN);
 
 			}
 		}
 		
-		hmExtractedValues.put("processInstance.currentStepCode", processInstance.getCurrentStepCode());
+		hmExtractedValues.put("processInstance.currentStepCode", result.getProcessInstance().getCurrentStepCode());
 		result.getProcessInstance().setInstanceVariables(hashMap2String(hmExtractedValues));
 
 		processService.saveProcessInstance(result.getProcessInstance());
 		
-		RunnerSingleton.getInstance().stop(processInstance.getCode());
+		RunnerSingleton.getInstance().stop(result.getProcessInstance().getCode());
 		
 		RunnerSingleton.getInstance().stop(result.getProcessInstance().getProcessDefinition().getCode());
 		

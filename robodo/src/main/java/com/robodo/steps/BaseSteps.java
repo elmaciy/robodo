@@ -1,7 +1,5 @@
 package com.robodo.steps;
 
-import java.util.HashMap;
-
 import com.robodo.utils.RunnerUtil;
 import com.robodo.utils.SeleniumUtil;
 

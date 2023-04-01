@@ -13,7 +13,8 @@ public class PageEpatsTahakkuklarim extends PageEpatsBase {
 	@FindBy(xpath="//div[@title='Tahakkuk No']/..//input")
 	WebElement elFilterTahakkukNo;
 
-
+	@FindBy(xpath="//div[text()='Seçili Tahakkuku Öde']")
+	WebElement elTahakkukOde;
 	
 
 	public PageEpatsTahakkuklarim(SeleniumUtil selenium) {
@@ -25,6 +26,11 @@ public class PageEpatsTahakkuklarim extends PageEpatsBase {
 	public void tahakkukNoArama(String tahakkukNo) {
 		selenium.setValue(elFilterTahakkukNo, tahakkukNo);
 		selenium.enter();
+		
+	}
+	
+	public void tahakkukOde() {
+		selenium.click(elTahakkukOde);
 		
 	}
 }

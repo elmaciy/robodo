@@ -41,6 +41,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -137,6 +138,7 @@ public class UIProcessor extends VerticalLayout {
 		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
 		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
 		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("3em");
+		gridProcessInstance.addColumn(p -> p.getError()).setHeader("Error").setWidth("10em");
 		gridProcessInstance.addComponentColumn(p -> {
 			ProgressBar progress = new ProgressBar();
 			progress.setMax(Double.valueOf(p.getSteps().size()));
@@ -294,6 +296,7 @@ public class UIProcessor extends VerticalLayout {
 		grid.addColumn(p -> p.getStepCode()).setHeader("Code").setAutoWidth(true);
 		grid.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("3em");
 		grid.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("5em");
+		grid.addColumn(p -> p.getError()).setHeader("Error").setWidth("10em");
 		grid.addColumn(p -> p.getCommands()).setHeader("Command Executed").setAutoWidth(true);
 		grid.addColumn(p -> p.getApprovedBy()).setHeader("Approved By").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getApprovalDate())).setHeader("Approval Date");
@@ -352,7 +355,12 @@ public class UIProcessor extends VerticalLayout {
 		HashMap<String, String> hmVars = RunnerUtil.String2HashMap(data);
 		Grid<KeyValue> gridVars=new Grid<>(KeyValue.class, false);
 		gridVars.addColumn(p -> p.getKey()).setHeader("Variable Name").setWidth("20em");
-		gridVars.addColumn(p -> p.getValue()).setHeader("Value").setWidth("30em");
+		gridVars.addComponentColumn(p -> {
+			TextField textField=new TextField();
+			textField.setWidthFull();
+			textField.setValue(p.getValue());
+			return textField;
+		}).setHeader("Value").setWidth("30em");
 		
 		gridVars.getColumns().forEach(col->{col.setResizable(true);});
 		gridVars.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
@@ -362,6 +370,16 @@ public class UIProcessor extends VerticalLayout {
 		hmVars.keySet().stream().forEach(key->{
 			items.add(new KeyValue(key,(String) hmVars.get(key)));
 		});
+		
+		Collections.sort(items, new Comparator<KeyValue>() {
+
+			@Override
+			public int compare(KeyValue o1, KeyValue o2) {
+				return o1.getKey().compareTo(o2.getKey());
+			}
+
+		});
+		
 		gridVars.setItems(items);
 		dialogLayout.add(gridVars);
 		

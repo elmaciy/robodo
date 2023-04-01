@@ -6,8 +6,10 @@ import com.robodo.pages.PageEpatsBenimSayfam;
 import com.robodo.pages.PageEpatsDosyaBilgisi;
 import com.robodo.pages.PageEpatsHizmetDokumu;
 import com.robodo.pages.PageEpatsHome;
+import com.robodo.pages.PageEpatsIslemSonucu;
 import com.robodo.pages.PageEpatsMenu;
 import com.robodo.pages.PageEpatsOnIzleme;
+import com.robodo.pages.PageEpatsTahakkukOde;
 import com.robodo.pages.PageEpatsTahakkuklarim;
 import com.robodo.utils.RunnerUtil;
 
@@ -22,6 +24,8 @@ public class BaseEpatsSteps extends BaseSteps {
 	PageEpatsDosyaBilgisi epatsDosyaBilgisi;
 	PageEpatsHizmetDokumu epatsHizmetDokumu;
 	PageEpatsOnIzleme epatsOnIzleme;
+	PageEpatsIslemSonucu epatsIslemSonucu;
+	PageEpatsTahakkukOde epatsTahakkukOde;
 	
 	public BaseEpatsSteps(RunnerUtil runnerUtil) {
 		super(runnerUtil);
@@ -35,7 +39,8 @@ public class BaseEpatsSteps extends BaseSteps {
 		this.epatsDosyaBilgisi=new PageEpatsDosyaBilgisi(selenium);
 		this.epatsHizmetDokumu=new PageEpatsHizmetDokumu(selenium);
 		this.epatsOnIzleme = new PageEpatsOnIzleme(selenium);
-	
+		this.epatsIslemSonucu=new PageEpatsIslemSonucu(selenium);
+		this.epatsTahakkukOde=new PageEpatsTahakkukOde(selenium);
 	}
 
 	public void sistemeGiris() {
@@ -101,8 +106,34 @@ public class BaseEpatsSteps extends BaseSteps {
 		karsilastir(getVariable("onizleme.odenecek.faturaKimlikNumarasi"), runnerUtil.getEnvironmentParameter("ankarapatent.vergino"), "ankara patent kimlik/vergi no karşılaştırılıyor");
 		karsilastir(getVariable("onizleme.odenecek.genelToplam"), getVariable("odemeTutari"), "ödenecek tutar karşılaştırılıyor");
 		
-		//epatsOnIzleme.tahakkukOlustur();
+		epatsOnIzleme.tahakkukOlustur();
 		
+	}
+	
+	public void  tahakkukNumarasiAl() {
+		String sonuc = epatsIslemSonucu.sonucAl();
+		setVariable("islemsonucu.sonuc", sonuc);
+		int pos= sonuc.lastIndexOf(":");
+		if (pos==-1) {
+			String msg="'Tahakkuk No:' bulunamadı.";
+			runnerUtil.logger(msg);
+			throw new RuntimeException(msg);
+		}
+		try {
+			String tahakkukNo=sonuc.substring(pos+1);
+			Integer.parseInt(tahakkukNo);
+			setVariable("tahakkukNo", sonuc);
+		} catch(Exception e) {
+			e.printStackTrace();
+			String msg="Tahakkuk no çıkarılırken beklenmedik bir hata oluştu : %s".formatted(e.getMessage());
+			runnerUtil.logger(msg);
+			throw new RuntimeException(msg);
+		}
+		
+	}
+	
+	public void anaSayfayaDon() {
+		epatsIslemSonucu.anaSayfayaDon();
 	}
 	
 	private void karsilastir(String v1, String v2, String mesaj) {
