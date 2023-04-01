@@ -25,5 +25,13 @@
 22. instanceleri başlatan kısımdaki lojikten dolayı hep aynı işleri öncelikli alıyor. burada bir dağılım yapmak iyi olabilir. 
 23. kendi timerin yerine düzgün bir timer koy sayfaya
 24. locatorleri gözden geçir. değişebilecek id ler varsa bunlar düzelt çünkü deploymentten sonra değişirler. 
+25. islem yarıda selenium exception alınca (mesela karsilastirma hatası) browser açık kalıyor. 
+26. hata alınca ekran görüntüsü alınsı o anki. sonra selenium kapatılsın. 
+27. bir step fail olunca neden devam ediyor?
 
+
+
+-------------------
+TAMAMLANANLAR 
+-------------------
 2. discovery ikincisinde aynı taskı gene discover ediyor

@@ -24,11 +24,16 @@ public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 		basvuruYap();
 		dosyaBilgisiDogrulaDevamEt();
 		hizmetDokumuDevamEt();
-		selenium.sleep(60L);
-		epatsMenu.cikis();
+		onizlemeKontrolveTahakkukOlustur();
+		selenium.sleep(120L);
+		//acilacak
+		//epatsMenu.cikis();
 		
 		selenium.stopDriver();
 	}
+
+
+	
 
 
 	

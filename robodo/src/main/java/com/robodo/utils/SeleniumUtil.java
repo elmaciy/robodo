@@ -77,6 +77,12 @@ public class SeleniumUtil {
 		sleep(1L); 
 	}
 	
+	public void scrollDownABit() {
+		runnerUtil.logger("scrolling a bit %s");
+		((JavascriptExecutor) webDriver).executeScript("window.scrollBy(0,250)", "");
+		sleep(1L); 
+	}
+	
 	public void copyPasteByRobot(String value) {
 		try {
 			String property = System.getProperty("java.awt.headless");

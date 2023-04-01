@@ -2,13 +2,11 @@ package com.robodo.threads;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.springframework.core.env.Environment;
 
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.services.ProcessService;
+import com.robodo.singleton.RunnerSingleton;
 import com.robodo.singleton.ThreadGroupSingleton;
 
 public class ThreadForInstanceStarter implements Runnable {
@@ -36,6 +34,9 @@ public class ThreadForInstanceStarter implements Runnable {
 			if (remaining>0) {
 				List<ProcessInstance> notCompletedInstances = processService.getProcessNotCompletedInstances(processDefinition,remaining);
 				for (ProcessInstance processInstance : notCompletedInstances) {
+					if (RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode())) {
+						continue;
+					}
 					Thread th=new Thread(new ThreadForInstanceRunner(processService, processInstance));
 					th.start();
 					currentThreadCount++;

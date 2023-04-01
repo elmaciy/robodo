@@ -498,6 +498,12 @@ public class UIProcessor extends VerticalLayout {
 			return;
 		}
 		
+		if (RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode())) {
+			notifyError("this instance %s is already running. Please wait.".formatted(processInstance.getCode()));
+			return;
+		}
+		
+		
 		Thread thread=new Thread(new ThreadForInstanceRunner(processService, processInstance));
 		thread.run();
 		

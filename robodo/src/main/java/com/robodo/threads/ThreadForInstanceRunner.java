@@ -1,7 +1,5 @@
 package com.robodo.threads;
 
-import org.springframework.core.env.Environment;
-
 import com.robodo.model.ExecutionResultsForInstance;
 import com.robodo.model.ProcessInstance;
 import com.robodo.services.ProcessService;
@@ -20,8 +18,11 @@ public class ThreadForInstanceRunner implements Runnable {
 	@Override
 	public void run() {
 		RunnerUtil runner=new RunnerUtil(processService);
-		runner.logger("running task : %s".formatted(processInstance.getCode()));
+		
+		runner.logger("start task : %s".formatted(processInstance.getCode()));
+		
 		ExecutionResultsForInstance result = runner.runProcessInstance(processInstance);
+		
 		if (result.getStatus().equals(ExecutionResultsForInstance.STATUS_FAILED)) {
 			String msg=result.getMessage();
 			runner.logger("exception at task : %s => %s".formatted(processInstance.getCode(),msg));
@@ -32,6 +33,9 @@ public class ThreadForInstanceRunner implements Runnable {
 		} else {
 			processService.saveProcessInstance(result.getProcessInstance());
 		}
+		
+		runner.logger("end task : %s".formatted(processInstance.getCode()));
+
 		
 
 	}

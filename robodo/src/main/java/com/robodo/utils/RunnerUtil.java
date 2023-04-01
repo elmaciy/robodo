@@ -45,15 +45,19 @@ public class RunnerUtil {
 
 		boolean eligibleToRun = isEligibleToRunProcessDefinition(processInstance.getProcessDefinition());
 		if (!eligibleToRun) {
-			String msg="not eligible for runing";
+			String msg="Not eligible for runing for multiple instance";
 			logger(msg);
 			result.setMessage(msg);
 			result.setStatus(ExecutionResultsForInstance.STATUS_NOT_ELIGIBLE);
 			return result;
 		}
-
+		
+		//aynı processden tek sefer koşulabilmesi için bunu yapıyoruz. 
 		RunnerSingleton.getInstance().start(processInstance.getProcessDefinition().getCode());
+	
 
+		RunnerSingleton.getInstance().start(processInstance.getCode());
+		
 		result.getProcessInstance().setRetryNo(processInstance.getRetryNo()+1);
 		result.getProcessInstance().setStatus(ProcessInstance.STATUS_RUNNING);
 		processService.saveProcessInstance(result.getProcessInstance());
@@ -130,7 +134,10 @@ public class RunnerUtil {
 
 		processService.saveProcessInstance(result.getProcessInstance());
 		
+		RunnerSingleton.getInstance().stop(processInstance.getCode());
+		
 		RunnerSingleton.getInstance().stop(result.getProcessInstance().getProcessDefinition().getCode());
+		
 		return result;
 
 	}
@@ -197,10 +204,11 @@ public class RunnerUtil {
 		return targetDir;
 	}
 
-	private ProcessInstanceStep runStep(ProcessInstance instance, ProcessInstanceStep step) {
+	private ProcessInstanceStep runStep(ProcessInstance processInstance, ProcessInstanceStep step) {
 		if (step.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
 			step.setStatus(ProcessInstanceStep.STATUS_RUNNING);
 			step.setStarted(LocalDateTime.now());
+			processService.saveProcessInstance(processInstance);
 		}
 
 		String normalizedCommand = normalize(step.getCommands());
@@ -210,13 +218,13 @@ public class RunnerUtil {
 		if (result.getStatus().equals(ExecutionResultsForCommand.STATUS_FAILED)) {
 			logger("Command [%s] execution is failed for step [%s] => %s".formatted(step.getCommands(),step.getStepCode(), result.getMessage()));
 			step.setError(result.getMessage());
-			instance.setError(result.getMessage());
+			processInstance.setError(result.getMessage());
 			step.setStatus(ProcessInstanceStep.STATUS_FAILED);
 		} else {
 			boolean isOk = result.getStatus().equals(ExecutionResultsForCommand.STATUS_SUCCESS);
 			step.setStatus(isOk ? ProcessInstanceStep.STATUS_COMPLETED : ProcessInstanceStep.STATUS_RUNNING);
 			step.setError("");
-			instance.setError("");
+			processInstance.setError("");
 			step.setFinished(LocalDateTime.now());
 		}
 		
