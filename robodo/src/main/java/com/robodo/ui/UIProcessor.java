@@ -20,6 +20,8 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
+import com.robodo.singleton.ThreadGroupSingleton;
+import com.robodo.threads.ThreadForInstanceRunner;
 import com.robodo.threads.ThreadForUIUpdating;
 import com.robodo.utils.RunnerUtil;
 import com.vaadin.flow.component.Unit;
@@ -290,8 +292,8 @@ public class UIProcessor extends VerticalLayout {
 		Grid<ProcessInstanceStep> grid=new Grid<>(ProcessInstanceStep.class, false);
 		grid.addColumn(p -> p.getId()).setHeader("#").setWidth("2em");
 		grid.addColumn(p -> p.getStepCode()).setHeader("Code").setAutoWidth(true);
-		grid.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("2em");
-		grid.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("3em");
+		grid.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("3em");
+		grid.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("5em");
 		grid.addColumn(p -> p.getCommands()).setHeader("Command Executed").setAutoWidth(true);
 		grid.addColumn(p -> p.getApprovedBy()).setHeader("Approved By").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getApprovalDate())).setHeader("Approval Date");
@@ -309,6 +311,9 @@ public class UIProcessor extends VerticalLayout {
 		TextArea content=new TextArea();
 		lay.add(content);
 		lay.setSizeFull();
+		
+		lay.setFlexGrow(2, grid);
+		lay.setFlexGrow(1, content);
 		
 		
 		grid.addSelectionListener(p -> {
@@ -485,21 +490,18 @@ public class UIProcessor extends VerticalLayout {
 
 
 	private void runProcessInstance(ProcessInstance processInstance) {
-		RunnerUtil runner=new RunnerUtil(processService);
-		runner.logger("running task : %s".formatted(processInstance.getCode()));
-		ExecutionResultsForInstance result = runner.runProcessInstance(processInstance);
-		if (result.getStatus().equals(ExecutionResultsForInstance.STATUS_FAILED)) {
-			String msg=result.getMessage();
-			notifyError("exception at task : %s => %s".formatted(processInstance.getCode(),msg));
+		
+		int maxThreadCount=Integer.valueOf(processService.getEnv().getProperty("max.thread"));
+		int currentThreadCount=ThreadGroupSingleton.getInstance().getActiveThreadCount();
+		if (currentThreadCount>=maxThreadCount) {
+			notifyError("no thread to run this instance");
 			return;
 		}
-		else  if (result.getStatus().equals(ExecutionResultsForInstance.STATUS_NOT_ELIGIBLE)) {
-			notifyError("the instance %s is not eligible for running at the moment, possibbly due to the limitations".formatted(processInstance.getCode()));
-		} else {
-			processService.saveProcessInstance(result.getProcessInstance());
-		}
-		fillGrid();
-		setData(processInstance.getProcessDefinition());
+		
+		Thread thread=new Thread(new ThreadForInstanceRunner(processService, processInstance));
+		thread.run();
+		
+		notifySuccess("tread succssfully started for instance %s, thread id : %s ".formatted(processInstance.getCode(), String.valueOf(thread.getId())));
 		
 	}
 

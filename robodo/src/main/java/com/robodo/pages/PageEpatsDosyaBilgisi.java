@@ -24,7 +24,7 @@ public class PageEpatsDosyaBilgisi extends PageEpatsBase {
 	
 
 	
-	@FindBy(css="//bmm-table//tbody/tr//span")
+	@FindBy(xpath="//bmm-table//tbody/tr//span")
 	List<WebElement> elSahipBilgileri;
 	
 	@FindBy(xpath = "//div[text()='Devam Et  >']")

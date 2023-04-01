@@ -1,3 +1,5 @@
+0. aynı instance in aynı anda iki kere koşmasını engelleyecek bir yapı yok. instance running iken ikincisi de gelip koşuyor. Running yerine PAused mi konulsa? Running aktif koşuyor anlamında. 
+1. Takılan instanceler nasıl tekrar kuyruğa alınacak? Heartbeat mantığı mı getirsek? 
 1. instance variable ekranında değiştirmeye izin verelim. 
 3. genel olarak bir thread count parametresi koyalım. propertiesden alsın. bu sayıdan fazla thread olmasın. 
 4. thread ların görünebileceği bir ekran yap. 

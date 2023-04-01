@@ -4,6 +4,7 @@ import com.robodo.pages.PageEdevletLogin;
 import com.robodo.pages.PageEpatsBasvuruYapan;
 import com.robodo.pages.PageEpatsBenimSayfam;
 import com.robodo.pages.PageEpatsDosyaBilgisi;
+import com.robodo.pages.PageEpatsHizmetDokumu;
 import com.robodo.pages.PageEpatsHome;
 import com.robodo.pages.PageEpatsMenu;
 import com.robodo.pages.PageEpatsTahakkuklarim;
@@ -18,6 +19,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	PageEpatsTahakkuklarim epatsTahakkuklarim;
 	PageEpatsBasvuruYapan epatsBasvuruYapan;
 	PageEpatsDosyaBilgisi epatsDosyaBilgisi;
+	PageEpatsHizmetDokumu epatsHizmetDokumu;
 	
 	public BaseEpatsSteps(RunnerUtil runnerUtil) {
 		super(runnerUtil);
@@ -29,6 +31,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		this.epatsTahakkuklarim=new PageEpatsTahakkuklarim(selenium);
 		this.epatsBasvuruYapan=new PageEpatsBasvuruYapan(selenium);
 		this.epatsDosyaBilgisi=new PageEpatsDosyaBilgisi(selenium);
+		this.epatsHizmetDokumu=new PageEpatsHizmetDokumu(selenium);
 	
 	}
 
@@ -47,6 +50,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		String basvuruTuru=getVariable("basvuruTuru");
 		String islemAdi=getVariable("islemAdi");
 		epatsBenimSayfam.dosyaArama(dosyaNo,basvuruTuru);
+		//selenium.sleep(10L);
 		epatsBenimSayfam.islemSec(islemAdi);
 	}
 	
@@ -68,7 +72,8 @@ public class BaseEpatsSteps extends BaseSteps {
 	}
 	
 	public void hizmetDokumuDevamEt() {
-		
+		String ankaraPatentKodu=runnerUtil.getEnvironmentParameter("ankarapatent.epats.kodu");
+		epatsHizmetDokumu.basvuruSahibiSec(ankaraPatentKodu);
 	}
 
 

@@ -56,7 +56,8 @@ public class PageEpatsBenimSayfam extends PageEpatsBase {
 
 
 	public void islemSec(String islemAdi) {
-		setComboboxByTitle(elIslemCombo, islemAdi);
+		selenium.scrollToElement(elIslemCombo);
+		setComboboxByTitleContains(elIslemCombo, islemAdi);
 		selenium.click(elIslemeGit);		
 	}
 }

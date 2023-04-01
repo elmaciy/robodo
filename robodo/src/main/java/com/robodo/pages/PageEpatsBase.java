@@ -13,13 +13,12 @@ public class PageEpatsBase extends BasePage {
 		super(selenium);
 	}
 
-	public void setComboboxByTitle(WebElement elCombo, String islemAdi) {
+	public void setComboboxByTitleContains(WebElement elCombo, String islemAdi) {
 		selenium.click(elCombo);
-		selenium.sleep(3L);
-		WebElement elIslemComboSearchInput=elCombo.findElement(By.xpath("//input[@type='search']"));
-		selenium.scrollToElement(elIslemComboSearchInput);
-		//selenium.click(elIslemComboSearchInput);
-		selenium.copyPasteByRobot(islemAdi);
+		selenium.sleep(1L);
+		WebElement elIslemComboSearchInput=elCombo.findElement(By.xpath(".//input[@type='search']"));
+		selenium.setValue(elIslemComboSearchInput, islemAdi);
+		//selenium.copyPasteByRobot(islemAdi);
 		selenium.tab();
 	}
 }

@@ -24,7 +24,7 @@ public class ScheduledTasks {
 	}
 	
 	
-	@Scheduled(fixedRate = 30000, initialDelay = 10000)
+	@Scheduled(fixedRate = 120000, initialDelay = 10000)
 	public void runProcessInstances() {
 		Thread th=new Thread(new ThreadForInstanceStarter(processService));
 		th.start();

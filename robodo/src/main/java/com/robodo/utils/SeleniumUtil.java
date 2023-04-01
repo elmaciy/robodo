@@ -88,6 +88,7 @@ public class SeleniumUtil {
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 	        clipboard.setContents(new StringSelection(value), null);
 	        
+	        logger("paste value from clipboard : %s".formatted(value));
 			
 			Robot robot=new Robot();
 			robot.keyPress(KeyEvent.VK_CONTROL);
