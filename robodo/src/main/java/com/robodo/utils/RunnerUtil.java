@@ -1,4 +1,4 @@
-package com.robodo.runner;
+package com.robodo.utils;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -13,11 +13,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.json.JSONParser;
 import org.openqa.selenium.WebElement;
-import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.robodo.discoverer.BaseDiscoverer;
+import com.robodo.model.ExecutionResultsForCommand;
 import com.robodo.model.ExecutionResultsForInstance;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
@@ -85,7 +85,7 @@ public class RunnerUtil {
 			processService.saveProcessInstance(result.getProcessInstance());
 			
 			try {
-				runStep(step);
+				runStep(result.getProcessInstance(), step);
 				if (step.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)) {
 					logger("stopped at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
 					step.setLogs(logs.toString());
@@ -149,7 +149,9 @@ public class RunnerUtil {
 		return true;
 	}
 
-	private boolean runCommand(ProcessInstanceStep step, String command) {
+	private ExecutionResultsForCommand runCommand(ProcessInstanceStep step, String command) {
+		
+		ExecutionResultsForCommand result=new ExecutionResultsForCommand();
 
 		String arg0 = getDo(command);
 		String arg1 = getArg(command);
@@ -157,13 +159,7 @@ public class RunnerUtil {
 		logger("%s (%s)".formatted(arg0, arg1));
 
 		if (arg0.equalsIgnoreCase("runStepClass")) {
-			try {
-				runStepClass(arg1);
-				return true;
-			} catch (Exception e) {
-				logger("Exception on running step %s : %s".formatted(arg1, e.getMessage()));
-				return false;
-			}
+			return runStepClass(arg1);
 		} else if (arg0.equalsIgnoreCase("sleep")) {
 			LocalDateTime started = step.getStarted();
 			LocalDateTime now = LocalDateTime.now();
@@ -172,21 +168,22 @@ public class RunnerUtil {
 
 			boolean isOk = now.isAfter(tobeFinishedAt);
 			if (!isOk) {
-				logger("Process will be waited till %s".formatted(tobeFinishedAt));
+				return result.skipped().withMessage("Process will be waited till %s".formatted(tobeFinishedAt));
 			}
 
-			return isOk;
+			return result.succeeded();
 		} else if (arg0.equalsIgnoreCase("waitHumanInteraction")) {
 			boolean isApproved = step.isApproved();
 			if (isApproved) {
 				logger("approved by : %s at [%s]".formatted(step.getApprovedBy(), step.getApprovalDate()));
+				return result.succeeded();
 			} else {
-				logger("not approved yet.");
+				return result.skipped().withMessage("Step is not approved yet!");
 			}
-			return isApproved;
+			
 		}
 
-		return false;
+		return result;
 	}
 
 	String getTargetPath(ProcessInstance processInstance) {
@@ -201,17 +198,30 @@ public class RunnerUtil {
 		return targetDir;
 	}
 
-	private ProcessInstanceStep runStep(ProcessInstanceStep step) {
+	private ProcessInstanceStep runStep(ProcessInstance instance, ProcessInstanceStep step) {
 		if (step.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
-
 			step.setStatus(ProcessInstanceStep.STATUS_RUNNING);
 			step.setStarted(LocalDateTime.now());
 		}
 
 		String normalizedCommand = normalize(step.getCommands());
-		boolean isOk = runCommand(step, normalizedCommand);
-		step.setStatus(isOk ? ProcessInstanceStep.STATUS_COMPLETED : ProcessInstanceStep.STATUS_RUNNING);
-		step.setFinished(LocalDateTime.now());
+		
+		ExecutionResultsForCommand result =  runCommand(step, normalizedCommand);
+		
+		if (result.getStatus().equals(ExecutionResultsForCommand.STATUS_FAILED)) {
+			logger("Command [%s] execution is failed for step [%s] => %s".formatted(step.getCommands(),step.getStepCode(), result.getMessage()));
+			step.setError(result.getMessage());
+			instance.setError(result.getMessage());
+			step.setStatus(ProcessInstanceStep.STATUS_FAILED);
+		} else {
+			boolean isOk = result.getStatus().equals(ExecutionResultsForCommand.STATUS_SUCCESS);
+			step.setStatus(isOk ? ProcessInstanceStep.STATUS_COMPLETED : ProcessInstanceStep.STATUS_RUNNING);
+			step.setError("");
+			instance.setError("");
+			step.setFinished(LocalDateTime.now());
+		}
+		
+		
 		return step;
 
 	}
@@ -270,16 +280,18 @@ public class RunnerUtil {
 		return StringUtils.substringAfter(command, " ").strip();
 	}
 
-	private void runStepClass(String className) {
+	private ExecutionResultsForCommand runStepClass(String className) {
+		ExecutionResultsForCommand result = new ExecutionResultsForCommand();
 		try {
 			String packageName = processService.getEnv().getProperty("steps.package");
 			Class<?> clazz = Class.forName(packageName + "." + className);
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class);
 			BaseSteps stepClassInstance = (BaseSteps) constructor.newInstance(this);
 			stepClassInstance.run();
+			return result.succeeded();
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("exception : %s".formatted(e.getMessage()));
+			return result.failed().withMessage(e.getMessage());
 		}
 
 	}

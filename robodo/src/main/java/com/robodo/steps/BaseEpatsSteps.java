@@ -6,7 +6,7 @@ import com.robodo.pages.PageEpatsBenimSayfam;
 import com.robodo.pages.PageEpatsHome;
 import com.robodo.pages.PageEpatsMenu;
 import com.robodo.pages.PageEpatsTahakkuklarim;
-import com.robodo.runner.RunnerUtil;
+import com.robodo.utils.RunnerUtil;
 
 public class BaseEpatsSteps extends BaseSteps {
 	

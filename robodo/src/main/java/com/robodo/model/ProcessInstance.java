@@ -36,6 +36,8 @@ public class ProcessInstance {
 	LocalDateTime finished;
 	String status;
 	String currentStepCode;
+	@Column(length = 32000)
+	String error;
 	@Column(length = 65000)
 	String instanceVariables;
 	
@@ -143,6 +145,14 @@ public class ProcessInstance {
 
 	public void setInstanceVariables(String instanceVariables) {
 		this.instanceVariables = instanceVariables;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 
 	

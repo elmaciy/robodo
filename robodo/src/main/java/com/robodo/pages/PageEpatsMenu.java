@@ -7,7 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.robodo.runner.SeleniumUtil;
+import com.robodo.utils.SeleniumUtil;
 
 public class PageEpatsMenu extends BasePage {
 

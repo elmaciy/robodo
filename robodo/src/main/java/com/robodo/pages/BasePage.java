@@ -2,8 +2,8 @@ package com.robodo.pages;
 
 import org.openqa.selenium.support.PageFactory;
 
-import com.robodo.runner.RunnerUtil;
-import com.robodo.runner.SeleniumUtil;
+import com.robodo.utils.RunnerUtil;
+import com.robodo.utils.SeleniumUtil;
 
 public class BasePage {
 	public SeleniumUtil selenium;

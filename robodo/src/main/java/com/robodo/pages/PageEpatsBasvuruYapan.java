@@ -3,7 +3,7 @@ package com.robodo.pages;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.robodo.runner.SeleniumUtil;
+import com.robodo.utils.SeleniumUtil;
 
 public class PageEpatsBasvuruYapan extends BasePage {
 

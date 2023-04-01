@@ -6,9 +6,9 @@ import org.springframework.core.env.Environment;
 
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
-import com.robodo.runner.RunnerUtil;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
+import com.robodo.utils.RunnerUtil;
 
 public class ThreadForDiscoverers implements Runnable {
 	

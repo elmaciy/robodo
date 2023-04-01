@@ -4,8 +4,8 @@ import org.springframework.core.env.Environment;
 
 import com.robodo.model.ExecutionResultsForInstance;
 import com.robodo.model.ProcessInstance;
-import com.robodo.runner.RunnerUtil;
 import com.robodo.services.ProcessService;
+import com.robodo.utils.RunnerUtil;
 
 public class ThreadForInstanceRunner implements Runnable {
 	
@@ -30,7 +30,7 @@ public class ThreadForInstanceRunner implements Runnable {
 			return;
 		}
 		else  if (result.getStatus().equals(ExecutionResultsForInstance.STATUS_NOT_ELIGIBLE)) {
-			runner.logger("the instance [%s,%s] is not eligible for running at the moment, possibbly due to the limitations".formatted(processInstance.getCode()));
+			runner.logger("the instance %s is not eligible for running at the moment, possibbly due to the limitations".formatted(processInstance.getCode()));
 		} else {
 			processService.saveProcessInstance(result.getProcessInstance());
 		}

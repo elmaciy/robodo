@@ -1,6 +1,7 @@
 package com.robodo.ui;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,9 +18,10 @@ import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
-import com.robodo.runner.RunnerUtil;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
+import com.robodo.threads.ThreadForUIUpdating;
+import com.robodo.utils.RunnerUtil;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -56,6 +58,8 @@ public class UIProcessor extends VerticalLayout {
 
 	@Autowired
 	public UIProcessor(ProcessService processService, Environment env) {
+		
+		startUpdaterThread();
 
 		this.processService = processService;
 		this.env = env;
@@ -135,9 +139,9 @@ public class UIProcessor extends VerticalLayout {
 		}).setHeader("Progress").setWidth("3em");
 		gridProcessInstance.addColumn(p -> p.getCurrentStepCode()).setHeader("Latest Step").setAutoWidth(true);
 		gridProcessInstance.addColumn(p -> p.getRetryNo()).setHeader("Retried#").setWidth("2em");
-		gridProcessInstance.addColumn(p -> p.getCreated()).setHeader("Created").setAutoWidth(true);
-		gridProcessInstance.addColumn(p -> p.getStarted()).setHeader("Started").setAutoWidth(true);
-		gridProcessInstance.addColumn(p -> p.getFinished()).setHeader("Finished").setAutoWidth(true);
+		gridProcessInstance.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setAutoWidth(true);
+		gridProcessInstance.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setAutoWidth(true);
+		gridProcessInstance.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setAutoWidth(true);
 		gridProcessInstance.addComponentColumn(p -> {
 			Button btnShowVars = new Button("", new Icon(VaadinIcon.LIST));
 			btnShowVars.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SMALL);
@@ -240,7 +244,21 @@ public class UIProcessor extends VerticalLayout {
 
 	}
 
-	
+	static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd HH:mm:ss");
+
+	private String dateFormat(LocalDateTime local) {
+		if (local==null) return null;
+		return local.format(formatter);
+	}
+
+
+
+	private void startUpdaterThread() {
+		Thread thread=new Thread(new ThreadForUIUpdating(this));
+		thread.start();
+	}
+
+
 
 	private void approveProcessInstance(ProcessInstance instance) {
 		Optional<ProcessInstanceStep> stepOpt = instance.getSteps().stream().filter(p->p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)).findFirst();
@@ -343,7 +361,24 @@ public class UIProcessor extends VerticalLayout {
 	}
 
 
+	public boolean refreshProcessDefinitionGrid() {
 
+		if (!isAttached()) {
+			return false;
+		}
+		if (!isVisible()) {
+			return false;
+		}
+		
+		var selection = gridProcess.getSelectedItems();
+		if (selection.isEmpty()) {
+			return true;
+		}
+		
+		setData(selection.iterator().next());
+
+		return true;
+	}
 
 
 
@@ -446,13 +481,19 @@ public class UIProcessor extends VerticalLayout {
 			return;
 		}
 		else  if (result.getStatus().equals(ExecutionResultsForInstance.STATUS_NOT_ELIGIBLE)) {
-			notifyError("the instance [%s,%s] is not eligible for running at the moment, possibbly due to the limitations".formatted(processInstance.getCode()));
+			notifyError("the instance %s is not eligible for running at the moment, possibbly due to the limitations".formatted(processInstance.getCode()));
 		} else {
 			processService.saveProcessInstance(result.getProcessInstance());
 		}
 		fillGrid();
 		setData(processInstance.getProcessDefinition());
 		
+	}
+
+
+
+	public long getRefreshInterval() {
+		return 1000;
 	}
 
 }

@@ -2,8 +2,8 @@ package com.robodo.steps;
 
 import java.util.HashMap;
 
-import com.robodo.runner.RunnerUtil;
-import com.robodo.runner.SeleniumUtil;
+import com.robodo.utils.RunnerUtil;
+import com.robodo.utils.SeleniumUtil;
 
 public abstract class BaseSteps {
 	

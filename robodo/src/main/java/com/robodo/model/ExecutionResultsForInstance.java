@@ -35,12 +35,8 @@ public class ExecutionResultsForInstance {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	public static String getStatusSuccess() {
-		return STATUS_SUCCESS;
-	}
-	public static String getStatusFailed() {
-		return STATUS_FAILED;
-	}
+
+
 	
 	
 

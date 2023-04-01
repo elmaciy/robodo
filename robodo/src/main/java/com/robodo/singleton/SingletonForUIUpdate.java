@@ -16,11 +16,11 @@ public class SingletonForUIUpdate {
 		return instance;
 	}
 
-	public static long getLastUpdate() {
+	public long getLastUpdate() {
 		return lastUpdate;
 	}
 
-	public static void setLastUpdate() {
+	public void setLastUpdate() {
 		SingletonForUIUpdate.lastUpdate = System.currentTimeMillis();
 	}
 	

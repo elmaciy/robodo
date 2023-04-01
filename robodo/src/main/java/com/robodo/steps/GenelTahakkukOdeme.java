@@ -1,6 +1,6 @@
 package com.robodo.steps;
 
-import com.robodo.runner.RunnerUtil;
+import com.robodo.utils.RunnerUtil;
 
 public class GenelTahakkukOdeme extends BaseEpatsSteps {
 

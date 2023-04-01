@@ -13,6 +13,7 @@ import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.repo.ProcessDefinitionRepo;
 import com.robodo.repo.ProcessInstanceRepo;
+import com.robodo.singleton.SingletonForUIUpdate;
 
 @Service
 public class ProcessService {
@@ -33,7 +34,7 @@ public class ProcessService {
 
 	public void saveProcessInstance(ProcessInstance processInstance) {
 		processInstanceRepo.save(processInstance);
-		
+		SingletonForUIUpdate.getInstance().setLastUpdate();
 	}
 
 	public boolean saveProcessDefinition(ProcessDefinition p) {

@@ -18,6 +18,7 @@ public class ProcessInstanceStep {
 	
 	public static final String STATUS_NEW="NEW";
 	public static final String STATUS_RUNNING="RUNNING";
+	public static final String STATUS_FAILED="FAILED";
 	public static final String STATUS_COMPLETED="COMPLETED";
 
 	@Id
@@ -33,6 +34,8 @@ public class ProcessInstanceStep {
 	LocalDateTime finished;
 	@Column(length = 65000)
 	String logs;
+	@Column(length = 4000)
+	String error;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "process_instance_id", nullable = false)
@@ -144,6 +147,14 @@ public class ProcessInstanceStep {
 
 	public void setApprovalDate(LocalDateTime approvalDate) {
 		this.approvalDate = approvalDate;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 	
 	

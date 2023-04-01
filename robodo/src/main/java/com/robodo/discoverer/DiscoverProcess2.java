@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
-import com.robodo.runner.RunnerUtil;
+import com.robodo.utils.RunnerUtil;
 
 public class DiscoverProcess2 extends BaseDiscoverer {
 

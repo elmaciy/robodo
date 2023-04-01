@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
-import com.robodo.runner.RunnerUtil;
-import com.robodo.runner.SeleniumUtil;
+import com.robodo.utils.RunnerUtil;
+import com.robodo.utils.SeleniumUtil;
 
 public abstract class BaseDiscoverer {
 	
