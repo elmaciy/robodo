@@ -14,13 +14,16 @@ public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 	
 	@Override
 	public void run() {
+		
+		//test amacli. silinecek
+		setVariable("tahakkukNo", "2166777");
+		
+		
 		sistemeGiris();
 		dosyaAraIslemSec();
 		basvuruYap();
 		dosyaBilgisiDogrulaDevamEt();
 		hizmetDokumuDevamEt();
-		//test amacli. silinecek
-		setVariable("tahakkukNo", "2166777");
 		selenium.sleep(60L);
 		epatsMenu.cikis();
 		

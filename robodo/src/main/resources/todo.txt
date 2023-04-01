@@ -22,5 +22,6 @@
 21. ekran görüntülerinin saklanması?
 22. instanceleri başlatan kısımdaki lojikten dolayı hep aynı işleri öncelikli alıyor. burada bir dağılım yapmak iyi olabilir. 
 23. kendi timerin yerine düzgün bir timer koy sayfaya
+24. locatorleri gözden geçir. değişebilecek id ler varsa bunlar düzelt çünkü deploymentten sonra değişirler. 
 
 2. discovery ikincisinde aynı taskı gene discover ediyor

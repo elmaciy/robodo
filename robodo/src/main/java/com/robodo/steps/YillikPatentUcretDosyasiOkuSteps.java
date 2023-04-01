@@ -10,7 +10,8 @@ public class YillikPatentUcretDosyasiOkuSteps extends BaseEpatsSteps {
 
 	@Override
 	public void run() {
-		selenium.stopDriver();
+		//selenium.startWebDriver();
+		//selenium.stopDriver();
 
 	}
 

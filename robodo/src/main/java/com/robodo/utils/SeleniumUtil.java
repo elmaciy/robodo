@@ -1,19 +1,18 @@
 package com.robodo.utils;
 
-import java.io.BufferedReader;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.time.Duration;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -52,27 +51,64 @@ public class SeleniumUtil {
 			return;
 		}
 		
-		this.webDriver.quit();
-		this.webDriver=null;
+		try {
+			this.webDriver.quit();
+			this.webDriver=null;
+		} catch(Exception e) {
+		}
 	}
 
 	public void navigate(String url) {
+		runnerUtil.logger("naviget to : %s".formatted(url));
 		webDriver.get(url);
 	}
 
-	public WebElement locateElementByCss(String cssSelector) {
-		return webDriver.findElement(By.cssSelector(cssSelector));
-	}
-	
-	public WebElement locateElementByXpath(String xpathSelector) {
-		return webDriver.findElement(By.xpath(xpathSelector));
-	}
-
 	public void setValue(WebElement el, String value) {
+		runnerUtil.logger("set value of %s to : %s".formatted(el2Str(el), value));
+
 		el.clear();
 		el.sendKeys(value);	
 	}
 	
+	public void scrollToElement(WebElement el) {
+		runnerUtil.logger("scroll to element : %s".formatted(el2Str(el)));
+
+		((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", el);
+		sleep(1L); 
+	}
+	
+	public void copyPasteByRobot(String value) {
+		try {
+			String property = System.getProperty("java.awt.headless");
+			if (!property.equals("false")) {
+				System.setProperty("java.awt.headless", "false");
+			}
+			
+			
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+	        clipboard.setContents(new StringSelection(value), null);
+	        
+			
+			Robot robot=new Robot();
+			robot.keyPress(KeyEvent.VK_CONTROL);
+			Thread.sleep(200); 
+			robot.keyPress(KeyEvent.VK_C); 
+			Thread.sleep(200); 
+			robot.keyRelease(KeyEvent.VK_C); 
+			Thread.sleep(200); 
+			robot.keyRelease(KeyEvent.VK_CONTROL); 
+			Thread.sleep(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("exception sendKeysByRobot :%S ".formatted(e.getMessage()));
+		}
+	}
+	
+	private String el2Str(WebElement el) {
+		if (el==null) return "null";
+		return el.getTagName()+"."+el.getAttribute("class");
+	}
+
 	private Keys encodeKey(String key) {
 		switch (key) {
 		case "ENTER": return Keys.ENTER;
@@ -87,28 +123,27 @@ public class SeleniumUtil {
 	}
 	
 	public void pressKey(String key) {
+		runnerUtil.logger("pressKey %s".formatted(key));
+
 		Keys encodeKey = encodeKey(key);
 		Actions builder = new Actions(webDriver);
 		builder.sendKeys(encodeKey).build().perform();
 	}
 
 	public void sleep(Long seconds) {
+		runnerUtil.logger("sleep %s seconds".formatted(String.valueOf(seconds)));
+
 		Actions builder = new Actions(webDriver);
 		builder.pause(seconds * 1000).build().perform();
 	}
 
 	public void click(WebElement el) {
+		runnerUtil.logger("click : %s".formatted(el2Str(el)));
+
 		el.click();
 		
 	}
 
-	public String extractElementAttribute(WebElement el, String attributeName) {
-		if (attributeName.toLowerCase().equals("text")) {
-			return el.getText();
-		}
-		
-		return el.getAttribute(attributeName);
-	}
 
 	public void screenShot(ProcessInstance processInstance) {
 		String targetDir=runnerUtil.getTargetPath(processInstance);
@@ -125,25 +160,6 @@ public class SeleniumUtil {
 		}
 	}
 	
-	public void loadJavascript(String scriptFile) {
-		String scriptHome=this.runnerUtil.getEnvironmentParameter("working.dir")+File.separator+"scripts";
-		String scriptFilePath=scriptHome+File.separator+scriptFile;
-		if (!scriptFilePath.toLowerCase().endsWith(".js")) {
-			scriptFilePath=scriptFilePath+".js";
-		}
-		if (!new File(scriptFilePath).exists()) {
-			throw new RuntimeException("loadJavascript : No file found : %s".formatted(scriptFilePath));
-		}
-		
-		try {
-			BufferedReader reader = new BufferedReader (new InputStreamReader(new FileInputStream(scriptFilePath), "UTF-8"));
-			this.loadedJavascriptcode = reader.lines().collect(Collectors.joining(System.lineSeparator()));
-		    reader.close();
-		} catch (Exception e) {
-			throw new RuntimeException("loadJavascript : exception : %s".formatted(e.getMessage()));
-		}
-		
-	}
 	
 	public void executeJavascript(WebElement el, String javaScript, String arguments)  {
 		JavascriptExecutor executor = (JavascriptExecutor) webDriver;
@@ -151,26 +167,17 @@ public class SeleniumUtil {
 		Object[] valuesExtracted =Splitter.on(",").trimResults().splitToList(arguments).stream().filter(p->p!=null && !p.isBlank()).map(p->{
 			return this.runnerUtil.hmExtractedValues.get(p);
 		}).toArray();
-		
+		runnerUtil.logger("execjs : %s for element %s".formatted(javaScript,el2Str(el)));
+
 		executor.executeScript(javaScript,el,  valuesExtracted);
 	}
 
-	public void executeJavascript(String arguments)  {
-		JavascriptExecutor executor = (JavascriptExecutor) webDriver;
-		Object[] valuesExtracted =Splitter.on(",").trimResults().splitToList(arguments).stream().filter(p->p!=null && !p.isBlank()).map(p->{
-			return this.runnerUtil.hmExtractedValues.get(p);
-		}).toArray();
-		
-		executor.executeScript(this.loadedJavascriptcode,this.runnerUtil.locatedWebElement,  valuesExtracted);
-	}
-
-	public SearchContext getWebDriver() {
+	public WebDriver getWebDriver() {
 		return webDriver;
 	}
 
 	public void logger(String logstr) {
 		runnerUtil.logger(logstr);
-		
 	}
 
 	public void enter() {

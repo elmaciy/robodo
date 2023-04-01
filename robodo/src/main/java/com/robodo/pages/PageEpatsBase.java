@@ -15,8 +15,11 @@ public class PageEpatsBase extends BasePage {
 
 	public void setComboboxByTitle(WebElement elCombo, String islemAdi) {
 		selenium.click(elCombo);
+		selenium.sleep(3L);
 		WebElement elIslemComboSearchInput=elCombo.findElement(By.xpath("//input[@type='search']"));
-		selenium.setValue(elIslemComboSearchInput, islemAdi);
+		selenium.scrollToElement(elIslemComboSearchInput);
+		//selenium.click(elIslemComboSearchInput);
+		selenium.copyPasteByRobot(islemAdi);
 		selenium.tab();
 	}
 }

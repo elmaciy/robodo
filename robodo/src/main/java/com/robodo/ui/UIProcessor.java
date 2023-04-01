@@ -284,29 +284,31 @@ public class UIProcessor extends VerticalLayout {
 	private void showProcessInstanceSteps(String title, List<ProcessInstanceStep> steps) {
 		Dialog dialog = new Dialog();
 		dialog.setHeaderTitle(title);
+		
+		HorizontalLayout lay=new HorizontalLayout();
 
 		Grid<ProcessInstanceStep> grid=new Grid<>(ProcessInstanceStep.class, false);
-		grid.addColumn(p -> p.getId()).setHeader("#").setFlexGrow(0);
-		grid.addColumn(p -> p.getStepCode()).setHeader("Code").setFlexGrow(1);
-		grid.addColumn(p -> p.getOrderNo()).setHeader("Order");
-		grid.addColumn(p -> p.getStatus()).setHeader("Status");
-		grid.addColumn(p -> p.getCommands()).setHeader("Command Executed");
-		grid.addColumn(p -> p.getApprovedBy()).setHeader("Approved By");
+		grid.addColumn(p -> p.getId()).setHeader("#").setWidth("2em");
+		grid.addColumn(p -> p.getStepCode()).setHeader("Code").setAutoWidth(true);
+		grid.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("2em");
+		grid.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("3em");
+		grid.addColumn(p -> p.getCommands()).setHeader("Command Executed").setAutoWidth(true);
+		grid.addColumn(p -> p.getApprovedBy()).setHeader("Approved By").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getApprovalDate())).setHeader("Approval Date");
-		grid.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created");
-		grid.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started");
-		grid.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished");
+		grid.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setAutoWidth(true);
+		grid.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setAutoWidth(true);
+		grid.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setAutoWidth(true);
 		
 		grid.getColumns().forEach(col->{col.setResizable(true);});
 		grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
 
 		grid.setItems(steps);
-		dialog.add(grid);
+		lay.add(grid);
 		
 		TextArea content=new TextArea();
-		content.setSizeFull();
-		dialog.add(content);
+		lay.add(content);
+		lay.setSizeFull();
 		
 		
 		grid.addSelectionListener(p -> {
@@ -319,6 +321,8 @@ public class UIProcessor extends VerticalLayout {
 			}
 		});
 		
+		
+		dialog.add(lay);
 		
 		Button cancelButton = new Button("Close", e -> dialog.close());
 		dialog.getFooter().add(cancelButton);
