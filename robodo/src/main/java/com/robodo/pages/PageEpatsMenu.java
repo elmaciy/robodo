@@ -1,15 +1,13 @@
 package com.robodo.pages;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 
 import com.robodo.utils.SeleniumUtil;
 
-public class PageEpatsMenu extends BasePage {
+public class PageEpatsMenu extends PageEpatsBase {
 
 	public PageEpatsMenu(SeleniumUtil selenium) {
 		super(selenium);

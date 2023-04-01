@@ -22,6 +22,7 @@ import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.threads.ThreadForUIUpdating;
 import com.robodo.utils.RunnerUtil;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -48,6 +49,10 @@ import com.vaadin.flow.spring.annotation.UIScope;
 public class UIProcessor extends VerticalLayout {
 
 	private static final long serialVersionUID = 1L;
+	
+
+
+	static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
 	ProcessService processService;
 	Environment env;
@@ -214,6 +219,9 @@ public class UIProcessor extends VerticalLayout {
 		gridProcessSteps.setWidthFull();
 		gridProcessInstance.setWidthFull();
 		
+		gridProcess.setMaxHeight(200, Unit.EM);
+		gridProcessSteps.setMaxHeight(200, Unit.EM);
+		
 		gridProcess.getColumns().forEach(col->{col.setResizable(true);});
 		gridProcessSteps.getColumns().forEach(col->{col.setResizable(true);});
 		gridProcessInstance.getColumns().forEach(col->{col.setResizable(true);});
@@ -226,7 +234,6 @@ public class UIProcessor extends VerticalLayout {
 		
 		HorizontalLayout horizontalLay = new HorizontalLayout(gridProcess,gridProcessSteps);
 		horizontalLay.setWidthFull();
-		horizontalLay.setFlexGrow(.7, gridProcess);
 		
 
 
@@ -243,8 +250,6 @@ public class UIProcessor extends VerticalLayout {
 		fillGrid();
 
 	}
-
-	static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd HH:mm:ss");
 
 	private String dateFormat(LocalDateTime local) {
 		if (local==null) return null;
@@ -287,10 +292,10 @@ public class UIProcessor extends VerticalLayout {
 		grid.addColumn(p -> p.getStatus()).setHeader("Status");
 		grid.addColumn(p -> p.getCommands()).setHeader("Command Executed");
 		grid.addColumn(p -> p.getApprovedBy()).setHeader("Approved By");
-		grid.addColumn(p -> p.getApprovalDate()).setHeader("Approval Date");
-		grid.addColumn(p -> p.getCreated()).setHeader("Created");
-		grid.addColumn(p -> p.getStarted()).setHeader("Started");
-		grid.addColumn(p -> p.getFinished()).setHeader("Finished");
+		grid.addColumn(p -> dateFormat(p.getApprovalDate())).setHeader("Approval Date");
+		grid.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created");
+		grid.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started");
+		grid.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished");
 		
 		grid.getColumns().forEach(col->{col.setResizable(true);});
 		grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
@@ -315,9 +320,13 @@ public class UIProcessor extends VerticalLayout {
 		});
 		
 		
-		Button cancelButton = new Button("Cancel", e -> dialog.close());
+		Button cancelButton = new Button("Close", e -> dialog.close());
 		dialog.getFooter().add(cancelButton);
-		dialog.setSizeFull();
+		dialog.setWidth("80%");
+		dialog.setHeight("60%");
+		dialog.setResizable(true);
+		dialog.setCloseOnEsc(true);
+		dialog.setCloseOnOutsideClick(true);
 		dialog.open();
 		
 	}
@@ -349,7 +358,7 @@ public class UIProcessor extends VerticalLayout {
 		
 		
 		dialog.add(dialogLayout);
-		Button cancelButton = new Button("Cancel", e -> dialog.close());
+		Button cancelButton = new Button("Close", e -> dialog.close());
 		dialog.getFooter().add(cancelButton);
 		dialog.setWidth("60%");
 		dialog.setHeight("50%");

@@ -2,8 +2,6 @@ package com.robodo.threads;
 
 import java.util.List;
 
-import org.springframework.core.env.Environment;
-
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.services.ProcessService;
@@ -13,11 +11,9 @@ import com.robodo.utils.RunnerUtil;
 public class ThreadForDiscoverers implements Runnable {
 	
 	private ProcessService processService;
-	Environment env;
 	
-	public ThreadForDiscoverers(ProcessService processService, Environment env) {
+	public ThreadForDiscoverers(ProcessService processService) {
 		this.processService=processService;
-		this.env=env;
 	}
 
 	@Override

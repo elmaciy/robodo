@@ -10,12 +10,10 @@ import com.robodo.utils.RunnerUtil;
 public class ThreadForInstanceRunner implements Runnable {
 	
 	private ProcessService processService;
-	Environment env;
 	ProcessInstance processInstance;
 	
-	public ThreadForInstanceRunner(ProcessService processService, Environment env, ProcessInstance processInstance) {
+	public ThreadForInstanceRunner(ProcessService processService, ProcessInstance processInstance) {
 		this.processService=processService;
-		this.env=env;
 		this.processInstance=processInstance;
 	}
 

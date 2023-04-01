@@ -5,7 +5,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.robodo.utils.SeleniumUtil;
 
-public class PageEpatsBasvuruYapan extends BasePage {
+public class PageEpatsBasvuruYapan extends PageEpatsBase {
 
 	public PageEpatsBasvuruYapan(SeleniumUtil selenium) {
 		super(selenium);

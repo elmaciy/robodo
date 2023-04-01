@@ -3,10 +3,9 @@ package com.robodo.pages;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.robodo.utils.RunnerUtil;
 import com.robodo.utils.SeleniumUtil;
 
-public class PageEpatsHome extends BasePage {
+public class PageEpatsHome extends PageEpatsBase {
 	
 	@FindBy(xpath = "//a")
 	WebElement elGirisEdevlet;

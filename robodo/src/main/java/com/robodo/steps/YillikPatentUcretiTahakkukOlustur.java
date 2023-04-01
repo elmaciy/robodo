@@ -17,6 +17,9 @@ public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 		sistemeGiris();
 		dosyaAraIslemSec();
 		basvuruYap();
+		dosyaBilgisiDogrulaDevamEt();
+		hizmetDokumuDevamEt();
+		//test amacli. silinecek
 		setVariable("tahakkukNo", "2166777");
 		selenium.sleep(60L);
 		epatsMenu.cikis();

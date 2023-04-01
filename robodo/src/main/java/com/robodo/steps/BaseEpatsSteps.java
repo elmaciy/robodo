@@ -3,6 +3,7 @@ package com.robodo.steps;
 import com.robodo.pages.PageEdevletLogin;
 import com.robodo.pages.PageEpatsBasvuruYapan;
 import com.robodo.pages.PageEpatsBenimSayfam;
+import com.robodo.pages.PageEpatsDosyaBilgisi;
 import com.robodo.pages.PageEpatsHome;
 import com.robodo.pages.PageEpatsMenu;
 import com.robodo.pages.PageEpatsTahakkuklarim;
@@ -16,6 +17,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	PageEpatsBenimSayfam epatsBenimSayfam;
 	PageEpatsTahakkuklarim epatsTahakkuklarim;
 	PageEpatsBasvuruYapan epatsBasvuruYapan;
+	PageEpatsDosyaBilgisi epatsDosyaBilgisi;
 	
 	public BaseEpatsSteps(RunnerUtil runnerUtil) {
 		super(runnerUtil);
@@ -26,6 +28,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		this.epatsBenimSayfam=new PageEpatsBenimSayfam(selenium);
 		this.epatsTahakkuklarim=new PageEpatsTahakkuklarim(selenium);
 		this.epatsBasvuruYapan=new PageEpatsBasvuruYapan(selenium);
+		this.epatsDosyaBilgisi=new PageEpatsDosyaBilgisi(selenium);
 	
 	}
 
@@ -35,8 +38,8 @@ public class BaseEpatsSteps extends BaseSteps {
 		String tckno=runnerUtil.getEnvironmentParameter("tckno");
 		String sifre=runnerUtil.getEnvironmentParameter("sifre");
 		edevletLogin.girisEdevlet(tckno, sifre);
-		
 	}
+	
 	
 	public void dosyaAraIslemSec() {
 		epatsMenu.gotoVekillikSayfam();
@@ -54,6 +57,21 @@ public class BaseEpatsSteps extends BaseSteps {
 		epatsBasvuruYapan.basvuruBilgileriniDoldur(eposta, cepTel, referansNo);
 		epatsBasvuruYapan.devamEt();
 	}
+	
+	public void dosyaBilgisiDogrulaDevamEt() {
+		setVariable("scr.dosyabilgisi.basvuruNumarasi", epatsDosyaBilgisi.getBasvuruNumarasi());
+		setVariable("scr.dosyabilgisi.basvuruTarihi", epatsDosyaBilgisi.getBasvuruTarihi());
+		setVariable("scr.dosyabilgisi.bulusBasligi", epatsDosyaBilgisi.getBulusBasligi());
+		setVariable("scr.dosyabilgisi.sahip.kimlik", epatsDosyaBilgisi.getSahipKimlikVergiNo());
+		setVariable("scr.dosyabilgisi.sahip.unvan", epatsDosyaBilgisi.getSahipUnvan());
+		epatsDosyaBilgisi.devamEt();
+	}
+	
+	public void hizmetDokumuDevamEt() {
+		
+	}
+
+
 	
 	@Override
 	public void run() {

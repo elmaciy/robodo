@@ -8,7 +8,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.robodo.utils.SeleniumUtil;
 
-public class PageEpatsBenimSayfam extends BasePage {
+public class PageEpatsBenimSayfam extends PageEpatsBase {
 	
 	private static final String ROOT_XPATH_DOSYALARIM="//div[contains(text(),'Dosyalarım')]/../../../../..";
 	private static final String ROOT_XPATH_GRID_DOSYALAR="//div[@id='datagrid360']";
@@ -24,11 +24,11 @@ public class PageEpatsBenimSayfam extends BasePage {
 	@FindBy(xpath=ROOT_XPATH_GRID_DOSYALAR+"//span[text()='Başvuru Türü']/../..//input")
 	WebElement inputDosyaTuru;
 	
-	@FindBy(css="#selectbox218 div.form-item-control")
+	private static final String ISLEM_COMBO_BASE_XPATH="//*[text()='Başvuru Sonrası İşlemler']/../../../../..//div[@class='form-item-control' and contains(@ng-if,'selectbox')]";
+	
+	@FindBy(xpath=ISLEM_COMBO_BASE_XPATH)
 	WebElement elIslemCombo;
 	
-	@FindBy(css="#selectbox218 input[type=search]")
-	WebElement elIslemComboSearchInput;
 	
 	@FindBy(xpath=ROOT_XPATH_DOSYALARIM+"//div[@class='btn btn-default' and text()='Git']")
 	WebElement elIslemeGit;
@@ -40,6 +40,7 @@ public class PageEpatsBenimSayfam extends BasePage {
 		super(selenium);
 	}
 
+	
 
 
 	public void dosyaArama(String dosyaNo, String basvuruTuru) {
@@ -54,12 +55,8 @@ public class PageEpatsBenimSayfam extends BasePage {
 	}
 
 
-
 	public void islemSec(String islemAdi) {
-		selenium.click(elIslemCombo);
-		selenium.setValue(elIslemComboSearchInput, islemAdi);
-		selenium.tab();
-		selenium.click(elIslemeGit);
-		
+		setComboboxByTitle(elIslemCombo, islemAdi);
+		selenium.click(elIslemeGit);		
 	}
 }

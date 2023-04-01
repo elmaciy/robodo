@@ -78,6 +78,7 @@ public class RunnerUtil {
 				continue;
 			}
 			logs.setLength(0);
+			//add existing logs if any
 			if (step.getLogs() != null) {
 				logs.append(step.getLogs());
 			}
@@ -91,6 +92,7 @@ public class RunnerUtil {
 					step.setLogs(logs.toString());
 					break;
 				}
+				result.setStatus(ExecutionResultsForInstance.STATUS_SUCCESS);
 			} catch (Exception e) {
 				String message = e.getMessage();
 				logger("exception at step [%s] at command [%s] : %s".formatted(step.getStepCode(), step.getCommands(),
@@ -101,11 +103,8 @@ public class RunnerUtil {
 
 			step.setLogs(logs.toString());
 			processService.saveProcessInstance(result.getProcessInstance());
-			
-			result.setStatus(ExecutionResultsForInstance.STATUS_SUCCESS);
-			return result;
 
-		}
+		} //for
 
 		
 		

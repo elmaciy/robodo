@@ -5,7 +5,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.robodo.utils.SeleniumUtil;
 
-public class PageEpatsTahakkuklarim extends BasePage {
+public class PageEpatsTahakkuklarim extends PageEpatsBase {
 		
 	public PageEpatsMenu menu;
 	

@@ -19,14 +19,14 @@ public class ScheduledTasks {
 		
 	@Scheduled(fixedRate = 120000, initialDelay = 0)
 	public void runDiscoverers() {
-		Thread th=new Thread(new ThreadForDiscoverers(processService, env));
+		Thread th=new Thread(new ThreadForDiscoverers(processService));
 		th.start();
 	}
 	
 	
 	@Scheduled(fixedRate = 30000, initialDelay = 10000)
-	public void runSteps() {
-		Thread th=new Thread(new ThreadForInstanceStarter(processService, env));
+	public void runProcessInstances() {
+		Thread th=new Thread(new ThreadForInstanceStarter(processService));
 		th.start();
 	}
 
