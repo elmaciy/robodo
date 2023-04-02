@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "process_instance_step_files")
-public class ProcessInstanceStepFiles {
+public class ProcessInstanceStepFile {
 
 	public static final String TYPE_SS="SCREENSHOT";
 	public static final String TYPE_DOWNLOADED="DOWNLOADED";

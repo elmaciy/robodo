@@ -19,7 +19,7 @@ import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
-import com.robodo.model.ProcessInstanceStepFiles;
+import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.singleton.ThreadGroupSingleton;
@@ -246,6 +246,8 @@ public class UIProcessor extends VerticalLayout {
 		
 		
 		HorizontalLayout horizontalLay = new HorizontalLayout(gridProcess,gridProcessSteps);
+		horizontalLay.setFlexGrow(5, gridProcess);
+		horizontalLay.setFlexGrow(2, gridProcessSteps);
 		horizontalLay.setWidthFull();
 		
 
@@ -321,7 +323,6 @@ public class UIProcessor extends VerticalLayout {
 
 
 		grid.setItems(steps);
-		//lay.add(grid);
 		
 		TextArea logMemo=new TextArea();
 		logMemo.setReadOnly(true);
@@ -419,20 +420,20 @@ public class UIProcessor extends VerticalLayout {
 
 
 
-	private Image getImage(ProcessInstanceStep step, ProcessInstanceStepFiles file) {
+	private Image getImage(ProcessInstanceStep step, ProcessInstanceStepFile file) {
 		String imageFileName=file.getFileName();
 		RunnerUtil runnerUtil = new RunnerUtil(processService);
 		String targetDir=runnerUtil.getTargetPath(step.getProcessInstance());
 		
 		String imagePath=targetDir+File.separator+imageFileName;
-		
+		System.err.println(imagePath);
 		byte[] imageBytes=HelperUtil.getFileAsByteArray(imagePath);
 		runnerUtil.logger("image file [%s] loaded, (%s) bytes".formatted(imagePath,String.valueOf(imageBytes.length)));
 		StreamResource resource = new StreamResource(imageFileName, () -> new ByteArrayInputStream(imageBytes));
 		Image image = new Image(resource, file.getDescription());
 
 		add(image);
-		image.setWidthFull();
+		image.setSizeFull();
 		return image;
 	}
 

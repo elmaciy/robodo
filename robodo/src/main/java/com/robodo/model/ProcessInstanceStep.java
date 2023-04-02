@@ -49,7 +49,7 @@ public class ProcessInstanceStep {
 	LocalDateTime approvalDate;
 	
 	@OneToMany(mappedBy = "processInstanceStep", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	List<ProcessInstanceStepFiles> files;
+	List<ProcessInstanceStepFile> files;
 
 	public Long getId() {
 		return id;
@@ -163,11 +163,11 @@ public class ProcessInstanceStep {
 		this.error = error;
 	}
 
-	public List<ProcessInstanceStepFiles> getFiles() {
+	public List<ProcessInstanceStepFile> getFiles() {
 		return files;
 	}
 
-	public void setFiles(List<ProcessInstanceStepFiles> files) {
+	public void setFiles(List<ProcessInstanceStepFile> files) {
 		this.files = files;
 	}
 	

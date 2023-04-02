@@ -42,12 +42,11 @@ public class HelperUtil {
 
 	public static byte[] getFileAsByteArray(String filePath) {
 		File file = new File(filePath);
-		if (file.exists()) {
+		if (!file.exists()) {
 			return null;
 		}
 		try {
-			byte[] fileContent = Files.readAllBytes(file.toPath());
-			return fileContent;
+			return  Files.readAllBytes(file.toPath());
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

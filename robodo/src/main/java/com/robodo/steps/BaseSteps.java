@@ -1,7 +1,7 @@
 package com.robodo.steps;
 
 import com.robodo.model.ProcessInstanceStep;
-import com.robodo.model.ProcessInstanceStepFiles;
+import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.utils.RunnerUtil;
 import com.robodo.utils.SeleniumUtil;
 
@@ -28,9 +28,9 @@ public abstract class BaseSteps {
 	 
 	 public void takeStepScreenShot(ProcessInstanceStep processInstanceStep, String description) {
 		 String ssFileName = selenium.screenShot(processInstanceStep.getProcessInstance());
-		 ProcessInstanceStepFiles file=new ProcessInstanceStepFiles();
+		 ProcessInstanceStepFile file=new ProcessInstanceStepFile();
 		 file.setFileName(ssFileName);
-		 file.setFileType(ProcessInstanceStepFiles.TYPE_SS);
+		 file.setFileType(ProcessInstanceStepFile.TYPE_SS);
 		 file.setDescription(description);
 		 file.setProcessInstanceStep(processInstanceStep);
 		 processInstanceStep.getFiles().add(file);
