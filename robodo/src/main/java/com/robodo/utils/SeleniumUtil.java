@@ -8,8 +8,12 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
@@ -52,8 +56,7 @@ public class SeleniumUtil {
 		}
 		
 		try {
-			this.webDriver.quit();
-			this.webDriver=null;
+			this.webDriver.close();;
 		} catch(Exception e) {
 		}
 	}
@@ -152,18 +155,21 @@ public class SeleniumUtil {
 	}
 
 
-	public void screenShot(ProcessInstance processInstance) {
+	public String screenShot(ProcessInstance processInstance) {
 		String targetDir=runnerUtil.getTargetPath(processInstance);
 		TakesScreenshot scrShot =((TakesScreenshot) webDriver);
 		File SrcFile=scrShot.getScreenshotAs(OutputType.FILE);
 		new File(targetDir).mkdirs();
-		String fileWithPath=targetDir+File.separator+"SHOT_"+System.currentTimeMillis()+".PNG";
+		String fileName="SS_"+System.currentTimeMillis()+".PNG";
+		String fileWithPath=targetDir+File.separator+fileName;
 		File DestFile=new File(fileWithPath);
 		try {
 			FileUtils.copyFile(SrcFile, DestFile);
 			runnerUtil.logger("SCREENSHOT::%s".formatted(fileWithPath));
+			return fileName;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
 	}
 	
@@ -195,6 +201,21 @@ public class SeleniumUtil {
 	public void tab() {
 		pressKey("TAB");
 		
+	}
+	
+	public void switchIframe(Predicate<WebElement> filter) {
+		runnerUtil.logger("switching to iframe by filter: %s".formatted(filter.toString()));
+		List<WebElement> iframes = webDriver.findElements(By.tagName("iframe"));
+		Optional<WebElement> opt = iframes.stream().filter(filter).findAny();
+		if (opt.isEmpty()) {
+			throw new RuntimeException("no iframe found to switch");
+		}
+		webDriver.switchTo().frame(opt.get());
+	}
+	
+	public void switchToMainFrame() {
+		runnerUtil.logger("switch to main frame");
+		webDriver.switchTo().defaultContent();
 	}
 
 }

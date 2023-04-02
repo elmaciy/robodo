@@ -1,5 +1,7 @@
 package com.robodo.pages;
 
+import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -23,23 +25,26 @@ public class PageEpatsTahakkukOde extends PageEpatsBase {
 	
 	@FindBy(css="#confirm")
 	WebElement btOde;
+	
+	@FindBy(css="div.btn.btn-default i.fa.fa-times")
+	WebElement btClose;
 
 
 	public PageEpatsTahakkukOde(SeleniumUtil selenium) {
 		super(selenium);
 	}
 	
-	public String getOdemeTutqri() {
-		String msg=elPaymentAlert.getText();
-		int pos=msg.indexOf("ödemeniz için");
-		if (pos==-1) {
-			throw new RuntimeException("ödenecek tutar ekranda bulunamadı. %s".formatted(msg));
+	public String getOdemeTutari() {
+		try {
+			return StringUtils.substringBefore(elPaymentAlert.getText(), " ödemeniz için");
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("getOdemeTutari hesaplanırken beklenmeyen bir hata oluştu. %s".formatted(e.getMessage()));
 		}
-		String tutar=msg.substring(0, pos-1);
-		return tutar;
 	}
 	
 	public void kartBilgileriniGir(String kartNo, String sonKullanma, String cvv) {
+		
 		
 		selenium.setValue(elKartNo, kartNo);
 		selenium.setValue(elKartExpire, sonKullanma);
@@ -49,12 +54,21 @@ public class PageEpatsTahakkukOde extends PageEpatsBase {
 	}
 	
 	public String getDekontNo() {
+		//todo : buraya gerçek kod eklenecek. 
 		return String.valueOf(System.currentTimeMillis());
+	}
+	
+	private void close() {
+		selenium.switchToMainFrame();
+		selenium.click(btClose);
+		selenium.sleep(3L);
+		var closeBtn=selenium.getWebDriver().findElement(By.xpath("//h2[text()='Ödemeniz tahsil edilememiştir.']/../..//button[text()='Tamam']"));
+		selenium.click(closeBtn);
 	}
 
 	public void odemeYap() {
 		//selenium.click(btOde);
-		
+		close();
 	}
 
 }

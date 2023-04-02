@@ -1,5 +1,8 @@
 package com.robodo.pages;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -21,4 +24,8 @@ public class PageEpatsBase extends BasePage {
 		//selenium.copyPasteByRobot(islemAdi);
 		selenium.tab();
 	}
+	
+	
+	
+
 }

@@ -172,7 +172,7 @@ public class RunnerUtil {
 		logger("%s (%s)".formatted(arg0, arg1));
 
 		if (arg0.equalsIgnoreCase("runStepClass")) {
-			return runStepClass(arg1);
+			return runStepClass(step, arg1);
 		} else if (arg0.equalsIgnoreCase("sleep")) {
 			LocalDateTime started = step.getStarted();
 			LocalDateTime now = LocalDateTime.now();
@@ -199,14 +199,13 @@ public class RunnerUtil {
 		return result;
 	}
 
-	String getTargetPath(ProcessInstance processInstance) {
+	public String getTargetPath(ProcessInstance processInstance) {
 		String workingDir = processService.getEnv().getProperty("working.dir");
 		String executionDir = workingDir + File.separator + "executions";
 		int year = processInstance.getCreated().getYear();
 		int month = processInstance.getCreated().getMonthValue();
 		int day = processInstance.getCreated().getDayOfMonth();
-		String subDir = "%d%s%02d%s%02d%s%s%s%s".formatted(year, File.separator, month, File.separator, day,
-				File.separator, processInstance.getCode(), File.separator, processInstance.getCurrentStepCode());
+		String subDir = "%d%s%02d%s%02d%s%s".formatted(year, File.separator, month, File.separator, day, File.separator, processInstance.getCode());
 		String targetDir = executionDir + File.separator + subDir;
 		return targetDir;
 	}
@@ -294,13 +293,14 @@ public class RunnerUtil {
 		return StringUtils.substringAfter(command, " ").strip();
 	}
 
-	private ExecutionResultsForCommand runStepClass(String className) {
+	private ExecutionResultsForCommand runStepClass(ProcessInstanceStep step,  String className) {
 		ExecutionResultsForCommand result = new ExecutionResultsForCommand();
 		try {
 			String packageName = processService.getEnv().getProperty("steps.package");
 			Class<?> clazz = Class.forName(packageName + "." + className);
-			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class);
-			BaseSteps stepClassInstance = (BaseSteps) constructor.newInstance(this);
+			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class, ProcessInstanceStep.class);
+			BaseSteps stepClassInstance = (BaseSteps) constructor.newInstance(this, step);
+			step.getFiles().clear();
 			stepClassInstance.run();
 			return result.succeeded();
 		} catch (Exception e) {

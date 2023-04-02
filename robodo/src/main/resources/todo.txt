@@ -29,7 +29,7 @@
 26. hata alınca ekran görüntüsü alınsı o anki. sonra selenium kapatılsın. 
 28. human interaaction da onaylama olmazsa? ekranda da süreçte de onay ve red olacak. isApproved = isDone olacak. 
 29. human interactionda ilgili kişilere mail atılır. mailden de onaylanabilir, linklere tıklanarak da. 
-
+30. ekrandaki human onay butonundan sonra confirmation alsın. bir de kontrol etmeden onaya izin vermese? 
 
 -------------------
 TAMAMLANANLAR 

@@ -1,13 +1,14 @@
 package com.robodo.steps;
 
+import com.robodo.model.ProcessInstanceStep;
 import com.robodo.utils.RunnerUtil;
 
 public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 
 
 	
-	public YillikPatentUcretiTahakkukOlustur(RunnerUtil runnerUtil) {
-		super(runnerUtil);
+	public YillikPatentUcretiTahakkukOlustur(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+		super(runnerUtil, processInstanceStep);
 	
 	}
 
@@ -25,9 +26,6 @@ public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 		epatsMenu.cikis();
 		
 		selenium.stopDriver();
-		
-		//test amacli. silinecek
-		//setVariable("tahakkukNo", "2169308");
 	}
 
 

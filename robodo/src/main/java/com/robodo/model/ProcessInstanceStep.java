@@ -1,7 +1,9 @@
 package com.robodo.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -44,6 +47,9 @@ public class ProcessInstanceStep {
 	boolean isApproved;
 	String approvedBy;
 	LocalDateTime approvalDate;
+	
+	@OneToMany(mappedBy = "processInstanceStep", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	List<ProcessInstanceStepFiles> files;
 
 	public Long getId() {
 		return id;
@@ -155,6 +161,14 @@ public class ProcessInstanceStep {
 
 	public void setError(String error) {
 		this.error = error;
+	}
+
+	public List<ProcessInstanceStepFiles> getFiles() {
+		return files;
+	}
+
+	public void setFiles(List<ProcessInstanceStepFiles> files) {
+		this.files = files;
 	}
 	
 	

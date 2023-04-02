@@ -33,7 +33,7 @@ public class ExecutionResultsForCommand {
 	}
 	public ExecutionResultsForCommand skipped() {
 		this.setStatus(STATUS_SKIPPED);
-		return null;
+		return this;
 	}
 	public ExecutionResultsForCommand withMessage(String message) {
 		this.setMessage(message);

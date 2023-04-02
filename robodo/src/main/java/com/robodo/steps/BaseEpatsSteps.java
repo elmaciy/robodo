@@ -1,5 +1,8 @@
 package com.robodo.steps;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.robodo.model.ProcessInstanceStep;
 import com.robodo.pages.PageEdevletLogin;
 import com.robodo.pages.PageEpatsBasvuruYapan;
 import com.robodo.pages.PageEpatsBenimSayfam;
@@ -11,6 +14,7 @@ import com.robodo.pages.PageEpatsMenu;
 import com.robodo.pages.PageEpatsOnIzleme;
 import com.robodo.pages.PageEpatsTahakkukOde;
 import com.robodo.pages.PageEpatsTahakkuklarim;
+import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
 public class BaseEpatsSteps extends BaseSteps {
@@ -27,8 +31,8 @@ public class BaseEpatsSteps extends BaseSteps {
 	PageEpatsIslemSonucu epatsIslemSonucu;
 	PageEpatsTahakkukOde epatsTahakkukOde;
 	
-	public BaseEpatsSteps(RunnerUtil runnerUtil) {
-		super(runnerUtil);
+	public BaseEpatsSteps(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+		super(runnerUtil, processInstanceStep);
 		selenium.startWebDriver();
 		this.home=new PageEpatsHome(selenium);
 		this.edevletLogin=new PageEdevletLogin(selenium);
@@ -49,6 +53,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		String tckno=runnerUtil.getEnvironmentParameter("tckno");
 		String sifre=runnerUtil.getEnvironmentParameter("sifre");
 		edevletLogin.girisEdevlet(tckno, sifre);
+		takeStepScreenShot(processInstanceStep, "Sisteme giriş yapıldı");
 	}
 	
 	
@@ -58,7 +63,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		String basvuruTuru=getVariable("basvuruTuru");
 		String islemAdi=getVariable("islemAdi");
 		epatsBenimSayfam.dosyaArama(dosyaNo,basvuruTuru);
-		//selenium.sleep(10L);
+		takeStepScreenShot(this.processInstanceStep, "Dosya arama sonucu");
 		epatsBenimSayfam.islemSec(islemAdi);
 	}
 	
@@ -67,6 +72,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		String cepTel=runnerUtil.getEnvironmentParameter("ceptel");
 		String referansNo=getVariable("takipNumarasi");
 		epatsBasvuruYapan.basvuruBilgileriniDoldur(eposta, cepTel, referansNo);
+		takeStepScreenShot(this.processInstanceStep, "Başvuru bilgileri");
 		epatsBasvuruYapan.devamEt();
 	}
 	
@@ -82,12 +88,14 @@ public class BaseEpatsSteps extends BaseSteps {
 		karsilastir(getVariable("dosyabilgisi.dosyabilgisi.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
 		karsilastir(getVariable("dosyabilgisi.dosyabilgisi.sahip.kimlik"), getVariable("basvuruSahipKimlikNo"), "başvuru sahibi kimlik/vergi no karşılaştırılıyor");
 		
+		takeStepScreenShot(this.processInstanceStep, "Dosya bilgisi");
 		epatsDosyaBilgisi.devamEt();
 	}
 	
 	public void hizmetDokumuDevamEt() {
 		String ankaraPatentKodu=runnerUtil.getEnvironmentParameter("ankarapatent.vergino");
 		epatsHizmetDokumu.basvuruSahibiSec(ankaraPatentKodu);
+		takeStepScreenShot(this.processInstanceStep, "Hizmet dökümü");
 		selenium.sleep(3L);
 		epatsHizmetDokumu.devamEt();
 	}
@@ -104,8 +112,9 @@ public class BaseEpatsSteps extends BaseSteps {
 		karsilastir(getVariable("onizleme.odenecek.referansNumarasi"), getVariable("takipNumarasi"), "başvuru takip/referans numarası karşılaştırılıyor");
 		karsilastir(getVariable("onizleme.odenecek.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
 		karsilastir(getVariable("onizleme.odenecek.faturaKimlikNumarasi"), runnerUtil.getEnvironmentParameter("ankarapatent.vergino"), "ankara patent kimlik/vergi no karşılaştırılıyor");
-		karsilastir(getVariable("onizleme.odenecek.genelToplam"), getVariable("odemeTutari"), "ödenecek tutar karşılaştırılıyor");
+		karsilastir(HelperUtil.normalizeAmount(getVariable("onizleme.odenecek.genelToplam")), HelperUtil.normalizeAmount(getVariable("odemeTutari")), "ödenecek tutar karşılaştırılıyor");
 		
+		takeStepScreenShot(this.processInstanceStep, "Önizleme");
 		epatsOnIzleme.tahakkukOlustur();
 		
 	}
@@ -113,16 +122,11 @@ public class BaseEpatsSteps extends BaseSteps {
 	public void  tahakkukNumarasiAl() {
 		String sonuc = epatsIslemSonucu.sonucAl();
 		setVariable("islemsonucu.sonuc", sonuc);
-		int pos= sonuc.lastIndexOf(":");
-		if (pos==-1) {
-			String msg="'Tahakkuk No:' bulunamadı.";
-			runnerUtil.logger(msg);
-			throw new RuntimeException(msg);
-		}
+		takeStepScreenShot(this.processInstanceStep, "Tahakkuk numarası oluşturuldu");
 		try {
-			String tahakkukNo=sonuc.substring(pos+1);
+			String tahakkukNo=StringUtils.substringAfter(sonuc, "Tahakkuk No:");
 			Integer.parseInt(tahakkukNo);
-			setVariable("tahakkukNo", sonuc);
+			setVariable("tahakkukNo", tahakkukNo);
 		} catch(Exception e) {
 			e.printStackTrace();
 			String msg="Tahakkuk no çıkarılırken beklenmedik bir hata oluştu : %s".formatted(e.getMessage());
@@ -136,7 +140,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		epatsIslemSonucu.anaSayfayaDon();
 	}
 	
-	private void karsilastir(String v1, String v2, String mesaj) {
+	public void karsilastir(String v1, String v2, String mesaj) {
 		runnerUtil.logger("compare [%s] and [%s].".formatted(v1,v2));
 		if (v1.equals(v2)) {
 			return;

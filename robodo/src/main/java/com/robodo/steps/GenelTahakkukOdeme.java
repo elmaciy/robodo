@@ -1,13 +1,15 @@
 package com.robodo.steps;
 
+import com.robodo.model.ProcessInstanceStep;
+import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
 public class GenelTahakkukOdeme extends BaseEpatsSteps {
 
 
 	
-	public GenelTahakkukOdeme(RunnerUtil runnerUtil) {
-		super(runnerUtil);
+	public GenelTahakkukOdeme(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+		super(runnerUtil, processInstanceStep);
 	
 	}
 
@@ -26,8 +28,8 @@ public class GenelTahakkukOdeme extends BaseEpatsSteps {
 	
 	private void tahakkukSecVeOdemeyeGit() {
 		String tahakkukNo=getVariable("tahakkukNo");
-		epatsTahakkuklarim.tahakkukNoArama(tahakkukNo);
-		selenium.sleep(60L);
+		epatsTahakkuklarim.tahakkukNoAramaSecme(tahakkukNo);
+		takeStepScreenShot(this.processInstanceStep, "Tahakkuk seçildi");
 		epatsTahakkuklarim.tahakkukOde();
 	}
 	
@@ -35,11 +37,19 @@ public class GenelTahakkukOdeme extends BaseEpatsSteps {
 		String kartNo=runnerUtil.getEnvironmentParameter("kredikarti.no");
 		String kartGecerlilik=runnerUtil.getEnvironmentParameter("kredikarti.gecerlilik");
 		String kartCVV=runnerUtil.getEnvironmentParameter("kredikarti.cvv");
+		selenium.switchIframe((p)->p.getAttribute("src").contains("/estpay/pay/"));
+		
+		karsilastir(HelperUtil.normalizeAmount(epatsTahakkukOde.getOdemeTutari()), HelperUtil.normalizeAmount(getVariable("odemeTutari")), "ödenecek tutarı karşılaştır");
 		epatsTahakkukOde.kartBilgileriniGir(kartNo, kartGecerlilik, kartCVV);
-		selenium.sleep(60L);
+		takeStepScreenShot(this.processInstanceStep, "Kart bilgileri girildi");
 		epatsTahakkukOde.odemeYap();
 		String dekontNo=epatsTahakkukOde.getDekontNo();
+		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.");
+		selenium.switchToMainFrame();
+		
 		setVariable("dekontNo", dekontNo);
+		
+		selenium.sleep(10L);
 		
 	}
 

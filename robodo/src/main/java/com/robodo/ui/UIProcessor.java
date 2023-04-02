@@ -1,5 +1,7 @@
 package com.robodo.ui;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -12,17 +14,18 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import com.robodo.model.ExecutionResultsForInstance;
 import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
+import com.robodo.model.ProcessInstanceStepFiles;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.singleton.ThreadGroupSingleton;
 import com.robodo.threads.ThreadForInstanceRunner;
 import com.robodo.threads.ThreadForUIUpdating;
+import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
@@ -33,6 +36,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -40,9 +45,12 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
@@ -211,6 +219,7 @@ public class UIProcessor extends VerticalLayout {
 			btnRun.addClickListener(e -> {
 				gridProcessInstance.select(p);
 				runProcessInstance(p);
+				try {Thread.sleep(3000);} catch(Exception ex) {}
 				btnRun.setEnabled(true);
 			});
 			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.END));
@@ -250,6 +259,8 @@ public class UIProcessor extends VerticalLayout {
 		verticalLay.add(gridProcessInstance);
 		add(verticalLay);
 		setSizeFull();
+		
+		getElement().getStyle().set("height", "100%");
 
 		fillGrid();
 
@@ -276,6 +287,7 @@ public class UIProcessor extends VerticalLayout {
 		}
 		
 		ProcessInstanceStep step = stepOpt.get();
+		step.setStatus(ProcessInstanceStep.STATUS_COMPLETED);
 		step.setApproved(true);
 		step.setApprovalDate(LocalDateTime.now());
 		step.setApprovedBy("TBD");
@@ -289,7 +301,7 @@ public class UIProcessor extends VerticalLayout {
 		Dialog dialog = new Dialog();
 		dialog.setHeaderTitle(title);
 		
-		HorizontalLayout lay=new HorizontalLayout();
+		
 
 		Grid<ProcessInstanceStep> grid=new Grid<>(ProcessInstanceStep.class, false);
 		grid.addColumn(p -> p.getId()).setHeader("#").setWidth("2em");
@@ -309,23 +321,54 @@ public class UIProcessor extends VerticalLayout {
 
 
 		grid.setItems(steps);
+		//lay.add(grid);
+		
+		TextArea logMemo=new TextArea();
+		logMemo.setReadOnly(true);
+		logMemo.setSizeFull();
+
+
+		
+		Tab tabLogs = new Tab(VaadinIcon.NOTEBOOK.create(), new Span("Logs"));
+		Tab tabFiles = new Tab(VaadinIcon.PICTURE.create(), new Span("Files"));
+		
+
+		Tabs tabs = new Tabs(tabLogs, tabFiles);
+		tabs.setSelectedTab(tabLogs);
+		tabs.setWidth("100%");
+		
+		HorizontalLayout tabContent=new HorizontalLayout(logMemo);
+		tabContent.setSizeFull();
+		
+		tabs.addSelectedChangeListener(event -> {
+			tabContent.removeAll();
+			if (grid.getSelectedItems().isEmpty()) {
+				return;
+			}
+			if (event.getSelectedTab().equals(tabLogs)) {
+				tabContent.add(logMemo);
+			} else if (event.getSelectedTab().equals(tabFiles)) {
+				ProcessInstanceStep step = grid.getSelectedItems().iterator().next();
+				tabContent.add(generateTabForFiles(step));
+			}
+        });
+		
+		VerticalLayout lay=new VerticalLayout();
+		
 		lay.add(grid);
+		lay.add(tabs);
+		lay.add(tabContent);
+
 		
-		TextArea content=new TextArea();
-		lay.add(content);
-		lay.setSizeFull();
-		
-		lay.setFlexGrow(2, grid);
-		lay.setFlexGrow(1, content);
 		
 		
 		grid.addSelectionListener(p -> {
 			Optional<ProcessInstanceStep> selection = p.getFirstSelectedItem();
 			if (selection.isEmpty()) {
-				content.setValue("");
+				logMemo.setValue("");
 			} else {
 				var logs=selection.get().getLogs();
-				content.setValue(logs==null ? "" : logs);
+				logMemo.setValue(logs==null ? "" : logs);
 			}
 		});
 		
@@ -335,7 +378,7 @@ public class UIProcessor extends VerticalLayout {
 		Button cancelButton = new Button("Close", e -> dialog.close());
 		dialog.getFooter().add(cancelButton);
 		dialog.setWidth("80%");
-		dialog.setHeight("60%");
+		dialog.setHeight("80%");
 		dialog.setResizable(true);
 		dialog.setCloseOnEsc(true);
 		dialog.setCloseOnOutsideClick(true);
@@ -344,6 +387,54 @@ public class UIProcessor extends VerticalLayout {
 	}
 
 
+	private HorizontalLayout generateTabForFiles(ProcessInstanceStep step) {
+		HorizontalLayout lay=new HorizontalLayout();
+		
+		VerticalLayout content=new VerticalLayout();
+		content.setSizeFull();
+		
+		Tabs tabs=new Tabs();
+		tabs.setOrientation(Tabs.Orientation.VERTICAL);
+		tabs.setHeightFull();
+		step.getFiles().forEach(file -> {
+			Tab tab = new Tab(VaadinIcon.FILE_PICTURE.create(), new Span(file.getDescription()));
+			tabs.add(tab);
+			tabs.addSelectedChangeListener(event -> {
+				content.removeAll();
+				content.add(getImage(step, file));
+			});
+		});	
+		
+		if (step.getFiles().size()>0) {
+			tabs.setSelectedIndex(0);
+			content.add(getImage(step, step.getFiles().get(0)));
+		}
+		
+		lay.setSizeFull();
+		lay.add(tabs, content);
+		
+		return lay;
+	}
+
+
+
+
+	private Image getImage(ProcessInstanceStep step, ProcessInstanceStepFiles file) {
+		String imageFileName=file.getFileName();
+		RunnerUtil runnerUtil = new RunnerUtil(processService);
+		String targetDir=runnerUtil.getTargetPath(step.getProcessInstance());
+		
+		String imagePath=targetDir+File.separator+imageFileName;
+		
+		byte[] imageBytes=HelperUtil.getFileAsByteArray(imagePath);
+		runnerUtil.logger("image file [%s] loaded, (%s) bytes".formatted(imagePath,String.valueOf(imageBytes.length)));
+		StreamResource resource = new StreamResource(imageFileName, () -> new ByteArrayInputStream(imageBytes));
+		Image image = new Image(resource, file.getDescription());
+
+		add(image);
+		image.setWidthFull();
+		return image;
+	}
 
 	private void showVariables(String title, String data) {
 		Dialog dialog = new Dialog();
@@ -523,7 +614,7 @@ public class UIProcessor extends VerticalLayout {
 		
 		
 		Thread thread=new Thread(new ThreadForInstanceRunner(processService, processInstance));
-		thread.run();
+		thread.start();
 		
 		notifySuccess("tread succssfully started for instance %s, thread id : %s ".formatted(processInstance.getCode(), String.valueOf(thread.getId())));
 		

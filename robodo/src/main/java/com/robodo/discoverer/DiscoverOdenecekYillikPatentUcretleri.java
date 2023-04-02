@@ -8,6 +8,7 @@ import java.util.List;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
+import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
 public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
@@ -43,7 +44,7 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
 			hmVars.put("takipNumarasi", "TTuu20029SSSa112");
 			hmVars.put("basvuruTuru", "PATENT");
 			hmVars.put("islemAdi", "Yıllık Ücret Ödeme");
-			hmVars.put("odemeTutari", "₺1.710,00");
+			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺1.710,00"));
 			instance.setInstanceVariables(RunnerUtil.hashMap2String(hmVars));
 			
 			for (var definitedSteps : processDefinition.getSteps()) {
