@@ -122,7 +122,7 @@ public class HelperUtil {
 		
 		for (String key : keys) {
 			String find="${%s}".formatted(key);
-			System.err.println("xxxxxxxxxxx searching for : %s".formatted(find));
+			//System.err.println("xxxxxxxxxxx searching for : %s".formatted(find));
 			
 			while(true) {
 				int pos=sb.indexOf(find);

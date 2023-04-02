@@ -4,21 +4,17 @@
 3. genel olarak bir thread count parametresi koyalım. propertiesden alsın. bu sayıdan fazla thread olmasın. 
 4. thread ların görünebileceği bir ekran yap. 
 5. gizli bilgilerin girileceği bir ekran yap. (kredi kartı bilgileri vs..)
-6. human interaction da onay ekranı olsun. önce maille link gönderilecek sonra onay verecek kişi bu ekrandan tüm detayları görebilecek. 
-7. human interactionda red edilirse işlem devam etmeyecek. ama bu instance tekrar alınacak mı?
-8. instance gridi anlık olarak güncellenebilir mi? 
 9. default olarak devam eden instanceler gelsin. filtre falan koyalım buraya. 
 10. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 11. instance gridine sıralama koy. kolonlarına da filtre koy. 
 12. instanece gridine tüm step loglarının gösterilebileceği bir button koy. tek tek bakmayalım. 
 13. instance için baştan al gibi bir seçenek gerekir mi? 
-14. aynı anda birden fazla süreç koşabiir mi?
-15. kullanıcı password girişi konulacak
+14. aynı anda birden fazla süreç koşabiir mi? teoride koşabilir. test edilecek. 
+15. login ekranı konulacak
 16. kurulan yerde chrome güncellenmemeli
 17. threshold belirle, bu aşılınca mail gitsin biryerlere, bu sayede bir problem olup olmadığını anlarız. 
 	a. uzun süredir hiçbir süreç discover edilmiyor
 	b. kuyruk azalmiyor
-18. human interaction adımında kime mail gideceği ile ilgili düzenleme yapılabilsin ya da email adresi komuta parametre olarak verilsin. tüm ilgili mailler tekrar oluşturulabilsin değişince. 
 19. H2DB yi diske alalım. 
 20. eski işi bitenleri silelim. 
 21. ekran görüntülerinin saklanması?
@@ -28,12 +24,22 @@
 25. islem yarıda selenium exception alınca (mesela karsilastirma hatası) browser açık kalıyor. 
 26. hata alınca ekran görüntüsü alınsı o anki. sonra selenium kapatılsın. 
 28. human interaaction da onaylama olmazsa? ekranda da süreçte de onay ve red olacak. isApproved = isDone olacak. 
-29. human interactionda ilgili kişilere mail atılır. mailden de onaylanabilir, linklere tıklanarak da. 
 30. ekrandaki human onay butonundan sonra confirmation alsın. bir de kontrol etmeden onaya izin vermese? 
 31. human notificationda email gitmezse tekrar deneyecek mi? 
+6. human interaction da onay ekranı olsun. önce maille link gönderilecek sonra onay verecek kişi bu ekrandan tüm detayları görebilecek. 
+32. email parametrelerini properties dosyasina al. esnek olmasini sagla. 
+33. emaile işaretlenen dosyalar eklensin attachment olarak. ekranı açmak zorunda kalmasın. 
+34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı?
+35. Ödeme aşamalarında bir şekilde o işlemin arada manual ödenip ödenmediğini kontrol edebilir miyiz? 
+
+
 -------------------
 TAMAMLANANLAR 
 -------------------
 2. discovery ikincisinde aynı taskı gene discover ediyor
 27. bir step fail olunca neden devam ediyor?
+8. instance gridi anlık olarak güncellenebilir mi? 
+18. human interaction adımında kime mail gideceği ile ilgili düzenleme yapılabilsin ya da email adresi komuta parametre olarak verilsin. tüm ilgili mailler tekrar oluşturulabilsin değişince. 
+29. human interactionda ilgili kişilere mail atılır. mailden de onaylanabilir, linklere tıklanarak da. 
+
 

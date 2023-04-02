@@ -116,6 +116,7 @@ public class RunnerUtil {
 			}
 
 			step.setLogs(logs.toString());
+			result.getProcessInstance().setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
 			processService.saveProcessInstance(result.getProcessInstance());
 
 		} //for

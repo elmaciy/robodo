@@ -145,18 +145,22 @@ public class RobodoApplication {
 			email.setCode("YILLIK_UCRET_ONAY");
 			email.setToAddress("elmaciy@hotmail.com,y.elmaci@astoundcommerce.com");
 			email.setSubject("Onayınız bekleniyor. Dosya No ${dosyaNumarasi}");
-			email.setBody("Sayın ilgili;"
+			email.setBody(
+					"Sayın ilgili;"
 					+ "<br>"
 					+ "<br>"
 					+ " ${dosyaNumarasi} numaralı dosyanın ${tahakkukNo} nolu tahakkuk kaydı oluşturulmuştur. "
 					+ "<br>"
 					+ "Onayınızın ardından ${onizleme.odenecek.genelToplam} tutarındaki ödemesi gerçekleştirilecektir."
 					+ "<br>"
+					+ "İyi çalışmalar"
+					+ "<hr>"
 					+ "<a href=\"http://localhost:8080/processses?onay=Y&instanceid=${instanceId}\"><b><font color=green>[+ Onayla]</font></b></a> "
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-					+ "<a href=\"http://localhost:8080/processses?onay=N&instanceid=${instanceId}\"><font color=green>[-Reddet]</font></a> "
-					+ "<br>"
-					+ "<a href=\"http://localhost:8080/processses?onay=A&instanceid=${instanceId}\">İzle</a> "
+					+ "<a href=\"http://localhost:8080/processses?onay=N&instanceid=${instanceId}\"><font color=red>[-Reddet]</font></a> "
+					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+					+ "<a href=\"http://localhost:8080/processses?onay=V&instanceid=${instanceId}\"><font color=blue>[İncele]</font></a> "
+					+ "<hr>"
 					+ " ");
 			emailTemplateRepo.save(email);
 			
