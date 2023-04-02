@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
+import com.robodo.repo.EmailTemplateRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
 import com.robodo.repo.ProcessInstanceRepo;
 import com.robodo.singleton.SingletonForUIUpdate;
@@ -27,6 +29,9 @@ public class ProcessService {
 	
 	@Autowired
 	ProcessInstanceRepo processInstanceRepo;
+	
+	@Autowired
+	EmailTemplateRepo emailTemplateRepo;
 	
 	public List<ProcessDefinition> getProcessDefinitions() {
 		return StreamSupport.stream(processDefinitionRepo.findAll().spliterator(), false).collect(Collectors.toList());
@@ -81,6 +86,14 @@ public class ProcessService {
 
 	public List<ProcessInstance> getProcessInstancesByProcessDefinition(ProcessDefinition processDefinition) {
 		return processInstanceRepo.findByProcessDefinition(processDefinition);
+	}
+	
+	public EmailTemplate getEmailTemplateByCode(String code) {
+		List<EmailTemplate> list = emailTemplateRepo.findByCode(code);
+		if (list.size()==0) {
+			return null;
+		}
+		return list.get(0);
 	}
 
 }

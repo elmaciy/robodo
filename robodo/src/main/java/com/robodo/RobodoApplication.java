@@ -9,8 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessDefinitionStep;
+import com.robodo.repo.EmailTemplateRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
 
 @SpringBootApplication
@@ -22,7 +24,7 @@ public class RobodoApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demo(ProcessDefinitionRepo processDefinitionRepo) {
+	public CommandLineRunner demo(ProcessDefinitionRepo processDefinitionRepo, EmailTemplateRepo emailTemplateRepo) {
 		return (args) -> {
 
 			
@@ -63,7 +65,7 @@ public class RobodoApplication {
 			stepOnay.setDescription("Patent yıllık ücreti ödeme için onay bekle");
 			stepOnay.setOrderNo("03");
 			stepOnay.setSingleAtATime(true);
-			stepOnay.setCommands("waitHumanInteraction");
+			stepOnay.setCommands("waitHumanInteraction YILLIK_UCRET_ONAY");
 			stepOnay.setProcessDefinition(yillikPatentUcreti);
 			
 			
@@ -84,11 +86,11 @@ public class RobodoApplication {
 			stepDekontIsle.setCommands("runStepClass GenelDekontKaydetSteps");
 			stepDekontIsle.setProcessDefinition(yillikPatentUcreti);
 			
-			//processDef1.getSteps().add(stepDosyaOku);
+			//yillikPatentUcreti.getSteps().add(stepDosyaOku);
 			yillikPatentUcreti.getSteps().add(stepTahakkukOlustur);
 			yillikPatentUcreti.getSteps().add(stepOnay);
 			yillikPatentUcreti.getSteps().add(stepOde);
-			//processDef1.getSteps().add(stepDekontIsle);
+			//yillikPatentUcreti.getSteps().add(stepDekontIsle);
 
 			
 			processDefinitionRepo.save(yillikPatentUcreti);
@@ -138,6 +140,25 @@ public class RobodoApplication {
 			
 			processDefinitionRepo.save(processDef2);
 			
+			//---------------------------------------------------
+			EmailTemplate email=new EmailTemplate();
+			email.setCode("YILLIK_UCRET_ONAY");
+			email.setToAddress("elmaciy@hotmail.com,y.elmaci@astoundcommerce.com");
+			email.setSubject("Onayınız bekleniyor. Dosya No ${dosyaNumarasi}");
+			email.setBody("Sayın ilgili;"
+					+ "<br>"
+					+ "<br>"
+					+ " ${dosyaNumarasi} numaralı dosyanın ${tahakkukNo} nolu tahakkuk kaydı oluşturulmuştur. "
+					+ "<br>"
+					+ "Onayınızın ardından ${onizleme.odenecek.genelToplam} tutarındaki ödemesi gerçekleştirilecektir."
+					+ "<br>"
+					+ "<a href=\"http://localhost:8080/processses?onay=Y&instanceid=${instanceId}\"><b><font color=green>[+ Onayla]</font></b></a> "
+					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+					+ "<a href=\"http://localhost:8080/processses?onay=N&instanceid=${instanceId}\"><font color=green>[-Reddet]</font></a> "
+					+ "<br>"
+					+ "<a href=\"http://localhost:8080/processses?onay=A&instanceid=${instanceId}\">İzle</a> "
+					+ " ");
+			emailTemplateRepo.save(email);
 			
 		};
 

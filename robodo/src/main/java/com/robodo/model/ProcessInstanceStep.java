@@ -44,7 +44,8 @@ public class ProcessInstanceStep {
 	@JoinColumn(name = "process_instance_id", nullable = false)
 	ProcessInstance processInstance;
 	
-	boolean isApproved;
+	boolean notificationSent;
+	boolean approved;
 	String approvedBy;
 	LocalDateTime approvalDate;
 	
@@ -131,12 +132,20 @@ public class ProcessInstanceStep {
 		this.orderNo = orderNo;
 	}
 
-	public boolean isApproved() {
-		return isApproved;
+	public boolean isNotificationSent() {
+		return notificationSent;
 	}
 
-	public void setApproved(boolean isApproved) {
-		this.isApproved = isApproved;
+	public void setNotificationSent(boolean notificationSent) {
+		this.notificationSent = notificationSent;
+	}
+
+	public boolean isApproved() {
+		return approved;
+	}
+
+	public void setApproved(boolean approved) {
+		this.approved = approved;
 	}
 
 	public String getApprovedBy() {

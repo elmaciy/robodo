@@ -45,7 +45,7 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
 			hmVars.put("basvuruTuru", "PATENT");
 			hmVars.put("islemAdi", "Yıllık Ücret Ödeme");
 			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺1.710,00"));
-			instance.setInstanceVariables(RunnerUtil.hashMap2String(hmVars));
+			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			
 			for (var definitedSteps : processDefinition.getSteps()) {
 				ProcessInstanceStep instanceStep = new ProcessInstanceStep();

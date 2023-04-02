@@ -444,7 +444,7 @@ public class UIProcessor extends VerticalLayout {
 		VerticalLayout dialogLayout = new VerticalLayout();
 		dialogLayout.setSizeFull();
 		
-		HashMap<String, String> hmVars = RunnerUtil.String2HashMap(data);
+		HashMap<String, String> hmVars = HelperUtil.String2HashMap(data);
 		Grid<KeyValue> gridVars=new Grid<>(KeyValue.class, false);
 		gridVars.addColumn(p -> p.getKey()).setHeader("Variable Name").setWidth("20em");
 		gridVars.addComponentColumn(p -> {

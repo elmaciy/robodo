@@ -17,6 +17,7 @@ import org.openqa.selenium.WebElement;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.robodo.discoverer.BaseDiscoverer;
+import com.robodo.model.EmailTemplate;
 import com.robodo.model.ExecutionResultsForCommand;
 import com.robodo.model.ExecutionResultsForInstance;
 import com.robodo.model.ProcessDefinition;
@@ -62,7 +63,8 @@ public class RunnerUtil {
 		result.getProcessInstance().setStatus(ProcessInstance.STATUS_RUNNING);
 		processService.saveProcessInstance(result.getProcessInstance());
 		
-		hmExtractedValues = String2HashMap(result.getProcessInstance().getInstanceVariables());
+		hmExtractedValues = HelperUtil.String2HashMap(result.getProcessInstance().getInstanceVariables());
+		setVariable("instanceId", processInstance.getCode());
 		
 
 		List<ProcessInstanceStep> steps = result.getProcessInstance().getSteps();
@@ -91,6 +93,7 @@ public class RunnerUtil {
 			
 			try {
 				runStep(result.getProcessInstance(), step);
+				
 				if (step.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)) {
 					logger("stopped at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
 					step.setLogs(logs.toString());
@@ -137,7 +140,7 @@ public class RunnerUtil {
 		}
 		
 		hmExtractedValues.put("processInstance.currentStepCode", result.getProcessInstance().getCurrentStepCode());
-		result.getProcessInstance().setInstanceVariables(hashMap2String(hmExtractedValues));
+		result.getProcessInstance().setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
 
 		processService.saveProcessInstance(result.getProcessInstance());
 		
@@ -186,6 +189,9 @@ public class RunnerUtil {
 
 			return result.succeeded();
 		} else if (arg0.equalsIgnoreCase("waitHumanInteraction")) {
+			if (!step.isNotificationSent()) {
+				sendEmailNotificationForApproval(step, arg1);
+			}
 			boolean isApproved = step.isApproved();
 			if (isApproved) {
 				logger("approved by : %s at [%s]".formatted(step.getApprovedBy(), step.getApprovalDate()));
@@ -197,6 +203,17 @@ public class RunnerUtil {
 		}
 
 		return result;
+	}
+
+	private void sendEmailNotificationForApproval(ProcessInstanceStep step, String emailTemplateCode) {
+		EmailTemplate emailTemplate = processService.getEmailTemplateByCode(emailTemplateCode);
+		if (emailTemplate==null) {
+			throw new RuntimeException("email template %s not found");
+		}
+		boolean isMailSend = HelperUtil.sendEmailByTemplate(emailTemplate, step, this);
+		if (!isMailSend) {
+			throw new RuntimeException("email not sent");
+		}
 	}
 
 	public String getTargetPath(ProcessInstance processInstance) {
@@ -239,32 +256,7 @@ public class RunnerUtil {
 
 	}
 	
-	public static String hashMap2String(HashMap<String,String> hm) {
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			String json = mapper.writeValueAsString(hm);
-			return json;
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
-	public static HashMap<String,String>  String2HashMap(String data) {
-		
-		HashMap<String,String> hm= new HashMap<String,String>();
-		try {
-			JSONParser parser = new JSONParser(data);
-			LinkedHashMap<String, Object> linkedList = parser.parseObject();
-			linkedList.keySet().stream().forEach(key->{
-				hm.put(key, (String) linkedList.get(key));
-			});
-			return hm;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new HashMap<String,String>();
-	}
 
 
 	private String normalize(String command) {
