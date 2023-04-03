@@ -27,7 +27,6 @@ import com.robodo.threads.ThreadForInstanceRunner;
 import com.robodo.threads.ThreadForUIUpdating;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
-import com.robodo.utils.UIUtils;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
@@ -57,7 +56,7 @@ import com.vaadin.flow.spring.annotation.UIScope;
 @Route("/process")
 @SpringComponent
 @UIScope
-public class UIProcessor extends VerticalLayout {
+public class UIProcessor extends UIBase {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -73,8 +72,8 @@ public class UIProcessor extends VerticalLayout {
 	Grid<ProcessInstance> gridProcessInstance;
 
 	@Autowired
-	public UIProcessor(ProcessService processService, Environment env) {
-		
+	public UIProcessor(ProcessService processService) {
+		super(processService);
 		startUpdaterThread();
 
 		this.processService = processService;
@@ -91,9 +90,9 @@ public class UIProcessor extends VerticalLayout {
 				p.setActive(newVal);
 				boolean isOk = processService.saveProcessDefinition(p);
 				if (!isOk) {
-					UIUtils.notifyError("Error saving");
+					notifyError("Error saving");
 				} else {
-					UIUtils.notifySuccess("process is %s".formatted(newVal ? "active" : "pasive"));
+					notifySuccess("process is %s".formatted(newVal ? "active" : "pasive"));
 				}
 			});
 			return chActive;
@@ -421,7 +420,7 @@ public class UIProcessor extends VerticalLayout {
 		}
 		
 		if (stepCount>0) {
-			UIUtils.notifyError("backward next steps first");
+			notifyError("backward next steps first");
 			return;
 		}
 		
@@ -443,7 +442,7 @@ public class UIProcessor extends VerticalLayout {
 
 		processService.saveProcessInstance(processInstance);
 		
-		UIUtils.notifySuccess("backwarded");
+		notifySuccess("backwarded");
 	}
 
 	private HorizontalLayout generateTabForFiles(ProcessInstanceStep step) {
@@ -606,7 +605,7 @@ public class UIProcessor extends VerticalLayout {
 		String processId="DISCOVERY.%s".formatted(processDefinition.getCode());
 		boolean isRunning = RunnerSingleton.getInstance().hasRunningInstance(processId);
 		if (isRunning) {
-			UIUtils.notifyError("Discovery is already running");
+			notifyError("Discovery is already running");
             return;
 		}
 		
@@ -628,7 +627,7 @@ public class UIProcessor extends VerticalLayout {
 		}
 		
 		RunnerSingleton.getInstance().stop(processId);
-		UIUtils.notifyInfo(discovered==0 ?  "no new instance is discovered " : "%d new instance discovered".formatted(discovered));
+		notifyInfo(discovered==0 ?  "no new instance is discovered " : "%d new instance discovered".formatted(discovered));
 		setData(processDefinition);
 		fillGrid();
 		
@@ -646,12 +645,12 @@ public class UIProcessor extends VerticalLayout {
 		int maxThreadCount=Integer.valueOf(processService.getEnv().getProperty("max.thread"));
 		int currentThreadCount=ThreadGroupSingleton.getInstance().getActiveThreadCount();
 		if (currentThreadCount>=maxThreadCount) {
-			UIUtils.notifyError("no thread to run this instance");
+			notifyError("no thread to run this instance");
 			return;
 		}
 		
 		if (RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode())) {
-			UIUtils.notifyError("this instance %s is already running. Please wait.".formatted(processInstance.getCode()));
+			notifyError("this instance %s is already running. Please wait.".formatted(processInstance.getCode()));
 			return;
 		}
 		
@@ -659,7 +658,7 @@ public class UIProcessor extends VerticalLayout {
 		Thread thread=new Thread(new ThreadForInstanceRunner(processService, processInstance));
 		thread.start();
 		
-		UIUtils.notifySuccess("tread succssfully started for instance %s, thread id : %s ".formatted(processInstance.getCode(), String.valueOf(thread.getId())));
+		notifySuccess("tread succssfully started for instance %s, thread id : %s ".formatted(processInstance.getCode(), String.valueOf(thread.getId())));
 		
 	}
 

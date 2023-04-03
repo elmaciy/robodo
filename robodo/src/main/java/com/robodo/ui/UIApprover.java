@@ -4,23 +4,18 @@ import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.services.ProcessService;
-import com.robodo.utils.UIUtils;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -32,7 +27,7 @@ import com.vaadin.flow.spring.annotation.UIScope;
 @Route("/approve/:instanceId/:action")
 @SpringComponent
 @UIScope
-public class UIApprover extends Div implements BeforeEnterObserver {
+public class UIApprover extends UIBase implements BeforeEnterObserver {
 
 	private static final long serialVersionUID = 1L;
 
@@ -57,29 +52,29 @@ public class UIApprover extends Div implements BeforeEnterObserver {
 
 	@Autowired
 	public UIApprover(ProcessService processService) {
-		
+		super(processService);
 		 this.processService=processService;
 		 this.action=(String) UI.getCurrent().getSession().getAttribute("action");
 		 this.instanceId=(String) UI.getCurrent().getSession().getAttribute("instanceId");
-
+		
 		 if (instanceId==null) {
-			 UIUtils.notifyError("instance is not given");
+			 notifyError("instance is not given");
 			 return;
 		 }
 		 
 		 if (action==null) {
-			 UIUtils.notifyError("action is not given");
+			 notifyError("action is not given");
 			 return;
 		 }
 		 
 		 if ("APPROVE,DECLINE,VIEW".indexOf(action)==-1) {
-			 UIUtils.notifyError("action is not defined : %s".formatted(action));
+			 notifyError("action is not defined : %s".formatted(action));
 			 return;
 		 }
 		 
 		 processInstance = processService.getProcessInstanceByCode(instanceId);
 		 if (processInstance==null) {
-			 UIUtils.notifyError("no instance found");
+			 notifyError("no instance found");
 			 return;
 		 }
 		 
@@ -151,11 +146,11 @@ public class UIApprover extends Div implements BeforeEnterObserver {
 	
 	private void approve(ProcessInstance processInstance) {
 		if (!isApproveable(processInstance)) {
-			UIUtils.notifyError("not approveable anymore");
+			notifyError("not approveable anymore");
 			return;
 		}
 		
-		UIUtils.confirmAndRun("Confirm","Are you sure to APPROVE this instance?",()->doApproval(processInstance, true));
+		confirmAndRun("Confirm","Are you sure to APPROVE this instance?",()->doApproval(processInstance, true));
 	}
 
 	
@@ -163,10 +158,10 @@ public class UIApprover extends Div implements BeforeEnterObserver {
 
 	private void decline(ProcessInstance processInstance) {
 		if (!isApproveable(processInstance)) {
-			UIUtils.notifyError("not approveable anymore");
+			notifyError("not approveable anymore");
 			return;
 		}
-		UIUtils.confirmAndRun("Confirm","Are you sure to DECLINE this instance?",()->doApproval(processInstance, false));
+		confirmAndRun("Confirm","Are you sure to DECLINE this instance?",()->doApproval(processInstance, false));
 
 		
 	}
@@ -194,7 +189,7 @@ public class UIApprover extends Div implements BeforeEnterObserver {
 	private void doApproval(ProcessInstance processInstance, boolean approved) {
 		ProcessInstanceStep stepForApproval = getStepToApprove(processInstance);
 		if (stepForApproval==null) {
-			UIUtils.notifyError("no step to approve");
+			notifyError("no step to approve");
 			return;
 		}
 		

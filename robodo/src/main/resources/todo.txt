@@ -1,10 +1,9 @@
-0. aynı instance in aynı anda iki kere koşmasını engelleyecek bir yapı yok. instance running iken ikincisi de gelip koşuyor. Running yerine PAused mi konulsa? Running aktif koşuyor anlamında. 
 1. Takılan instanceler nasıl tekrar kuyruğa alınacak? Heartbeat mantığı mı getirsek? 
 1. instance variable ekranında değiştirmeye izin verelim. 
 3. genel olarak bir thread count parametresi koyalım. propertiesden alsın. bu sayıdan fazla thread olmasın. 
 4. thread ların görünebileceği bir ekran yap. 
 5. gizli bilgilerin girileceği bir ekran yap. (kredi kartı bilgileri vs..)
-9. default olarak devam eden instanceler gelsin. filtre falan koyalım buraya. 
+9. instance ekranında başlangıçta sadece non completed instanceler gelsin. filtre falan koyalım buraya. 
 10. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 11. instance gridine sıralama koy. kolonlarına da filtre koy. 
 12. instanece gridine tüm step loglarının gösterilebileceği bir button koy. tek tek bakmayalım. 
@@ -41,5 +40,5 @@ TAMAMLANANLAR
 8. instance gridi anlık olarak güncellenebilir mi? 
 18. human interaction adımında kime mail gideceği ile ilgili düzenleme yapılabilsin ya da email adresi komuta parametre olarak verilsin. tüm ilgili mailler tekrar oluşturulabilsin değişince. 
 29. human interactionda ilgili kişilere mail atılır. mailden de onaylanabilir, linklere tıklanarak da. 
-
+0. aynı instance in aynı anda iki kere koşmasını engelleyecek bir yapı yok. instance running iken ikincisi de gelip koşuyor. Running yerine PAused mi konulsa? Running aktif koşuyor anlamında. 
 
