@@ -149,7 +149,12 @@ public class UIProcessor extends UIBase {
 		gridProcessInstance.addComponentColumn(p -> {
 			ProgressBar progress = new ProgressBar();
 			progress.setMax(Double.valueOf(p.getSteps().size()));
-			var step=p.getSteps().stream().filter(s->s.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)).count();
+			var step=p.getSteps().stream()
+					.filter(
+							s->!s.getStatus().equals(ProcessInstanceStep.STATUS_NEW) 
+							&& !s.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)
+							)
+					.count();
 			progress.setValue(Double.valueOf(step));
 			return progress;
 		}).setHeader("Progress").setWidth("3em");
@@ -161,10 +166,8 @@ public class UIProcessor extends UIBase {
 		gridProcessInstance.addComponentColumn(p -> {
 			Button btnShowVars = new Button("", new Icon(VaadinIcon.LIST));
 			btnShowVars.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SMALL);
-			btnShowVars.setEnabled(!p.getStatus().equals(ProcessInstance.END));
 			btnShowVars.setDisableOnClick(true);
 			btnShowVars.addClickListener(e -> {
-				//gridProcessInstance.select(p);
 				showVariables("instance variable for %s (%s)".formatted(p.getCode(), p.getDescription()),p.getInstanceVariables());
 				btnShowVars.setEnabled(true);
 			});
@@ -175,7 +178,6 @@ public class UIProcessor extends UIBase {
 			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SMALL);
 			btnShowSteps.setDisableOnClick(true);
 			btnShowSteps.addClickListener(e -> {
-				//gridProcessInstance.select(p);
 				showProcessInstanceSteps("steps for %s (%s)".formatted(p.getCode(), p.getDescription()),p.getSteps());
 				btnShowSteps.setEnabled(true);
 			});
@@ -221,7 +223,7 @@ public class UIProcessor extends UIBase {
 				try {Thread.sleep(1000);} catch(Exception ex) {}
 				btnRun.setEnabled(true);
 			});
-			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.END));
+			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.STATUS_COMPLETED));
 			return btnRun;
 		}).setHeader("Run").setAutoWidth(true);
 		
@@ -282,7 +284,9 @@ public class UIProcessor extends UIBase {
 
 
 	private void approveProcessInstance(ProcessInstance instance) {
-		Optional<ProcessInstanceStep> stepOpt = instance.getSteps().stream().filter(p->p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)).findFirst();
+		Optional<ProcessInstanceStep> stepOpt = instance.getSteps().stream()
+				.filter(p->p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING))
+				.findFirst();
 		if (stepOpt.isEmpty()) {
 			return;
 		}
@@ -401,14 +405,7 @@ public class UIProcessor extends UIBase {
 		}
 		ProcessInstance processInstance = stepToBackward.getProcessInstance();
 		List<ProcessInstanceStep> steps = processInstance.getSteps();
-		
-		Collections.sort(steps, new Comparator<ProcessInstanceStep>() {
-			@Override
-			public int compare(ProcessInstanceStep o1, ProcessInstanceStep o2) {
-				return o1.getOrderNo().compareTo(o2.getOrderNo());
-			}
-		});
-		
+
 		int stepCount=0;
 		for (int i=steps.size()-1;i>=0;i--) {
 			ProcessInstanceStep step=steps.get(i);
@@ -437,7 +434,7 @@ public class UIProcessor extends UIBase {
 		
 		processInstance.setStatus(countOfNonNew==0 ? ProcessInstance.STATUS_NEW : ProcessInstance.STATUS_RUNNING);
 		processInstance.setFinished(null);
-		processInstance.setCurrentStepCode(countOfNonNew==0 ? ProcessInstance.BEGIN : "BACKWARDED");
+		processInstance.setCurrentStepCode(countOfNonNew==0 ? null : "BACKWARDED");
 		processInstance.setRetryNo(Integer.max(processInstance.getRetryNo()-1, 0));
 
 		processService.saveProcessInstance(processInstance);
@@ -579,14 +576,9 @@ public class UIProcessor extends UIBase {
 
 	private void setData(ProcessDefinition processDefinition) {
 		gridProcess.select(processDefinition);
+		
 		List<ProcessDefinitionStep> definitionSteps = processDefinition.getSteps();
-		Collections.sort(definitionSteps, new Comparator<ProcessDefinitionStep>() {
-
-			@Override
-			public int compare(ProcessDefinitionStep o1, ProcessDefinitionStep o2) {
-				return o1.getOrderNo().compareTo(o2.getOrderNo());
-			}
-		});
+		
 		gridProcessSteps.setItems(definitionSteps);
 
 		List<ProcessInstance> instances = processService.getProcessInstancesByProcessDefinition(processDefinition);

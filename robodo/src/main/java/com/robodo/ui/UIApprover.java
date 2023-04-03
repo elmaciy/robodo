@@ -90,7 +90,6 @@ public class UIApprover extends UIBase implements BeforeEnterObserver {
 		btApprove.setEnabled(isApproveable(processInstance));
 		btApprove.addClickListener(e -> {
 			approve(processInstance);
-			btApprove.setEnabled(true);
 		});
 		
 		Button btDecline = new Button("DECLINE", new Icon(VaadinIcon.CLOSE));
@@ -99,7 +98,6 @@ public class UIApprover extends UIBase implements BeforeEnterObserver {
 		btDecline.setEnabled(isApproveable(processInstance));
 		btDecline.addClickListener(e -> {
 			decline(processInstance);
-			btDecline.setEnabled(true);
 		});
 		
 		
@@ -200,7 +198,7 @@ public class UIApprover extends UIBase implements BeforeEnterObserver {
 		
 		if (!approved) {
 			processInstance.setFinished(LocalDateTime.now());
-			processInstance.setStatus(ProcessInstance.END);
+			processInstance.setStatus(ProcessInstance.STATUS_COMPLETED);
 			processInstance.setError(approved ? null : "declined by user");
 		} 
 		

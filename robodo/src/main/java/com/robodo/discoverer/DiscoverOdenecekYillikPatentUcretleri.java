@@ -31,7 +31,7 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
 			instance.setFinished(null);
 			instance.setRetryNo(0);
 			instance.setStatus(ProcessInstance.STATUS_NEW);
-			instance.setCurrentStepCode(ProcessInstance.BEGIN);
+			instance.setCurrentStepCode(null);
 			instance.setProcessDefinition(processDefinition);
 			instance.setSteps(new ArrayList<ProcessInstanceStep>());
 			
@@ -58,16 +58,7 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
 				instance.getSteps().add(instanceStep);
 			}
 			
-			
-			
 			instances.add(instance);
-			
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 		
 		return instances;

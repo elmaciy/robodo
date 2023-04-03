@@ -93,7 +93,10 @@ public class RobodoApplication {
 			//yillikPatentUcreti.getSteps().add(stepDekontIsle);
 
 			
-			processDefinitionRepo.save(yillikPatentUcreti);
+			if (processDefinitionRepo.findByCode(yillikPatentUcreti.getCode()).isEmpty()) {
+				processDefinitionRepo.save(yillikPatentUcreti);
+			}
+			
 			
 			
 			//--------------------------------------------
@@ -116,7 +119,6 @@ public class RobodoApplication {
 			
 			
 			ProcessDefinitionStep step21=new ProcessDefinitionStep();
-			//step1.setId(1L);
 			step21.setCode("STEP2");
 			step21.setDescription("STEP 1 of PROCESS2");
 			step21.setOrderNo("01");
@@ -127,7 +129,6 @@ public class RobodoApplication {
 			
 			
 			ProcessDefinitionStep step22=new ProcessDefinitionStep();
-			//step2.setId(2L);
 			step22.setCode("STEP2");
 			step22.setDescription("STEP2 of PROCESS2");
 			step22.setOrderNo("02");
@@ -138,7 +139,11 @@ public class RobodoApplication {
 			processDef2.getSteps().add(step21);
 			processDef2.getSteps().add(step22);
 			
-			processDefinitionRepo.save(processDef2);
+			
+			if (processDefinitionRepo.findByCode(processDef2.getCode()).isEmpty()) {
+				processDefinitionRepo.save(processDef2);
+			}
+			
 			
 			//---------------------------------------------------
 			EmailTemplate email=new EmailTemplate();
@@ -164,7 +169,11 @@ public class RobodoApplication {
 					+ "</center>"
 					+ "<hr>"
 					+ " ");
-			emailTemplateRepo.save(email);
+			
+			if (emailTemplateRepo.findByCode(email.getCode()).isEmpty()) {
+				emailTemplateRepo.save(email);
+			}
+			
 			
 		};
 

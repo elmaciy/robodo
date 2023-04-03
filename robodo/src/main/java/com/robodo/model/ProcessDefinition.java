@@ -1,5 +1,7 @@
 package com.robodo.model;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -55,6 +57,14 @@ public class ProcessDefinition {
 		return steps;
 	}
 	public void setSteps(List<ProcessDefinitionStep> steps) {
+		Collections.sort(steps, new Comparator<ProcessDefinitionStep>() {
+
+			@Override
+			public int compare(ProcessDefinitionStep o1, ProcessDefinitionStep o2) {
+				return o1.getOrderNo().compareTo(o2.getOrderNo());
+			}
+		});
+		
 		this.steps = steps;
 	}
 	public Integer getMaxRetryCount() {

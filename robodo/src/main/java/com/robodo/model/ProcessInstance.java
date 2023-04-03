@@ -1,7 +1,11 @@
 package com.robodo.model;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -21,8 +25,8 @@ public class ProcessInstance {
 	public static final String STATUS_NEW="NEW";
 	public static final String STATUS_RUNNING="RUNNING";
 	public static final String STATUS_HUMAN="HUMAN";
-	public static final String BEGIN = "<BEGIN>";
-	public static final String END = "<END>";
+	public static final String STATUS_COMPLETED ="COMPLETED";
+
 
 	
 	@Id
@@ -132,6 +136,15 @@ public class ProcessInstance {
 	}
 
 	public List<ProcessInstanceStep> getSteps() {
+		
+		Collections.sort(steps, new Comparator<ProcessInstanceStep>() {
+
+			@Override
+			public int compare(ProcessInstanceStep o1, ProcessInstanceStep o2) {
+				return o1.getOrderNo().compareTo(o2.getOrderNo());
+			}
+		});
+		
 		return steps;
 	}
 
@@ -155,8 +168,36 @@ public class ProcessInstance {
 		this.error = error;
 	}
 
+	public ProcessInstanceStep getCurrentStep() {
+		if (this.getStatus().equals(STATUS_NEW)) {
+			return null;
+		}
+		
+		if (this.getStatus().equals(STATUS_COMPLETED)) {
+			return this.steps.get(this.steps.size()-1);
+		}
+		
+		List<ProcessInstanceStep> runningSteps = this.steps.stream()
+				.filter(p->p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING) || p.getStatus()
+				.equals(ProcessInstanceStep.STATUS_FAILED))
+				.collect(Collectors.toList());
+		
+		if (runningSteps.size()==0) {
+			return null;
+		}
+		
+		return runningSteps.get(runningSteps.size()-1);
+ 	}
 	
-	
+	public List<ProcessInstanceStep> getPreviousSteps(ProcessInstanceStep refStep) {
+		return this.steps.stream().filter(p->p.getOrderNo().compareTo(refStep.getOrderNo())<0)
+				.collect(Collectors.toList());
+	}
+
+	public List<ProcessInstanceStep> getNextSteps(ProcessInstanceStep refStep) {
+		return this.steps.stream().filter(p->p.getOrderNo().compareTo(refStep.getOrderNo())>0)
+				.collect(Collectors.toList());
+	}
 	
 	
 	

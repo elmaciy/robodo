@@ -3,8 +3,6 @@ package com.robodo.utils;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -64,16 +62,9 @@ public class RunnerUtil {
 
 		List<ProcessInstanceStep> steps = result.getProcessInstance().getSteps();
 
-		Collections.sort(steps, new Comparator<ProcessInstanceStep>() {
-
-			@Override
-			public int compare(ProcessInstanceStep o1, ProcessInstanceStep o2) {
-				return o1.getOrderNo().compareTo(o2.getOrderNo());
-			}
-
-		});
-
-		for (ProcessInstanceStep step : result.getProcessInstance().getSteps()) {
+		int runnedStepCount=0;
+		
+		for (ProcessInstanceStep step : steps) {
 			if (step.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)) {
 				logger("skipping already completed step %s".formatted(step.getStepCode()));
 				continue;
@@ -124,7 +115,7 @@ public class RunnerUtil {
 		boolean allStepsCompleted = result.getProcessInstance().getSteps().stream()
 				.allMatch(p -> p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED));
 
-		result.getProcessInstance().setStatus(allStepsCompleted ? ProcessInstance.END : ProcessInstance.STATUS_RUNNING);
+		result.getProcessInstance().setStatus(allStepsCompleted ? ProcessInstance.STATUS_COMPLETED : ProcessInstance.STATUS_RUNNING);
 		if (allStepsCompleted) {
 			result.getProcessInstance().setFinished(LocalDateTime.now());
 		} else {

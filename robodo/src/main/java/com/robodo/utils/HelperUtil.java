@@ -131,7 +131,7 @@ public class HelperUtil {
 				if (pos==-1) break;
 				sb.delete(pos, pos+find.length());
 				if (isSecret(key)) {
-					sb.insert(pos, decrypt(hmVars.get(key)));
+					sb.insert(pos, encrypt(hmVars.get(key)));
 				} else {
 					sb.insert(pos, hmVars.get(key));
 				}
@@ -145,7 +145,7 @@ public class HelperUtil {
 	
 	
 	private static boolean isSecret(String key) {
-		return List.of("instanceId","processInstance.code").stream().anyMatch(p->p.equals(key));
+		return List.of("").stream().anyMatch(p->p.equals(key));
 	}
 
 	private static boolean sendEmail(EmailTemplate emailTemplate, RunnerUtil runnerUtil) {
@@ -249,6 +249,7 @@ public class HelperUtil {
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
         } catch (Exception e) {
+        	e.printStackTrace();
             System.out.println("Error while encrypting: " + e.toString());
         }
         return null;
@@ -261,6 +262,7 @@ public class HelperUtil {
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
         } catch (Exception e) {
+        	e.printStackTrace();
             System.out.println("Error while decrypting: " + e.toString());
         }
         return null;
