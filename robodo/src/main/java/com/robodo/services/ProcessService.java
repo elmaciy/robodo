@@ -55,6 +55,13 @@ public class ProcessService {
 		List<ProcessInstance> list = processInstanceRepo.findByCode(discoveredInstance.getCode());
 		return !list.isEmpty();
 	}
+	
+	public ProcessInstance getProcessInstanceByCode(String code) {
+		List<ProcessInstance> list = processInstanceRepo.findByCode(code);
+		if (list.size()==0) return null;
+		return list.get(0);
+		
+	}
 
 	public List<ProcessInstance> getProcessNotCompletedInstances(ProcessDefinition processDefinition, int maxInstance) {
 		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
@@ -95,5 +102,7 @@ public class ProcessService {
 		}
 		return list.get(0);
 	}
+
+	
 
 }

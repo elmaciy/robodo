@@ -31,7 +31,7 @@
 33. emaile işaretlenen dosyalar eklensin attachment olarak. ekranı açmak zorunda kalmasın. 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı?
 35. Ödeme aşamalarında bir şekilde o işlemin arada manual ödenip ödenmediğini kontrol edebilir miyiz? 
-
+36. human interaction bekleyen instancelerde retry count u artırmasın. Human interaction onaylandığında ya da reddedildiğinde de retry count artmasın. 
 
 -------------------
 TAMAMLANANLAR 

@@ -2,26 +2,29 @@ package com.robodo.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import javax.mail.BodyPart;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.mail.Message;
-import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 import org.apache.tomcat.util.json.JSONParser;
 
@@ -122,13 +125,17 @@ public class HelperUtil {
 		
 		for (String key : keys) {
 			String find="${%s}".formatted(key);
-			//System.err.println("xxxxxxxxxxx searching for : %s".formatted(find));
 			
 			while(true) {
 				int pos=sb.indexOf(find);
 				if (pos==-1) break;
 				sb.delete(pos, pos+find.length());
-				sb.insert(pos, hmVars.get(key));
+				if (isSecret(key)) {
+					sb.insert(pos, decrypt(hmVars.get(key)));
+				} else {
+					sb.insert(pos, hmVars.get(key));
+				}
+				
 			}
 		}
 		
@@ -137,19 +144,22 @@ public class HelperUtil {
 	}
 	
 	
+	private static boolean isSecret(String key) {
+		return List.of("instanceId","processInstance.code").stream().anyMatch(p->p.equals(key));
+	}
+
 	private static boolean sendEmail(EmailTemplate emailTemplate, RunnerUtil runnerUtil) {
 		String from = "yildirayelmaci@gmail.com";
-		String host = "smtp.gmail.com";
 		Properties properties = System.getProperties();
 		
-		properties.put("mail.smtp.host", host);
+		properties.put("mail.smtp.host", "smtp.gmail.com");
 		properties.put("mail.smtp.port", "465");
 		properties.put("mail.smtp.ssl.enable", "true");
 		properties.put("mail.smtp.auth", "true");
 
 		Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("yildirayelmaci@gmail.com", "zffxuvhipdjvlfkn");
+                return new PasswordAuthentication(from, "zffxuvhipdjvlfkn");
             }
         });
 		
@@ -208,5 +218,53 @@ public class HelperUtil {
 		   return valid;
 	}
 
+	private static final String ALGORITHM = "AES";
+	private static final String passKey="!228yESIamaGoodRobot!9003$12331";
 
+	private static SecretKeySpec secretKey;
+    private static byte[] key;
+    
+    
+
+    public static void prepareSecreteKey() {
+        MessageDigest sha = null;
+        try {
+            key = passKey.getBytes(StandardCharsets.UTF_8);
+            sha = MessageDigest.getInstance("SHA-1");
+            key = sha.digest(key);
+            key = Arrays.copyOf(key, 16);
+            secretKey = new SecretKeySpec(key, ALGORITHM);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    static {
+    	prepareSecreteKey();
+    }
+
+    public static String encrypt(String strToEncrypt) {
+        try {
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
+        } catch (Exception e) {
+            System.out.println("Error while encrypting: " + e.toString());
+        }
+        return null;
+    }
+
+    public static String decrypt(String strToDecrypt) {
+        try {
+            prepareSecreteKey();
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
+        } catch (Exception e) {
+            System.out.println("Error while decrypting: " + e.toString());
+        }
+        return null;
+    }
+    
+ 
 }

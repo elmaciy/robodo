@@ -7,15 +7,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.json.JSONParser;
 import org.openqa.selenium.WebElement;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.robodo.discoverer.BaseDiscoverer;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ExecutionResultsForCommand;
@@ -64,7 +60,6 @@ public class RunnerUtil {
 		processService.saveProcessInstance(result.getProcessInstance());
 		
 		hmExtractedValues = HelperUtil.String2HashMap(result.getProcessInstance().getInstanceVariables());
-		setVariable("instanceId", processInstance.getCode());
 		
 
 		List<ProcessInstanceStep> steps = result.getProcessInstance().getSteps();
@@ -84,10 +79,12 @@ public class RunnerUtil {
 				continue;
 			}
 			logs.setLength(0);
+			
 			//add existing logs if any
 			if (step.getLogs() != null) {
 				logs.append(step.getLogs());
 			}
+			
 			result.getProcessInstance().setCurrentStepCode(step.getStepCode());
 			processService.saveProcessInstance(result.getProcessInstance());
 			

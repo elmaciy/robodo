@@ -27,6 +27,8 @@ import com.robodo.threads.ThreadForInstanceRunner;
 import com.robodo.threads.ThreadForUIUpdating;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
+import com.robodo.utils.UIUtils;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -40,8 +42,6 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
@@ -91,9 +91,9 @@ public class UIProcessor extends VerticalLayout {
 				p.setActive(newVal);
 				boolean isOk = processService.saveProcessDefinition(p);
 				if (!isOk) {
-					notifyError("Error saving");
+					UIUtils.notifyError("Error saving");
 				} else {
-					notifySuccess("process is %s".formatted(newVal ? "active" : "pasive"));
+					UIUtils.notifySuccess("process is %s".formatted(newVal ? "active" : "pasive"));
 				}
 			});
 			return chActive;
@@ -165,8 +165,8 @@ public class UIProcessor extends VerticalLayout {
 			btnShowVars.setEnabled(!p.getStatus().equals(ProcessInstance.END));
 			btnShowVars.setDisableOnClick(true);
 			btnShowVars.addClickListener(e -> {
-				gridProcessInstance.select(p);
-				showVariables("instance variable for %s".formatted(p.getCode()),p.getInstanceVariables());
+				//gridProcessInstance.select(p);
+				showVariables("instance variable for %s (%s)".formatted(p.getCode(), p.getDescription()),p.getInstanceVariables());
 				btnShowVars.setEnabled(true);
 			});
 			return btnShowVars;
@@ -176,8 +176,8 @@ public class UIProcessor extends VerticalLayout {
 			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SMALL);
 			btnShowSteps.setDisableOnClick(true);
 			btnShowSteps.addClickListener(e -> {
-				gridProcessInstance.select(p);
-				showProcessInstanceSteps("instance variable for %s".formatted(p.getCode()),p.getSteps());
+				//gridProcessInstance.select(p);
+				showProcessInstanceSteps("steps for %s (%s)".formatted(p.getCode(), p.getDescription()),p.getSteps());
 				btnShowSteps.setEnabled(true);
 			});
 			return btnShowSteps;
@@ -185,7 +185,7 @@ public class UIProcessor extends VerticalLayout {
 		
 		
 		gridProcessInstance.addComponentColumn(p -> {
-			Button btnApprove = new Button("Release", new Icon(VaadinIcon.CHECK));
+			Button btnApprove = new Button("Approval", new Icon(VaadinIcon.CHECK));
 			btnApprove.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 			if (p.getStatus().equals(ProcessInstance.STATUS_RUNNING)) {
 				Optional<ProcessInstanceStep> instanceStepOpt =  p.getSteps().stream().filter(i->i.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)).findFirst();
@@ -204,12 +204,12 @@ public class UIProcessor extends VerticalLayout {
 			
 			btnApprove.setDisableOnClick(true);
 			btnApprove.addClickListener(e -> {
-				gridProcessInstance.select(p);
+				//gridProcessInstance.select(p);
 				approveProcessInstance(p);
 				btnApprove.setEnabled(true);
 			});
 			return btnApprove;
-		}).setHeader("Release").setAutoWidth(true);
+		}).setHeader("Approval").setAutoWidth(true);
 		
 		
 		gridProcessInstance.addComponentColumn(p -> {
@@ -219,7 +219,7 @@ public class UIProcessor extends VerticalLayout {
 			btnRun.addClickListener(e -> {
 				gridProcessInstance.select(p);
 				runProcessInstance(p);
-				try {Thread.sleep(3000);} catch(Exception ex) {}
+				try {Thread.sleep(1000);} catch(Exception ex) {}
 				btnRun.setEnabled(true);
 			});
 			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.END));
@@ -288,12 +288,8 @@ public class UIProcessor extends VerticalLayout {
 			return;
 		}
 		
-		ProcessInstanceStep step = stepOpt.get();
-		step.setStatus(ProcessInstanceStep.STATUS_COMPLETED);
-		step.setApproved(true);
-		step.setApprovalDate(LocalDateTime.now());
-		step.setApprovedBy("TBD");
-		processService.saveProcessInstance(instance);
+		UI.getCurrent().navigate("/approve/%s/VIEW".formatted(instance.getCode()));
+		
 		
 	}
 
@@ -317,6 +313,17 @@ public class UIProcessor extends VerticalLayout {
 		grid.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setAutoWidth(true);
+		grid.addComponentColumn(p->{
+			Button btnBackward = new Button("Backwards", new Icon(VaadinIcon.BACKWARDS));
+			btnBackward.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+			btnBackward.setDisableOnClick(true);
+			btnBackward.addClickListener(e -> {
+				setBackward(p);
+				btnBackward.setEnabled(true);
+			});
+			btnBackward.setEnabled(!p.getStatus().equals(ProcessInstance.END));
+			return btnBackward; 
+		}).setHeader("Backwards").setAutoWidth(true);
 		
 		grid.getColumns().forEach(col->{col.setResizable(true);});
 		grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
@@ -387,6 +394,53 @@ public class UIProcessor extends VerticalLayout {
 		
 	}
 
+
+	private void setBackward(ProcessInstanceStep stepToBackward) {
+		ProcessInstance processInstance = stepToBackward.getProcessInstance();
+		List<ProcessInstanceStep> steps = processInstance.getSteps();
+		
+		Collections.sort(steps, new Comparator<ProcessInstanceStep>() {
+			@Override
+			public int compare(ProcessInstanceStep o1, ProcessInstanceStep o2) {
+				return o1.getOrderNo().compareTo(o2.getOrderNo());
+			}
+		});
+		
+		int stepCount=0;
+		for (int i=steps.size()-1;i>=0;i--) {
+			ProcessInstanceStep step=steps.get(i);
+			if (step.getStepCode().equals(stepToBackward.getStepCode())) break;
+			
+			if (!step.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
+				stepCount++;
+			}
+		}
+		
+		if (stepCount>0) {
+			UIUtils.notifyError("backward next steps first");
+			return;
+		}
+		
+		stepToBackward.setStatus(ProcessInstanceStep.STATUS_NEW);
+		stepToBackward.setApprovalDate(null);
+		stepToBackward.setApproved(false);
+		stepToBackward.setApprovedBy(null);
+		stepToBackward.setNotificationSent(false);
+		stepToBackward.setError(null);
+		stepToBackward.setFiles(new ArrayList<ProcessInstanceStepFile>());
+		stepToBackward.setLogs(null);
+		
+		long countOfNonNew=steps.stream().filter(p->!p.getStatus().equals(ProcessInstanceStep.STATUS_NEW)).count();
+		
+		processInstance.setStatus(countOfNonNew==0 ? ProcessInstance.STATUS_NEW : ProcessInstance.STATUS_RUNNING);
+		processInstance.setFinished(null);
+		processInstance.setCurrentStepCode(countOfNonNew==0 ? ProcessInstance.BEGIN : "BACKWARDED");
+		processInstance.setRetryNo(Integer.max(processInstance.getRetryNo()-1, 0));
+
+		processService.saveProcessInstance(processInstance);
+		
+		UIUtils.notifyError("backwarded");
+	}
 
 	private HorizontalLayout generateTabForFiles(ProcessInstanceStep step) {
 		HorizontalLayout lay=new HorizontalLayout();
@@ -548,7 +602,7 @@ public class UIProcessor extends VerticalLayout {
 		String processId="DISCOVERY.%s".formatted(processDefinition.getCode());
 		boolean isRunning = RunnerSingleton.getInstance().hasRunningInstance(processId);
 		if (isRunning) {
-			notifyError("Discovery is already running");
+			UIUtils.notifyError("Discovery is already running");
             return;
 		}
 		
@@ -570,30 +624,14 @@ public class UIProcessor extends VerticalLayout {
 		}
 		
 		RunnerSingleton.getInstance().stop(processId);
-		notifyInfo(discovered==0 ?  "no new instance is discovered " : "%d new instance discovered".formatted(discovered));
+		UIUtils.notifyInfo(discovered==0 ?  "no new instance is discovered " : "%d new instance discovered".formatted(discovered));
 		setData(processDefinition);
 		fillGrid();
 		
 	}
 	
 	
-	private void notifySuccess(String content) {
-		Notification notification = Notification.show(content);
-        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-        notification.setPosition(Notification.Position.TOP_END);
-	}
 	
-	private void notifyError(String content) {
-		Notification notification = Notification.show(content);
-        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        notification.setPosition(Notification.Position.TOP_END);		
-	}
-	
-	private void notifyInfo(String content) {
-		Notification notification = Notification.show(content);
-        notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
-        notification.setPosition(Notification.Position.TOP_END);		
-	}
 
 
 
@@ -604,12 +642,12 @@ public class UIProcessor extends VerticalLayout {
 		int maxThreadCount=Integer.valueOf(processService.getEnv().getProperty("max.thread"));
 		int currentThreadCount=ThreadGroupSingleton.getInstance().getActiveThreadCount();
 		if (currentThreadCount>=maxThreadCount) {
-			notifyError("no thread to run this instance");
+			UIUtils.notifyError("no thread to run this instance");
 			return;
 		}
 		
 		if (RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode())) {
-			notifyError("this instance %s is already running. Please wait.".formatted(processInstance.getCode()));
+			UIUtils.notifyError("this instance %s is already running. Please wait.".formatted(processInstance.getCode()));
 			return;
 		}
 		
@@ -617,7 +655,7 @@ public class UIProcessor extends VerticalLayout {
 		Thread thread=new Thread(new ThreadForInstanceRunner(processService, processInstance));
 		thread.start();
 		
-		notifySuccess("tread succssfully started for instance %s, thread id : %s ".formatted(processInstance.getCode(), String.valueOf(thread.getId())));
+		UIUtils.notifySuccess("tread succssfully started for instance %s, thread id : %s ".formatted(processInstance.getCode(), String.valueOf(thread.getId())));
 		
 	}
 

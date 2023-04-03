@@ -155,11 +155,13 @@ public class RobodoApplication {
 					+ "<br>"
 					+ "İyi çalışmalar"
 					+ "<hr>"
-					+ "<a href=\"http://localhost:8080/processses?onay=Y&instanceid=${instanceId}\"><b><font color=green>[+ Onayla]</font></b></a> "
+					+ "<center>"
+					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/APPROVE\"><b><font color=green>[+ Onayla]</font></b></a> "
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-					+ "<a href=\"http://localhost:8080/processses?onay=N&instanceid=${instanceId}\"><font color=red>[-Reddet]</font></a> "
+					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/DECLINE\"><font color=red>[-Reddet]</font></a> "
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-					+ "<a href=\"http://localhost:8080/processses?onay=V&instanceid=${instanceId}\"><font color=blue>[İncele]</font></a> "
+					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/VIEW\"><font color=blue>[İncele]</font></a> "
+					+ "</center>"
 					+ "<hr>"
 					+ " ");
 			emailTemplateRepo.save(email);
