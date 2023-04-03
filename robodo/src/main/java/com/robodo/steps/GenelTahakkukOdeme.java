@@ -49,8 +49,6 @@ public class GenelTahakkukOdeme extends BaseEpatsSteps {
 		
 		setVariable("dekontNo", dekontNo);
 		
-		selenium.sleep(10L);
-		
 	}
 
 

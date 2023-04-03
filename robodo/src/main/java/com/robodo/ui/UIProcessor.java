@@ -321,7 +321,7 @@ public class UIProcessor extends VerticalLayout {
 				setBackward(p);
 				btnBackward.setEnabled(true);
 			});
-			btnBackward.setEnabled(!p.getStatus().equals(ProcessInstance.END));
+			btnBackward.setEnabled(!p.getStatus().equals(ProcessInstanceStep.STATUS_NEW));
 			return btnBackward; 
 		}).setHeader("Backwards").setAutoWidth(true);
 		
@@ -396,6 +396,10 @@ public class UIProcessor extends VerticalLayout {
 
 
 	private void setBackward(ProcessInstanceStep stepToBackward) {
+		
+		if (stepToBackward.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
+			return;
+		}
 		ProcessInstance processInstance = stepToBackward.getProcessInstance();
 		List<ProcessInstanceStep> steps = processInstance.getSteps();
 		
@@ -439,7 +443,7 @@ public class UIProcessor extends VerticalLayout {
 
 		processService.saveProcessInstance(processInstance);
 		
-		UIUtils.notifyError("backwarded");
+		UIUtils.notifySuccess("backwarded");
 	}
 
 	private HorizontalLayout generateTabForFiles(ProcessInstanceStep step) {
