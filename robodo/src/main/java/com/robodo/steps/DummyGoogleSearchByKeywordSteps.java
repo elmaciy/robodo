@@ -15,11 +15,14 @@ public class DummyGoogleSearchByKeywordSteps extends BaseSteps {
 
 	@Override
 	public void run() {
+		selenium.startWebDriver();
+		selenium.navigate("http://www.google.com");
 		WebElement findElement = selenium.getWebDriver().findElement(By.cssSelector("[name=q]"));
 		String keyword=getVariable("keyword");
 		selenium.setValue(findElement, keyword);
 		selenium.enter();
 		takeStepScreenShot(this.processInstanceStep, keyword);
+		selenium.stopDriver();
 		
 	}
 

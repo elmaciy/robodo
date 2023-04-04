@@ -294,7 +294,7 @@ public class UIProcessor extends UIBase {
 			return;
 		}
 		
-		UI.getCurrent().navigate("/approve?instanceId=%s&action=VIEW".formatted(instance.getCode()));
+		UI.getCurrent().navigate("/approve/%s/VIEW".formatted(instance.getCode()));
 		
 		
 	}
@@ -314,8 +314,25 @@ public class UIProcessor extends UIBase {
 		grid.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("5em");
 		grid.addColumn(p -> p.getError()).setHeader("Error").setWidth("10em");
 		grid.addColumn(p -> p.getCommands()).setHeader("Command Executed").setAutoWidth(true);
-		grid.addColumn(p -> p.getApprovedBy()).setHeader("Approved By").setAutoWidth(true);
-		grid.addColumn(p -> dateFormat(p.getApprovalDate())).setHeader("Approval Date");
+		grid.addComponentColumn(p->{
+			Button btnIcon = new Button();
+			btnIcon.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL);
+			if (p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)) {
+				if (p.isApproved()) {
+					btnIcon.setIcon(VaadinIcon.CHECK.create());
+					btnIcon.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+					
+				} else {
+					btnIcon.setIcon(VaadinIcon.CLOSE.create());
+					btnIcon.addThemeVariants(ButtonVariant.LUMO_ERROR);
+					
+				}
+			} 
+			
+			return btnIcon;
+		}).setHeader("Approved").setAutoWidth(true);
+		grid.addColumn(p -> p.getApprovedBy()).setHeader("App. By").setAutoWidth(true);
+		grid.addColumn(p -> dateFormat(p.getApprovalDate())).setHeader("App. Date");
 		grid.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setAutoWidth(true);

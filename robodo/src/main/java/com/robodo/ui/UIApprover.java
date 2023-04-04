@@ -1,9 +1,8 @@
 package com.robodo.ui;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +20,13 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
-@Route(value = "/approve")
+@Route(value = "/approve/:instanceId/:action")
 @PageTitle("Robodo - Approval")
 @SpringComponent
 @UIScope
@@ -41,35 +39,20 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	
 	String instanceId;
 	String action;
-	
-	Map<String, List<String>> parametersMap=new HashMap<String,List<String>>();
+
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {
-
-		Location location = event.getLocation();
-	    QueryParameters queryParameters = location.getQueryParameters();
-	    parametersMap = queryParameters.getParameters();
-	    UI.getCurrent().getSession().setAttribute("instanceId", getQueryParameter(instanceId));
-	    UI.getCurrent().getSession().setAttribute("action", getQueryParameter(action));
-	}
-	
-	public String getQueryParameter(String parameterName) {
-
-		if (parametersMap.containsKey(parameterName)) {
-			try {
-				return parametersMap.get(parameterName).get(0);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-			
+		RouteParameters routeParameters = event.getRouteParameters();
+		Iterator<String> it = routeParameters.getParameterNames().iterator();
+		while (it.hasNext()) {
+			String parameterName=it.next();
+			String value=routeParameters.get(parameterName).get();
+			System.err.println("set parameter[%s=%s]".formatted(parameterName,value));
+			UI.getCurrent().getSession().setAttribute(parameterName, value);			
 		}
 		
-		return null;
 	}
-	
-	
 
 	@Autowired
 	public UIApprover(ProcessService processService) {
@@ -231,14 +214,5 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		
 		UI.getCurrent().getPage().reload();
 	}
-
-
-
-
-
-
-	
-
-	
 
 }
