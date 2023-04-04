@@ -19,7 +19,7 @@ public class DiscoverProcessGooggleSearch extends BaseDiscoverer {
 
 	@Override
 	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {
-		List<String> keywords = List.of("Yildiray","Elmacı");
+		List<String> keywords = List.of("Yildiray","Elmacı","Eidhoven");
 		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
 		
 		for (String keyword : keywords) {

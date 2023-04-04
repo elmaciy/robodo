@@ -59,6 +59,18 @@ public class UIBase extends Div {
 	}
 
 
-	
+	public void informAndRun(String header, String message, Runnable actionAfterInform) {
+		ConfirmDialog dialog = new ConfirmDialog();
+		dialog.setHeader(header);
+		dialog.setText(message);
+		dialog.setCancelable(false);
+		
+		dialog.setRejectable(false);
+		dialog.setConfirmText("OK");
+		dialog.addConfirmListener(event -> {
+			actionAfterInform.run();
+		});
+		dialog.open();
+	}	
 
 }

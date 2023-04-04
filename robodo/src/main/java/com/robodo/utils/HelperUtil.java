@@ -2,8 +2,10 @@ package com.robodo.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -16,7 +18,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
@@ -145,7 +150,7 @@ public class HelperUtil {
 	
 	
 	private static boolean isSecret(String key) {
-		return List.of("").stream().anyMatch(p->p.equals(key));
+		return List.of("instanceId","processinstance.code").stream().anyMatch(p->p.equals(key));
 	}
 
 	private static boolean sendEmail(EmailTemplate emailTemplate, RunnerUtil runnerUtil) {
@@ -243,30 +248,71 @@ public class HelperUtil {
     	prepareSecreteKey();
     }
 
-    public static String encrypt(String strToEncrypt) {
+    public static String encrypt(String in) {
+    	byte[] input = in.getBytes();
+        SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
         try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
-        } catch (Exception e) {
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+            byte[] arr= cipher.doFinal(input);	
+            return byteArr2HexString(arr);
+        } catch(Exception e) {
         	e.printStackTrace();
-            System.out.println("Error while encrypting: " + e.toString());
+        	return null;
         }
-        return null;
-    }
-
-    public static String decrypt(String strToDecrypt) {
-        try {
-            prepareSecreteKey();
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
-        } catch (Exception e) {
-        	e.printStackTrace();
-            System.out.println("Error while decrypting: " + e.toString());
-        }
-        return null;
     }
     
+    public static String decrypt(String in) {
+    	byte[] bytes=hexStringToByteArr(in);
+        SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
+        try {
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec);
+            byte[] bytesDecrypted= cipher.doFinal(bytes);
+            return new String(bytesDecrypted, Charset.forName("utf8"));
+        } catch(Exception e) {
+        	e.printStackTrace();
+        	return null;
+        }
+    }   
+
+    private static String byteArr2HexString(byte[] bytes) {
+		StringBuilder sb = new StringBuilder();
+	    for (byte b : bytes) {
+	        sb.append(String.format("%02X", b));
+	    }
+	    return sb.toString();
+	}
+    
+    private static byte[] hexStringToByteArr(String hexString) {
+    	byte[] bytes=new byte[hexString.length()/2];
+    	int loc=0;
+    	for (int i=0;i<hexString.length()/2;i++) {
+            int firstDigit = toDigit(hexString.charAt(i*2+0));
+            int secondDigit = toDigit(hexString.charAt(i*2+1));
+            byte b= (byte) ((firstDigit << 4) + secondDigit);
+            bytes[loc++]=b;
+    	}
+    	return bytes;
+    }
+
+    private static int toDigit(char hexChar) {
+        int digit = Character.digit(hexChar, 16);
+        if(digit == -1) {
+            throw new IllegalArgumentException(
+              "Invalid Hexadecimal Character: "+ hexChar);
+        }
+        return digit;
+    }
+
+	
+    
+    public static void main(String[] args) {
+    	String str="YıldırayElmacı/123";
+    	String encrypted = new String(encrypt(str));
+    	System.err.println("encrypted : "+encrypted);
+    	String decrypted = new String(decrypt(encrypted));
+    	System.err.println("encrypted : "+decrypted);
+    }
  
 }

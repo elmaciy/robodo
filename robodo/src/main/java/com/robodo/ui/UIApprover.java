@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.services.ProcessService;
+import com.robodo.utils.HelperUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -26,7 +27,7 @@ import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
-@Route(value = "/approve/:instanceId/:action")
+@Route(value = "/approve/:instanceId/:action/:source")
 @PageTitle("Robodo - Approval")
 @SpringComponent
 @UIScope
@@ -39,6 +40,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	
 	String instanceId;
 	String action;
+	String source;
 
 
 	@Override
@@ -63,10 +65,13 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		
 		this.action=(String) UI.getCurrent().getSession().getAttribute("action");
 		this.instanceId=(String) UI.getCurrent().getSession().getAttribute("instanceId");
+		this.source=(String) UI.getCurrent().getSession().getAttribute("source");
 		
 		if (instanceId==null) {
 			notifyError("instance is not given");
 			return;
+		} else {
+			instanceId=HelperUtil.decrypt(instanceId);
 		}
 		 
 		if (action==null) {
@@ -75,13 +80,18 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		}
 		 
 		if ("APPROVE,DECLINE,VIEW".indexOf(action)==-1) {
-			notifyError("action is not defined : %s".formatted(action));
+			notifyError("invalid action : %s".formatted(action));
+			return;
+		}
+		
+		if ("EMAIL,SCREEN".indexOf(source)==-1) {
+			notifyError("invalid source: %s".formatted(source));
 			return;
 		}
 		 
 		processInstance = processService.getProcessInstanceByCode(instanceId);
 		if (processInstance==null) {
-			notifyError("no instance found");
+			notifyError("no instance found : %s".formatted(instanceId));
 			return;
 		}
 		 
@@ -93,16 +103,14 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	private void drawScreen() {
 		Button btApprove = new Button("APPROVE", new Icon(VaadinIcon.CHECK));
 		btApprove.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_LARGE);
-		btApprove.setDisableOnClick(true);
-		btApprove.setEnabled(isApproveable(processInstance));
+		btApprove.setEnabled(isApproveable(processInstance) && !source.equals("EMAIL"));
 		btApprove.addClickListener(e -> {
 			approve(processInstance);
 		});
 		
 		Button btDecline = new Button("DECLINE", new Icon(VaadinIcon.CLOSE));
 		btDecline.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_LARGE);
-		btDecline.setDisableOnClick(true);
-		btDecline.setEnabled(isApproveable(processInstance));
+		btDecline.setEnabled(isApproveable(processInstance)  && !source.equals("EMAIL"));
 		btDecline.addClickListener(e -> {
 			decline(processInstance);
 		});
@@ -144,7 +152,6 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		Optional<ProcessInstanceStep> opt = processInstance.getSteps().stream()
 				.filter(p-> p.getCommands().startsWith("waitHumanInteraction"))
 				.filter(p-> p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING))
-				.filter(p-> !p.isApproved())
 				.findFirst();
 		return opt.isPresent();
 	}
@@ -212,7 +219,15 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		
 		processService.saveProcessInstance(processInstance);
 		
-		UI.getCurrent().getPage().reload();
+		if (source.equals("EMAIL")) {
+			UI.getCurrent().navigate(UIApprovalOk.class);
+			return;
+		}
+
+		informAndRun("Approval", "Successfully %s".formatted(approved? "approved":"declined"), ()->{
+			UI.getCurrent().navigate(UIProcessor.class);
+		});
+		
 	}
 
 }

@@ -293,8 +293,9 @@ public class UIProcessor extends UIBase {
 		if (stepOpt.isEmpty()) {
 			return;
 		}
+
 		
-		UI.getCurrent().navigate("/approve/%s/VIEW".formatted(instance.getCode()));
+		UI.getCurrent().navigate("/approve/%s/VIEW/SCREEN".formatted(HelperUtil.encrypt(instance.getCode())));
 		
 		
 	}
@@ -317,7 +318,7 @@ public class UIProcessor extends UIBase {
 		grid.addComponentColumn(p->{
 			Button btnIcon = new Button();
 			btnIcon.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL);
-			if (p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)) {
+			if (p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED) && p.getCommands().startsWith("waitHumanInteraction")) {
 				if (p.isApproved()) {
 					btnIcon.setIcon(VaadinIcon.CHECK.create());
 					btnIcon.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
