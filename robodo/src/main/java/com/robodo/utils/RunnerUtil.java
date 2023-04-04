@@ -128,7 +128,6 @@ public class RunnerUtil {
 			}
 		}
 		
-		hmExtractedValues.put("processInstance.currentStepCode", result.getProcessInstance().getCurrentStepCode());
 		result.getProcessInstance().setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
 
 		processService.saveProcessInstance(result.getProcessInstance());

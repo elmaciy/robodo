@@ -1,8 +1,9 @@
 package com.robodo.ui;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,66 +21,89 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.Location;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
-@Route("/approve/:instanceId/:action")
+@Route(value = "/approve")
+@PageTitle("Robodo - Approval")
 @SpringComponent
 @UIScope
-public class UIApprover extends UIBase implements BeforeEnterObserver {
+public class UIApprover extends UIBase   implements BeforeEnterObserver {
 
 	private static final long serialVersionUID = 1L;
 
 	ProcessService processService;
 	ProcessInstance processInstance;
 	
-	String action;
 	String instanceId;
-
-
+	String action;
+	
+	Map<String, List<String>> parametersMap=new HashMap<String,List<String>>();
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {
-		Iterator<String> it = event.getRouteParameters().getParameterNames().iterator();
-		while (it.hasNext()) {
-			String param = it.next();
-			String value=event.getRouteParameters().get(param).get();
-			UI.getCurrent().getSession().setAttribute(param, value);
-		}
+
+		Location location = event.getLocation();
+	    QueryParameters queryParameters = location.getQueryParameters();
+	    parametersMap = queryParameters.getParameters();
+	    UI.getCurrent().getSession().setAttribute("instanceId", getQueryParameter(instanceId));
+	    UI.getCurrent().getSession().setAttribute("action", getQueryParameter(action));
 	}
+	
+	public String getQueryParameter(String parameterName) {
+
+		if (parametersMap.containsKey(parameterName)) {
+			try {
+				return parametersMap.get(parameterName).get(0);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+			
+		}
+		
+		return null;
+	}
+	
 	
 
 	@Autowired
 	public UIApprover(ProcessService processService) {
 		super(processService);
-		 this.processService=processService;
-		 this.action=(String) UI.getCurrent().getSession().getAttribute("action");
-		 this.instanceId=(String) UI.getCurrent().getSession().getAttribute("instanceId");
 		
-		 if (instanceId==null) {
-			 notifyError("instance is not given");
-			 return;
-		 }
+		this.processService=processService;
+		
+		
+		this.action=(String) UI.getCurrent().getSession().getAttribute("action");
+		this.instanceId=(String) UI.getCurrent().getSession().getAttribute("instanceId");
+		
+		if (instanceId==null) {
+			notifyError("instance is not given");
+			return;
+		}
 		 
-		 if (action==null) {
-			 notifyError("action is not given");
-			 return;
-		 }
+		if (action==null) {
+			notifyError("action is not given");
+			return;
+		}
 		 
-		 if ("APPROVE,DECLINE,VIEW".indexOf(action)==-1) {
-			 notifyError("action is not defined : %s".formatted(action));
-			 return;
-		 }
+		if ("APPROVE,DECLINE,VIEW".indexOf(action)==-1) {
+			notifyError("action is not defined : %s".formatted(action));
+			return;
+		}
 		 
-		 processInstance = processService.getProcessInstanceByCode(instanceId);
-		 if (processInstance==null) {
-			 notifyError("no instance found");
-			 return;
-		 }
+		processInstance = processService.getProcessInstanceByCode(instanceId);
+		if (processInstance==null) {
+			notifyError("no instance found");
+			return;
+		}
 		 
 		 
-		 drawScreen();
+		drawScreen();
 	}
 
 
@@ -207,6 +231,12 @@ public class UIApprover extends UIBase implements BeforeEnterObserver {
 		
 		UI.getCurrent().getPage().reload();
 	}
+
+
+
+
+
+
 	
 
 	

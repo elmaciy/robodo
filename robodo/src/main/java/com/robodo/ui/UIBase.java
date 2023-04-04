@@ -1,6 +1,5 @@
 package com.robodo.ui;
 
-import com.robodo.model.ProcessInstance;
 import com.robodo.services.ProcessService;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.html.Div;
@@ -9,21 +8,17 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
+
 @SpringComponent
 @UIScope
 public class UIBase extends Div {
-
 	private static final long serialVersionUID = 1L;
 
 	ProcessService processService;
-	ProcessInstance processInstance;
 	
-	String action;
-	String instanceId;
-
-
-
-	public UIBase(ProcessService processService) {}
+	public UIBase(ProcessService processService) {
+		this.processService=processService;
+	}
 	
 	
 	public void notifySuccess(String content) {
@@ -62,6 +57,7 @@ public class UIBase extends Div {
 	
 		dialog.open();
 	}
+
 
 	
 

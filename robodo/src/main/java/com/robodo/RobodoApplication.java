@@ -38,7 +38,7 @@ public class RobodoApplication {
 			yillikPatentUcreti.setSteps(steps);
 			yillikPatentUcreti.setSingleAtATime(true);
 			yillikPatentUcreti.setDiscovererClass("DiscoverOdenecekYillikPatentUcretleri");
-			yillikPatentUcreti.setActive(true);
+			yillikPatentUcreti.setActive(false);
 			
 			
 			
@@ -103,54 +103,54 @@ public class RobodoApplication {
 			
 			
 			
-			ProcessDefinition processDef2=new ProcessDefinition();
+			ProcessDefinition getTextAndSearchOnGoogle=new ProcessDefinition();
 			//processDef1.setId(1L);
-			processDef2.setCode("PROCESS2");
-			processDef2.setDescription("PROCESS FOR TEST 2");
-			processDef2.setMaxRetryCount(1);
-			processDef2.setMaxThreadCount(1);
+			getTextAndSearchOnGoogle.setCode("GOOGLESEARCH");
+			getTextAndSearchOnGoogle.setDescription("Get text from somewhere and search on google");
+			getTextAndSearchOnGoogle.setMaxRetryCount(1);
+			getTextAndSearchOnGoogle.setMaxThreadCount(1);
 			List<ProcessDefinitionStep> steps2=new ArrayList<ProcessDefinitionStep>();			
-			processDef2.setSteps(steps2);
-			processDef2.setSingleAtATime(true);
-			processDef2.setDiscovererClass("DiscoverProcess2");
-			processDef2.setActive(false);
+			getTextAndSearchOnGoogle.setSteps(steps2);
+			getTextAndSearchOnGoogle.setSingleAtATime(true);
+			getTextAndSearchOnGoogle.setDiscovererClass("DiscoverProcessGooggleSearch");
+			getTextAndSearchOnGoogle.setActive(true);
 			
 			
 			
 			
-			ProcessDefinitionStep step21=new ProcessDefinitionStep();
-			step21.setCode("STEP2");
-			step21.setDescription("STEP 1 of PROCESS2");
-			step21.setOrderNo("01");
-			step21.setSingleAtATime(true);
-			step21.setCommands("commands");
-			step21.setProcessDefinition(processDef2);
+			ProcessDefinitionStep googleWaitApproval=new ProcessDefinitionStep();
+			googleWaitApproval.setCode("WAIT_APPROVAL");
+			googleWaitApproval.setDescription("Wait for approval");
+			googleWaitApproval.setOrderNo("01");
+			googleWaitApproval.setSingleAtATime(true);
+			googleWaitApproval.setCommands("waitHumanInteraction GOOGLE");
+			googleWaitApproval.setProcessDefinition(getTextAndSearchOnGoogle);
 			
 			
 			
-			ProcessDefinitionStep step22=new ProcessDefinitionStep();
-			step22.setCode("STEP2");
-			step22.setDescription("STEP2 of PROCESS2");
-			step22.setOrderNo("02");
-			step22.setSingleAtATime(true);
-			step22.setCommands("commands");
-			step22.setProcessDefinition(processDef2);
+			ProcessDefinitionStep googleSearchStep=new ProcessDefinitionStep();
+			googleSearchStep.setCode("DOSEARCH");
+			googleSearchStep.setDescription("Search keyword");
+			googleSearchStep.setOrderNo("02");
+			googleSearchStep.setSingleAtATime(true);
+			googleSearchStep.setCommands("runStepClass DummyGoogleSearchByKeywordSteps");
+			googleSearchStep.setProcessDefinition(getTextAndSearchOnGoogle);
 			
-			processDef2.getSteps().add(step21);
-			processDef2.getSteps().add(step22);
+			getTextAndSearchOnGoogle.getSteps().add(googleWaitApproval);
+			getTextAndSearchOnGoogle.getSteps().add(googleSearchStep);
 			
 			
-			if (processDefinitionRepo.findByCode(processDef2.getCode()).isEmpty()) {
-				processDefinitionRepo.save(processDef2);
+			if (processDefinitionRepo.findByCode(getTextAndSearchOnGoogle.getCode()).isEmpty()) {
+				processDefinitionRepo.save(getTextAndSearchOnGoogle);
 			}
 			
 			
 			//---------------------------------------------------
-			EmailTemplate email=new EmailTemplate();
-			email.setCode("YILLIK_UCRET_ONAY");
-			email.setToAddress("elmaciy@hotmail.com,y.elmaci@astoundcommerce.com");
-			email.setSubject("Onayınız bekleniyor. Dosya No ${dosyaNumarasi}");
-			email.setBody(
+			EmailTemplate emailForYillikPatentUcreti=new EmailTemplate();
+			emailForYillikPatentUcreti.setCode("YILLIK_UCRET_ONAY");
+			emailForYillikPatentUcreti.setToAddress("elmaciy@hotmail.com,y.elmaci@astoundcommerce.com");
+			emailForYillikPatentUcreti.setSubject("Onayınız bekleniyor. Dosya No ${dosyaNumarasi}");
+			emailForYillikPatentUcreti.setBody(
 					"Sayın ilgili;"
 					+ "<br>"
 					+ "<br>"
@@ -161,19 +161,47 @@ public class RobodoApplication {
 					+ "İyi çalışmalar"
 					+ "<hr>"
 					+ "<center>"
-					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/APPROVE\"><b><font color=green>[+ Onayla]</font></b></a> "
+					+ "<a href=\"http://localhost:8080/approve?instanceId=${processInstance.code}&action=APPROVE\"><b><font color=green>[+ Onayla]</font></b></a> "
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/DECLINE\"><font color=red>[-Reddet]</font></a> "
+					+ "<a href=\"http://localhost:8080/approve?instanceId=${processInstance.code}&action=DECLINE\"><font color=red>[-Reddet]</font></a> "
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/VIEW\"><font color=blue>[İncele]</font></a> "
+					+ "<a href=\"http://localhost:8080/approve?instanceId=${processInstance.code}&action=VIEW\"><font color=blue>[İncele]</font></a> "
 					+ "</center>"
 					+ "<hr>"
 					+ " ");
 			
-			if (emailTemplateRepo.findByCode(email.getCode()).isEmpty()) {
-				emailTemplateRepo.save(email);
+			if (emailTemplateRepo.findByCode(emailForYillikPatentUcreti.getCode()).isEmpty()) {
+				emailTemplateRepo.save(emailForYillikPatentUcreti);
 			}
 			
+			
+			
+			//---------------------------------------------------
+			EmailTemplate emailForGoogleSearch=new EmailTemplate();
+			emailForGoogleSearch.setCode("GOOGLE");
+			emailForGoogleSearch.setToAddress("elmaciy@hotmail.com");
+			emailForGoogleSearch.setSubject("Onayınız bekleniyor. Aranacak Kelime : ${keyword}");
+			emailForGoogleSearch.setBody(
+					"Sayın ilgili;"
+					+ "<br>"
+					+ "<br>"
+					+ " ${keyword} kelimesi, onayınız sonrası aranacaktır "
+					+ "<br>"
+					+ "İyi çalışmalar"
+					+ "<hr>"
+					+ "<center>"
+					+ "<a href=\"http://localhost:8080/approve?instanceId=${processInstance.code}&action=APPROVE\"><b><font color=green>[+ Onayla]</font></b></a> "
+					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+					+ "<a href=\"http://localhost:8080/approve?instanceId=${processInstance.code}&action=DECLINE\"><font color=red>[-Reddet]</font></a> "
+					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+					+ "<a href=\"http://localhost:8080/approve?instanceId=${processInstance.code}&action=VIEW\"><font color=blue>[İncele]</font></a> "
+					+ "</center>"
+					+ "<hr>"
+					+ " ");
+			
+			if (emailTemplateRepo.findByCode(emailForGoogleSearch.getCode()).isEmpty()) {
+				emailTemplateRepo.save(emailForGoogleSearch);
+			}
 			
 		};
 

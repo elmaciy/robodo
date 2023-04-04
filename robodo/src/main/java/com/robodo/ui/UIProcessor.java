@@ -48,12 +48,15 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
+
 @Route("/process")
+@PageTitle("Robodo - Processes")
 @SpringComponent
 @UIScope
 public class UIProcessor extends UIBase {
@@ -141,10 +144,10 @@ public class UIProcessor extends UIBase {
 		
 		//--------------------------------------------------------------------
 		gridProcessInstance = new Grid<>(ProcessInstance.class, false);
-		gridProcessInstance.addColumn(p -> p.getId()).setHeader("#");
-		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
-		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
-		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("3em");
+		gridProcessInstance.addColumn(p -> p.getId()).setHeader("#").setFrozen(true);
+		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true).setFrozen(true);
+		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true).setFrozen(true);
+		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("3em").setFrozen(true);
 		gridProcessInstance.addColumn(p -> p.getError()).setHeader("Error").setWidth("10em");
 		gridProcessInstance.addComponentColumn(p -> {
 			ProgressBar progress = new ProgressBar();
@@ -168,11 +171,11 @@ public class UIProcessor extends UIBase {
 			btnShowVars.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SMALL);
 			btnShowVars.setDisableOnClick(true);
 			btnShowVars.addClickListener(e -> {
-				showVariables("instance variable for %s (%s)".formatted(p.getCode(), p.getDescription()),p.getInstanceVariables());
+				showVariables(p);
 				btnShowVars.setEnabled(true);
 			});
 			return btnShowVars;
-		}).setHeader("Vars").setWidth("2em");
+		}).setHeader("Vars").setWidth("2em").setFrozenToEnd(true);
 		gridProcessInstance.addComponentColumn(p -> {
 			Button btnShowSteps = new Button("", new Icon(VaadinIcon.OPEN_BOOK));
 			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SMALL);
@@ -182,11 +185,11 @@ public class UIProcessor extends UIBase {
 				btnShowSteps.setEnabled(true);
 			});
 			return btnShowSteps;
-		}).setHeader("Steps").setWidth("2em");;
+		}).setHeader("Steps").setWidth("2em").setFrozenToEnd(true);
 		
 		
 		gridProcessInstance.addComponentColumn(p -> {
-			Button btnApprove = new Button("Approval", new Icon(VaadinIcon.CHECK));
+			Button btnApprove = new Button("", new Icon(VaadinIcon.CHECK));
 			btnApprove.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 			if (p.getStatus().equals(ProcessInstance.STATUS_RUNNING)) {
 				Optional<ProcessInstanceStep> instanceStepOpt =  p.getSteps().stream().filter(i->i.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)).findFirst();
@@ -210,11 +213,11 @@ public class UIProcessor extends UIBase {
 				btnApprove.setEnabled(true);
 			});
 			return btnApprove;
-		}).setHeader("Approval").setAutoWidth(true);
+		}).setHeader("Approve").setAutoWidth(true).setFrozenToEnd(true);
 		
 		
 		gridProcessInstance.addComponentColumn(p -> {
-			Button btnRun = new Button("Run", new Icon(VaadinIcon.PLAY));
+			Button btnRun = new Button("", new Icon(VaadinIcon.PLAY));
 			btnRun.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 			btnRun.setDisableOnClick(true);
 			btnRun.addClickListener(e -> {
@@ -225,7 +228,7 @@ public class UIProcessor extends UIBase {
 			});
 			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.STATUS_COMPLETED));
 			return btnRun;
-		}).setHeader("Run").setAutoWidth(true);
+		}).setHeader("Run").setAutoWidth(true).setFrozenToEnd(true);
 		
 
 		
@@ -291,7 +294,7 @@ public class UIProcessor extends UIBase {
 			return;
 		}
 		
-		UI.getCurrent().navigate("/approve/%s/VIEW".formatted(instance.getCode()));
+		UI.getCurrent().navigate("/approve?instanceId=%s&action=VIEW".formatted(instance.getCode()));
 		
 		
 	}
@@ -491,27 +494,80 @@ public class UIProcessor extends UIBase {
 		return image;
 	}
 
-	private void showVariables(String title, String data) {
+	private void showVariables(ProcessInstance processInstance) {
 		Dialog dialog = new Dialog();
+		String title="instance variable for %s (%s)".formatted(processInstance.getCode(), processInstance.getDescription());
 		dialog.setHeaderTitle(title);
 		
 		VerticalLayout dialogLayout = new VerticalLayout();
 		dialogLayout.setSizeFull();
 		
-		HashMap<String, String> hmVars = HelperUtil.String2HashMap(data);
+		HashMap<String, String> hmVars = HelperUtil.String2HashMap(processInstance.getInstanceVariables());
 		Grid<KeyValue> gridVars=new Grid<>(KeyValue.class, false);
 		gridVars.addColumn(p -> p.getKey()).setHeader("Variable Name").setWidth("20em");
 		gridVars.addComponentColumn(p -> {
 			TextField textField=new TextField();
 			textField.setWidthFull();
 			textField.setValue(p.getValue());
+			textField.addValueChangeListener(e->{
+				p.setValue(e.getValue());
+			});
 			return textField;
 		}).setHeader("Value").setWidth("30em");
+		
+		gridVars.addComponentColumn(p -> {
+			Button btnUpdate = new Button("Save", new Icon(VaadinIcon.DOWNLOAD));
+			btnUpdate.addThemeVariants( ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+			btnUpdate.setDisableOnClick(true);
+			btnUpdate.addClickListener(e -> {
+				hmVars.put(p.getKey(), p.getValue());
+				String changedVariables = HelperUtil.hashMap2String(hmVars);
+				processInstance.setInstanceVariables(changedVariables);
+				processService.saveProcessInstance(processInstance);
+				notifyInfo("variable changed");
+				btnUpdate.setEnabled(true);
+			});
+			return btnUpdate;
+		}).setHeader("Update").setAutoWidth(true);
+		
+		gridVars.addComponentColumn(p -> {
+			Button btnRemove = new Button("Remove", new Icon(VaadinIcon.DOWNLOAD));
+			btnRemove.addThemeVariants( ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+			btnRemove.setDisableOnClick(true);
+			btnRemove.addClickListener(e -> {
+				hmVars.remove(p.getKey());
+				String changedVariables = HelperUtil.hashMap2String(hmVars);
+				processInstance.setInstanceVariables(changedVariables);
+				processService.saveProcessInstance(processInstance);
+				notifyInfo("variable removed");
+				setVariableGridItems(gridVars, hmVars);
+				btnRemove.setEnabled(true);
+			});
+			return btnRemove;
+		}).setHeader("Update").setAutoWidth(true);
 		
 		gridVars.getColumns().forEach(col->{col.setResizable(true);});
 		gridVars.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 		gridVars.setSizeFull();
 
+		setVariableGridItems(gridVars,hmVars);
+		dialogLayout.add(gridVars);
+		
+		
+		dialog.add(dialogLayout);
+		Button cancelButton = new Button("Close", e -> dialog.close());
+		dialog.getFooter().add(cancelButton);
+		dialog.setWidth("60%");
+		dialog.setHeight("80%");
+		dialog.setResizable(true);
+		dialog.setCloseOnEsc(true);
+		dialog.setCloseOnOutsideClick(true);
+		dialog.open();
+		
+	}
+
+
+	private void setVariableGridItems(Grid<KeyValue> gridVars, HashMap<String, String> hmVars) {
 		List<KeyValue> items=new ArrayList<KeyValue>();
 		hmVars.keySet().stream().forEach(key->{
 			items.add(new KeyValue(key,(String) hmVars.get(key)));
@@ -527,21 +583,8 @@ public class UIProcessor extends UIBase {
 		});
 		
 		gridVars.setItems(items);
-		dialogLayout.add(gridVars);
-		
-		
-		dialog.add(dialogLayout);
-		Button cancelButton = new Button("Close", e -> dialog.close());
-		dialog.getFooter().add(cancelButton);
-		dialog.setWidth("60%");
-		dialog.setHeight("50%");
-		dialog.setResizable(true);
-		dialog.setCloseOnEsc(true);
-		dialog.setCloseOnOutsideClick(true);
-		dialog.open();
 		
 	}
-
 
 	public boolean refreshProcessDefinitionGrid() {
 

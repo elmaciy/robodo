@@ -1,5 +1,4 @@
 1. Takılan instanceler nasıl tekrar kuyruğa alınacak? Heartbeat mantığı mı getirsek? 
-1. instance variable ekranında değiştirmeye izin verelim. 
 3. genel olarak bir thread count parametresi koyalım. propertiesden alsın. bu sayıdan fazla thread olmasın. 
 4. thread ların görünebileceği bir ekran yap. 
 5. gizli bilgilerin girileceği bir ekran yap. (kredi kartı bilgileri vs..)
@@ -14,7 +13,7 @@
 17. threshold belirle, bu aşılınca mail gitsin biryerlere, bu sayede bir problem olup olmadığını anlarız. 
 	a. uzun süredir hiçbir süreç discover edilmiyor
 	b. kuyruk azalmiyor
-19. H2DB yi diske alalım. 
+19. H2DB yi mysql e çevir
 20. eski işi bitenleri silelim. 
 21. ekran görüntülerinin saklanması?
 22. instanceleri başlatan kısımdaki lojikten dolayı hep aynı işleri öncelikli alıyor. burada bir dağılım yapmak iyi olabilir. 
@@ -23,14 +22,13 @@
 25. islem yarıda selenium exception alınca (mesela karsilastirma hatası) browser açık kalıyor. 
 26. hata alınca ekran görüntüsü alınsı o anki. sonra selenium kapatılsın. 
 28. human interaaction da onaylama olmazsa? ekranda da süreçte de onay ve red olacak. isApproved = isDone olacak. 
-30. ekrandaki human onay butonundan sonra confirmation alsın. bir de kontrol etmeden onaya izin vermese? 
 31. human notificationda email gitmezse tekrar deneyecek mi? 
 6. human interaction da onay ekranı olsun. önce maille link gönderilecek sonra onay verecek kişi bu ekrandan tüm detayları görebilecek. 
-32. email parametrelerini properties dosyasina al. esnek olmasini sagla. 
 33. emaile işaretlenen dosyalar eklensin attachment olarak. ekranı açmak zorunda kalmasın. 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı?
 35. Ödeme aşamalarında bir şekilde o işlemin arada manual ödenip ödenmediğini kontrol edebilir miyiz? 
 36. human interaction bekleyen instancelerde retry count u artırmasın. Human interaction onaylandığında ya da reddedildiğinde de retry count artmasın. 
+37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
 
 -------------------
 TAMAMLANANLAR 
@@ -41,4 +39,7 @@ TAMAMLANANLAR
 18. human interaction adımında kime mail gideceği ile ilgili düzenleme yapılabilsin ya da email adresi komuta parametre olarak verilsin. tüm ilgili mailler tekrar oluşturulabilsin değişince. 
 29. human interactionda ilgili kişilere mail atılır. mailden de onaylanabilir, linklere tıklanarak da. 
 0. aynı instance in aynı anda iki kere koşmasını engelleyecek bir yapı yok. instance running iken ikincisi de gelip koşuyor. Running yerine PAused mi konulsa? Running aktif koşuyor anlamında. 
+30. ekrandaki human onay butonundan sonra confirmation alsın. bir de kontrol etmeden onaya izin vermese? 
+32. email parametrelerini properties dosyasina al. esnek olmasini sagla. 
+1. instance variable ekranında değiştirmeye ve silmeye izin verelim. 
 
