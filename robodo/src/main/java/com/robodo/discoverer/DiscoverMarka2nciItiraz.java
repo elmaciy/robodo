@@ -47,6 +47,19 @@ public class DiscoverMarka2nciItiraz extends BaseDiscoverer {
 			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺2.450,00"));
 			hmVars.put("itirazSahibiAdi", "KOÇ HOLDİNG ANONİM ŞİRKETİ");
 			hmVars.put("itirazSahibiKimlikNo", "5700020575");
+			
+			hmVars.put("Benzerlik/Karıştırılma İhtimali (6/1)", "YES");
+			hmVars.put("Eskiye Dayalı Kullanım (6/3)", "YES");
+			hmVars.put("Ortak/Garanti Markanın Yenilenmemesi (6/7)", "YES");
+			hmVars.put("Kötü Niyet (6/9)", "YES");
+			
+			
+			//hmVars.put("itirazaGerekceDosyaNumaralari", "T/00132, 2018/62877, 2021/059708");
+			hmVars.put("itirazaGerekceDosyaNumaralari", "2019");
+			
+			hmVars.put("itirazaIliskinDosya", "C:\\projects\\robodo\\files\\itirazailiskindosya1.pdf");
+			
+			
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			
 			for (var definitedSteps : processDefinition.getSteps()) {

@@ -1,7 +1,10 @@
 package com.robodo.steps;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.base.Splitter;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.pages.PageEdevletLogin;
 import com.robodo.pages.PageEpatsBasvuruYapan;
@@ -10,7 +13,10 @@ import com.robodo.pages.PageEpatsDosyaBilgisi;
 import com.robodo.pages.PageEpatsHizmetDokumu;
 import com.robodo.pages.PageEpatsHome;
 import com.robodo.pages.PageEpatsIslemSonucu;
+import com.robodo.pages.PageEpatsItirazGerekceleri;
 import com.robodo.pages.PageEpatsItirazSahibiBilgisi;
+import com.robodo.pages.PageEpatsItirazaIliskinBilgiler;
+import com.robodo.pages.PageEpatsItirazaIliskinEkler;
 import com.robodo.pages.PageEpatsMenu;
 import com.robodo.pages.PageEpatsOnIzleme;
 import com.robodo.pages.PageEpatsTahakkukOde;
@@ -34,6 +40,9 @@ public class BaseEpatsSteps extends BaseSteps {
 	PageEpatsTahakkukOde epatsTahakkukOde;
 	PageEpatsTalepTuru epatsTalepTuru;
 	PageEpatsItirazSahibiBilgisi epatsItirazSahibiBilgisi;
+	PageEpatsItirazGerekceleri epatsItirazGerekceleri;
+	PageEpatsItirazaIliskinBilgiler epatsItirazaIliskinBilgiler;
+	PageEpatsItirazaIliskinEkler epatsItirazaIliskinEkler;
 	
 	public BaseEpatsSteps(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
@@ -51,6 +60,9 @@ public class BaseEpatsSteps extends BaseSteps {
 		this.epatsTahakkukOde=new PageEpatsTahakkukOde(selenium);
 		this.epatsTalepTuru=new PageEpatsTalepTuru(selenium);
 		this.epatsItirazSahibiBilgisi=new PageEpatsItirazSahibiBilgisi(selenium);
+		this.epatsItirazGerekceleri=new PageEpatsItirazGerekceleri(selenium);
+		this.epatsItirazaIliskinBilgiler=new PageEpatsItirazaIliskinBilgiler(selenium);
+		this.epatsItirazaIliskinEkler=new PageEpatsItirazaIliskinEkler(selenium);
 	}
 
 	public void sistemeGiris() {
@@ -128,11 +140,60 @@ public class BaseEpatsSteps extends BaseSteps {
 		epatsDosyaBilgisi.devamEt();
 	}
 	
-	public void itirazSahibiEkle() {
+	public void itirazSahibiEkleDevamEt() {
 		String itirazSahibiAdi= getVariable("itirazSahibiAdi");
 		String itirazSahibiKimlikNo = getVariable("itirazSahibiKimlikNo");
 		
 		epatsItirazSahibiBilgisi.itirazSahibiEkle(itirazSahibiAdi, itirazSahibiKimlikNo);
+		
+
+		epatsItirazSahibiBilgisi.devamEt();
+	}
+	
+	public void itirazGerekceleriEkle() {
+		List<String> itirazSecenekleri = List.of(
+				"Benzerlik/Karıştırılma İhtimali (6/1)",
+				"Temsilci Tarafından Yapılan İzinsiz Başvuru (6/2)",
+				"Eskiye Dayalı Kullanım (6/3)",
+				"Paris Sözleşmesi Kapsamında Tanınmışlık (6/4)",
+				"Tanınmışlık (6/5)",
+				"Diğer Fikri Haklar veya Kişi Hakları (6/6)",
+				"Ortak/Garanti Markanın Yenilenmemesi (6/7)",
+				"Tescilli Markanın Yenilenmemesi (6/8)",
+				"Kötü Niyet (6/9)",
+				"Diğer");
+		
+		itirazSecenekleri.forEach(itiraz->{
+			if (getVariable(itiraz)!=null) {
+				epatsItirazGerekceleri.itirazGerekcesiIsaretle(itiraz);	
+			}
+			
+		});
+	}
+	
+	public void itirazaGerekceDosyalariEkleDevamEt() {
+		String itirazaGerekceDosyaNumaralari=getVariable("itirazaGerekceDosyaNumaralari");
+		if (itirazaGerekceDosyaNumaralari==null || itirazaGerekceDosyaNumaralari.strip().isBlank()) {
+			runnerUtil.logger("itiraza gerekce dosya belirtilmediğinden bu adım geçiliyor. ");
+			return;
+		}
+		List<String> dosyaNumaralari = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(itirazaGerekceDosyaNumaralari);
+		dosyaNumaralari.forEach(dosya->{
+			epatsItirazGerekceleri.itirazaGerekceDosyaEkle(dosya);
+		});
+		
+		epatsItirazGerekceleri.devamEt();
+	}
+	
+	public void itirazaIliskibBilgileriEkleDevamEt() {
+		String itirazaIliskinDosya=getVariable("itirazaIliskinDosya");
+		epatsItirazaIliskinBilgiler.itirazaIliskinEvrakYukle(itirazaIliskinDosya);
+		epatsItirazaIliskinBilgiler.devamEt();
+
+	}
+	
+	public void itirazaIliskinEkleriEkleDevamEt() {
+		epatsItirazaIliskinEkler.devamEt();
 	}
 	
 	public void talepTuruTamSecVeDevamEt() {
@@ -198,6 +259,11 @@ public class BaseEpatsSteps extends BaseSteps {
 		}
 		
 	}
+	
+	public void vazgecVeSayfayaDon() {
+		epatsMenu.vazgecVeSayfayaDon();
+	}
+	
 	
 	public void anaSayfayaDon() {
 		epatsIslemSonucu.anaSayfayaDon();

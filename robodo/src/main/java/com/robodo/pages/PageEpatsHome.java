@@ -25,12 +25,13 @@ public class PageEpatsHome extends PageEpatsBase {
 		//bunu asmak icin bu şekilde deneme yanılmalı bir döngü kurduk
 		int counter=0;
 		while(true) {
-			if (counter++>=5) break;
+			if (counter++>=10) break;
 			selenium.navigate("https://epats.turkpatent.gov.tr/");
 			String currentUrl = selenium.getWebDriver().getCurrentUrl();
 			if (currentUrl.contains("TP/EDEVLET/giris")) {
 				break;
 			}
+			selenium.sleep(3L);
 		}
 		
 		

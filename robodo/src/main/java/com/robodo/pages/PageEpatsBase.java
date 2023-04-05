@@ -1,11 +1,12 @@
 package com.robodo.pages;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.io.File;
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.robodo.utils.SeleniumUtil;
 
@@ -58,5 +59,20 @@ public class PageEpatsBase extends BasePage {
 		
 	}
 	
+	public void waitProcessorGone() {
+		WebDriverWait waiter=new WebDriverWait(selenium.getWebDriver(), selenium.getWebDriver().manage().timeouts().getImplicitWaitTimeout());
+		waiter.until(ExpectedConditions.invisibilityOf(selenium.getWebDriver().findElement(By.cssSelector("div.sweet-overlay"))));
+		
+	}
+	
+	public void uploadFileBySingleFileZone(WebElement el, String filePath) {
+		selenium.sleep(3L);
+		selenium.sendKeys(el,filePath);
+		WebElement btYukle = selenium.getWebDriver().findElement(By.cssSelector("div.upload-container span.btn.btn-success"));
+		selenium.click(btYukle);
+		File file=new File(filePath);
+		String fileName=file.getName();
+		selenium.waitElementAttributeToBe(By.xpath("//i[@class='fa fa-file']/..//a"),"download",fileName);
+	}
 
 }

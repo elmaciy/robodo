@@ -23,6 +23,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Splitter;
 import com.robodo.model.ProcessInstance;
@@ -62,7 +64,7 @@ public class SeleniumUtil {
 	}
 
 	public void navigate(String url) {
-		runnerUtil.logger("naviget to : %s".formatted(url));
+		runnerUtil.logger("navigating to : %s".formatted(url));
 		webDriver.get(url);
 	}
 
@@ -213,9 +215,40 @@ public class SeleniumUtil {
 		webDriver.switchTo().frame(opt.get());
 	}
 	
+
+	
 	public void switchToMainFrame() {
 		runnerUtil.logger("switch to main frame");
 		webDriver.switchTo().defaultContent();
 	}
+	
+	private WebDriverWait getWebDriverWait() {
+		return new WebDriverWait(webDriver, this.webDriver.manage().timeouts().getImplicitWaitTimeout());
+	}
+
+	public void waitElementClickable(WebElement el) {
+		runnerUtil.logger("wait to be clickable: element %s".formatted(el2Str(el)));
+		getWebDriverWait().until(ExpectedConditions.elementToBeClickable(el));
+	}
+	
+	public void waitElementAttributeToBe(By xpath, String attribute, String expectedValue) {
+		runnerUtil.logger("wait attribute [%s] of element to be [%s]: for element %s".formatted(attribute, expectedValue, xpath));
+		getWebDriverWait().until(ExpectedConditions.attributeToBe(xpath, attribute, expectedValue));
+		
+	}
+
+	public void setValueByJavaScript(WebElement el, String filePath) {
+		runnerUtil.logger("set input value to '%s' by javascript: element %s".formatted(filePath,el2Str(el)));
+		JavascriptExecutor j = (JavascriptExecutor) webDriver;
+		j.executeScript("arguments[0].value=arguments[1];", el, filePath);
+		
+	}
+
+	public void sendKeys(WebElement el, String value) {
+		runnerUtil.logger("send keys '%s : element %s".formatted(value,el2Str(el)));
+		el.sendKeys(value);
+	}
+
+	
 
 }

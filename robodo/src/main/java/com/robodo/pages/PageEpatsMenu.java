@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 import com.robodo.utils.SeleniumUtil;
 
@@ -13,6 +14,11 @@ public class PageEpatsMenu extends PageEpatsBase {
 		super(selenium);
 	}
 	
+	@FindBy(xpath="//div[text()='Vazgeç ve Ana Ekrana Dön']")
+	WebElement elVazgec;
+	
+	@FindBy(css="div.sweet-alert.showSweetAlert.visible div.sa-confirm-button-container")
+	WebElement elConfirmVazgec;
 
 	private void clickableAction(String title) {
 		selenium.logger("menü aç => %s".formatted(title));
@@ -47,6 +53,13 @@ public class PageEpatsMenu extends PageEpatsBase {
 
 	public void gotoVekillikSayfam() {
 		clickableAction("Vekillik Sayfam");		
+		
+	}
+
+
+	public void vazgecVeSayfayaDon() {
+		selenium.click(elVazgec);
+		selenium.click(elConfirmVazgec);
 		
 	}
 

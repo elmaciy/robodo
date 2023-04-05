@@ -20,7 +20,21 @@ public class Marka2nciItirazOlusturSteps extends BaseEpatsSteps {
 		basvuruYap();
 		dosyaBilgisiAra();
 		dosyaBilgisiDogrulaDevamEt();
-		itirazSahibiEkle();
+		itirazSahibiEkleDevamEt();
+		itirazGerekceleriEkle();
+		itirazaGerekceDosyalariEkleDevamEt();
+		itirazaIliskibBilgileriEkleDevamEt();
+		itirazaIliskinEkleriEkleDevamEt();
+		hizmetDokumuDevamEt();
+		//bu kisimlar acilacak...
+		//onizlemeKontrolveTahakkukOlustur();
+		//tahakkukNumarasiAl();
+		//anaSayfayaDon();
+		
+		//gecici olarak ana sayfaya donuyoruz. 
+		epatsMenu.vazgecVeSayfayaDon();
+		epatsMenu.cikis();
+		
 		selenium.sleep(10L);
 		selenium.stopDriver();
 	}
