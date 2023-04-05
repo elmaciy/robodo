@@ -534,7 +534,7 @@ public class UIProcessor extends UIBase {
 		}).setHeader("Value").setWidth("30em");
 		
 		gridVars.addComponentColumn(p -> {
-			Button btnUpdate = new Button("Save", new Icon(VaadinIcon.DOWNLOAD));
+			Button btnUpdate = new Button("Update", new Icon(VaadinIcon.DOWNLOAD));
 			btnUpdate.addThemeVariants( ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 			btnUpdate.setDisableOnClick(true);
 			btnUpdate.addClickListener(e -> {
@@ -562,7 +562,7 @@ public class UIProcessor extends UIBase {
 				btnRemove.setEnabled(true);
 			});
 			return btnRemove;
-		}).setHeader("Update").setAutoWidth(true);
+		}).setHeader("Remove").setAutoWidth(true);
 		
 		gridVars.getColumns().forEach(col->{col.setResizable(true);});
 		gridVars.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);

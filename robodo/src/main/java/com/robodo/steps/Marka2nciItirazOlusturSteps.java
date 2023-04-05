@@ -22,7 +22,7 @@ public class Marka2nciItirazOlusturSteps extends BaseEpatsSteps {
 		dosyaBilgisiDogrulaDevamEt();
 		itirazSahibiEkleDevamEt();
 		itirazGerekceleriEkle();
-		itirazaGerekceDosyalariEkleDevamEt();
+		itirazaGerekceDosyaNumaralariEkleDevamEt();
 		itirazaIliskibBilgileriEkleDevamEt();
 		itirazaIliskinEkleriEkleDevamEt();
 		hizmetDokumuDevamEt();

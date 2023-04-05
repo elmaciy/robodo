@@ -148,6 +148,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		
 
 		epatsItirazSahibiBilgisi.devamEt();
+		takeStepScreenShot(processInstanceStep, "İtiraz sahibi eklendi", false);
 	}
 	
 	public void itirazGerekceleriEkle() {
@@ -163,15 +164,19 @@ public class BaseEpatsSteps extends BaseSteps {
 				"Kötü Niyet (6/9)",
 				"Diğer");
 		
+		
+		
 		itirazSecenekleri.forEach(itiraz->{
 			if (getVariable(itiraz)!=null) {
 				epatsItirazGerekceleri.itirazGerekcesiIsaretle(itiraz);	
 			}
 			
 		});
+		
+		takeStepScreenShot(processInstanceStep, "İtiraz gerekçeleri işaretlendi", false);
 	}
 	
-	public void itirazaGerekceDosyalariEkleDevamEt() {
+	public void itirazaGerekceDosyaNumaralariEkleDevamEt() {
 		String itirazaGerekceDosyaNumaralari=getVariable("itirazaGerekceDosyaNumaralari");
 		if (itirazaGerekceDosyaNumaralari==null || itirazaGerekceDosyaNumaralari.strip().isBlank()) {
 			runnerUtil.logger("itiraza gerekce dosya belirtilmediğinden bu adım geçiliyor. ");
@@ -182,12 +187,15 @@ public class BaseEpatsSteps extends BaseSteps {
 			epatsItirazGerekceleri.itirazaGerekceDosyaEkle(dosya);
 		});
 		
+		takeStepScreenShot(processInstanceStep, "İtiraza gerekçe dosyaları eklendi", false);
+		
 		epatsItirazGerekceleri.devamEt();
 	}
 	
 	public void itirazaIliskibBilgileriEkleDevamEt() {
 		String itirazaIliskinDosya=getVariable("itirazaIliskinDosya");
 		epatsItirazaIliskinBilgiler.itirazaIliskinEvrakYukle(itirazaIliskinDosya);
+		takeStepScreenShot(processInstanceStep, "İtiraza ilişkin bilgilere ait dosya eklendi", false);
 		epatsItirazaIliskinBilgiler.devamEt();
 
 	}
