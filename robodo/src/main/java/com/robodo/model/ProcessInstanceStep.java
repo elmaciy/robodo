@@ -179,6 +179,10 @@ public class ProcessInstanceStep {
 	public void setFiles(List<ProcessInstanceStepFile> files) {
 		this.files = files;
 	}
+
+	public boolean isHumanInteractionStep() {
+		return this.getCommands().startsWith("waitHumanInteraction");
+	}
 	
 	
 	

@@ -150,7 +150,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 
 	private boolean isApproveable(ProcessInstance processInstance) {
 		Optional<ProcessInstanceStep> opt = processInstance.getSteps().stream()
-				.filter(p-> p.getCommands().startsWith("waitHumanInteraction"))
+				.filter(p-> p.isHumanInteractionStep())
 				.filter(p-> p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING))
 				.findFirst();
 		return opt.isPresent();
@@ -188,7 +188,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 
 	private ProcessInstanceStep getStepToApprove(ProcessInstance processInstance2) {
 		Optional<ProcessInstanceStep> opt = processInstance.getSteps().stream()
-				.filter(p-> p.getCommands().startsWith("waitHumanInteraction"))
+				.filter(p-> p.isHumanInteractionStep())
 				.filter(p-> p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING))
 				.filter(p-> !p.isApproved())
 				.findFirst();

@@ -53,7 +53,7 @@ public class RunnerUtil {
 
 		RunnerSingleton.getInstance().start(processInstance.getCode());
 		
-		result.getProcessInstance().setRetryNo(processInstance.getRetryNo()+1);
+		
 		result.getProcessInstance().setStatus(ProcessInstance.STATUS_RUNNING);
 		processService.saveProcessInstance(result.getProcessInstance());
 		
@@ -62,7 +62,19 @@ public class RunnerUtil {
 
 		List<ProcessInstanceStep> steps = result.getProcessInstance().getSteps();
 
-		int runnedStepCount=0;
+		boolean isRetrying=false;
+		if (result.getProcessInstance().getRetryNo()==0) {
+			isRetrying=true;
+		} else {
+			ProcessInstanceStep currentStep = result.getProcessInstance().getCurrentStep();
+			if (currentStep!=null && !currentStep.isHumanInteractionStep()) {
+				isRetrying=true;
+			}
+		}
+		
+		if (isRetrying) {
+			result.getProcessInstance().setRetryNo(processInstance.getRetryNo()+1);
+		}
 		
 		for (ProcessInstanceStep step : steps) {
 			if (step.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)) {
@@ -120,8 +132,7 @@ public class RunnerUtil {
 			result.getProcessInstance().setFinished(LocalDateTime.now());
 		} else {
 			boolean isInHumanIntegration = result.getProcessInstance().getSteps().stream()
-					.filter(p -> !p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)).findFirst().get()
-					.getCommands().contains("waitHumanInteraction");
+					.filter(p -> !p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)).findFirst().get().isHumanInteractionStep();
 			if (isInHumanIntegration) {
 				result.getProcessInstance().setCurrentStepCode(ProcessInstance.STATUS_HUMAN);
 

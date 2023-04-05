@@ -197,7 +197,7 @@ public class UIProcessor extends UIBase {
 					btnApprove.setEnabled(false);
 				} else {
 					ProcessInstanceStep instanceStep = instanceStepOpt.get();
-					boolean enabled = instanceStepOpt.get().getCommands().contains("waitHumanInteraction") && !instanceStep.isApproved();
+					boolean enabled = instanceStepOpt.get().isHumanInteractionStep() && !instanceStep.isApproved();
 					btnApprove.setEnabled(enabled);
 				}
 				
@@ -318,7 +318,7 @@ public class UIProcessor extends UIBase {
 		grid.addComponentColumn(p->{
 			Button btnIcon = new Button();
 			btnIcon.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL);
-			if (p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED) && p.getCommands().startsWith("waitHumanInteraction")) {
+			if (p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED) && p.isHumanInteractionStep()) {
 				if (p.isApproved()) {
 					btnIcon.setIcon(VaadinIcon.CHECK.create());
 					btnIcon.addThemeVariants(ButtonVariant.LUMO_SUCCESS);

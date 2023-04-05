@@ -1,7 +1,6 @@
 package com.robodo;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -188,8 +187,8 @@ public class RobodoApplication {
 			stepMarka2nciItirazDosyaOku.setProcessDefinition(markaItiraz2);
 
 			ProcessDefinitionStep stepMarka2nciItirazOlustur=new ProcessDefinitionStep();
-			stepMarka2nciItirazOlustur.setCode("MARKA_YENILEME_TAHAKKUK");
-			stepMarka2nciItirazOlustur.setDescription("Marka yenileme tahakkuk oluşturma");
+			stepMarka2nciItirazOlustur.setCode("MARKA_2NCI_ITIRAZ_TAHAKKUK");
+			stepMarka2nciItirazOlustur.setDescription("Marka yayınına itirazın yeniden inceleneceği kayıtlar için tahakkuk oluşturma");
 			stepMarka2nciItirazOlustur.setOrderNo("02");
 			stepMarka2nciItirazOlustur.setSingleAtATime(false);
 			stepMarka2nciItirazOlustur.setCommands("runStepClass Marka2nciItirazOlusturSteps");

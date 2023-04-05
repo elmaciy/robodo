@@ -4,7 +4,6 @@
 9. instance ekranında başlangıçta sadece non completed instanceler gelsin. filtre falan koyalım buraya. 
 10. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 11. instance gridine sıralama koy. kolonlarına da filtre koy. 
-12. instanece gridine tüm step loglarının gösterilebileceği bir button koy. tek tek bakmayalım. 
 15. login ekranı konulacak
 16. kurulan yerde chrome güncellenmemeli
 17. alarm oluştur ve threshold belirle, bu aşılınca mail gitsin biryerlere, bu sayede bir problem olup olmadığını anlarız. 
@@ -13,21 +12,16 @@
 20. eski işi bitenleri belli bir gün geçince silelim. 
 22. instanceleri başlatan kısımdaki lojikten dolayı hep aynı işleri öncelikli alıyor. burada bir dağılım yapmak iyi olabilir. 
 23. kendi timerin yerine düzgün bir timer koy sayfaya
-24. locatorleri gözden geçir. değişebilecek id ler varsa bunlar düzelt çünkü deploymentten sonra değişirler. 
 25. islem yarıda selenium exception alınca (mesela karsilastirma hatası) browser açık kalıyor. 
 26. hata alınca ekran görüntüsü alınsı o anki. sonra selenium kapatılsın. 
-28. human interaaction da onaylama olmazsa? ekranda da süreçte de onay ve red olacak. isApproved = isDone olacak. 
 31. human notificationda email gitmezse tekrar deneyecek mi? 
 6. human interaction da onay ekranı olsun. önce maille link gönderilecek sonra onay verecek kişi bu ekrandan tüm detayları görebilecek. 
 33. emaile işaretlenen dosyalar eklensin attachment olarak. ekranı açmak zorunda kalmasın. 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı?
 35. Ödeme aşamalarında bir şekilde o işlemin arada manual ödenip ödenmediğini kontrol edebilir miyiz? 
-36. human interaction bekleyen instancelerde retry count u artırmasın. Human interaction onaylandığında ya da reddedildiğinde de retry count artmasın. 
 37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
 38. tablolara indexleri koy
 39. decline ettiğinde last stepi yanlış hesaplıyor. 
-40. human interactionda ise retry count u artırmasın
-41. grid bulurken kullanilan su xpath i daha düzgün yaz => ROOT_XPATH_GRID_DOSYALAR="//div[@id='datagrid360']";
 
 //----------------------------------------------
 drop table  email_template_seq;        
