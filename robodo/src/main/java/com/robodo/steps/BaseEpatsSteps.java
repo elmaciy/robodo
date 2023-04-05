@@ -56,26 +56,34 @@ public class BaseEpatsSteps extends BaseSteps {
 		String tckno=runnerUtil.getEnvironmentParameter("tckno");
 		String sifre=runnerUtil.getEnvironmentParameter("sifre");
 		edevletLogin.girisEdevlet(tckno, sifre);
-		takeStepScreenShot(processInstanceStep, "Sisteme giriş yapıldı");
+		takeStepScreenShot(processInstanceStep, "Sisteme giriş yapıldı", false);
 	}
 	
 	
-	public void dosyaAraIslemSec() {
+	public void dosyaAra() {
 		epatsMenu.gotoVekillikSayfam();
 		String dosyaNo=getVariable("dosyaNumarasi");
 		String basvuruTuru=getVariable("basvuruTuru");
-		String islemAdi=getVariable("islemAdi");
 		epatsBenimSayfam.dosyaArama(dosyaNo,basvuruTuru);
-		takeStepScreenShot(this.processInstanceStep, "Dosya arama sonucu");
-		epatsBenimSayfam.islemSec(islemAdi);
+		takeStepScreenShot(this.processInstanceStep, "Dosya arama sonucu", false);
+		
 	}
+	
+	public void islemSec() {
+		String islemGrubu=getVariable("islemGrubu");
+		String islemAdi=getVariable("islemAdi");
+		epatsBenimSayfam.islemSec(islemGrubu,islemAdi);
+		takeStepScreenShot(this.processInstanceStep, "Işlem Secimi", false);
+	}
+	
+	
 	
 	public void basvuruYap() {
 		String eposta=runnerUtil.getEnvironmentParameter("eposta");;
 		String cepTel=runnerUtil.getEnvironmentParameter("ceptel");
 		String referansNo=getVariable("takipNumarasi");
 		epatsBasvuruYapan.basvuruBilgileriniDoldur(eposta, cepTel, referansNo);
-		takeStepScreenShot(this.processInstanceStep, "Başvuru bilgileri");
+		takeStepScreenShot(this.processInstanceStep, "Başvuru bilgileri", false);
 		epatsBasvuruYapan.devamEt();
 	}
 	
@@ -114,7 +122,7 @@ public class BaseEpatsSteps extends BaseSteps {
 
 		karsilastir(getVariable("dosyabilgisi.dosyabilgisi.sahip.kimlik"), getVariable("basvuruSahipKimlikNo"), "başvuru sahibi kimlik/vergi no karşılaştırılıyor");
 		
-		takeStepScreenShot(this.processInstanceStep, "Dosya bilgisi");
+		takeStepScreenShot(this.processInstanceStep, "Dosya bilgisi", false);
 		epatsDosyaBilgisi.devamEt();
 	}
 	
@@ -126,7 +134,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	public void hizmetDokumuDevamEt() {
 		String ankaraPatentKodu=runnerUtil.getEnvironmentParameter("ankarapatent.vergino");
 		epatsHizmetDokumu.basvuruSahibiSec(ankaraPatentKodu);
-		takeStepScreenShot(this.processInstanceStep, "Hizmet dökümü");
+		takeStepScreenShot(this.processInstanceStep, "Hizmet dökümü", true);
 		selenium.sleep(3L);
 		epatsHizmetDokumu.devamEt();
 	}
@@ -160,7 +168,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		
 		karsilastir(HelperUtil.normalizeAmount(getVariable("onizleme.odenecek.genelToplam")), HelperUtil.normalizeAmount(getVariable("odemeTutari")), "ödenecek tutar karşılaştırılıyor");
 		
-		takeStepScreenShot(this.processInstanceStep, "Önizleme");
+		takeStepScreenShot(this.processInstanceStep, "Önizleme", true);
 		epatsOnIzleme.tahakkukOlustur();
 		
 	}
@@ -168,7 +176,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	public void  tahakkukNumarasiAl() {
 		String sonuc = epatsIslemSonucu.sonucAl();
 		setVariable("islemsonucu.sonuc", sonuc);
-		takeStepScreenShot(this.processInstanceStep, "Tahakkuk numarası oluşturuldu");
+		takeStepScreenShot(this.processInstanceStep, "Tahakkuk numarası oluşturuldu", true);
 		try {
 			String tahakkukNo=StringUtils.substringAfter(sonuc, "Tahakkuk No:");
 			Integer.parseInt(tahakkukNo);

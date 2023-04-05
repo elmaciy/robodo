@@ -11,9 +11,9 @@ import com.robodo.model.ProcessInstanceStep;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
-public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
+public class DiscoverMarka2nciItiraz extends BaseDiscoverer {
 
-	public DiscoverOdenecekYillikPatentUcretleri(RunnerUtil runnerUtil) {
+	public DiscoverMarka2nciItiraz(RunnerUtil runnerUtil) {
 		super(runnerUtil);
 	}
 
@@ -37,15 +37,15 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
 			
 			HashMap<String, String> hmVars=new HashMap<String, String>();
 			hmVars.put("processInstance.code", instance.getCode());
-			hmVars.put("dosyaNumarasi", "2019/06601");
-			hmVars.put("basvuruSahipKimlikNo", "9250412830");
-			hmVars.put("basvuruSahipUnvani", "VSY BİYOTEKNOLOJİ VE İLAÇ SANAYİ ANONİM ŞİRKETİ");
-			hmVars.put("bulusAdi", "HİYALURONİK ASİT/KİTOSAN/KARBOKSİMETİL SELÜLOZ İÇEREN BİYOUYUMLU, BİYOBOZUNUR VE BİYOEMİLEBİLİR BİR ADEZYON MEMBRAN VE ÜRETİM YÖNTEMİ");
-			hmVars.put("takipNumarasi", "TTuu20029SSSa112");
-			hmVars.put("basvuruTuru", "PATENT");
-			hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
-			hmVars.put("islemAdi", "Yıllık Ücret Ödeme");
-			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺1.710,00"));
+			hmVars.put("dosyaNumarasi", "2022/203652");
+			hmVars.put("basvuruSahipKimlikNo", "5700020575");
+			hmVars.put("basvuruSahipUnvani", "KOÇ HOLDİNG ANONİM ŞİRKETİ");
+			hmVars.put("markaAdi", "bilal koçotomotiv ticari yedek parça");
+			hmVars.put("takipNumarasi", "TKP_%s".formatted(String.valueOf(System.currentTimeMillis())));
+			hmVars.put("islemGrubu", "Üçüncü Kişi İşlemleri");
+			hmVars.put("islemAdi", "Marka Yayıma İtirazın Yeniden İncelenmesi (YİDD)");
+			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺2.450,00"));
+			hmVars.put("talepTuru", "Tam");
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			
 			for (var definitedSteps : processDefinition.getSteps()) {

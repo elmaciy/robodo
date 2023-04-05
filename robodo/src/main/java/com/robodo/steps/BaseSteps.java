@@ -26,13 +26,14 @@ public abstract class BaseSteps {
 		 return runnerUtil.getVariable(key);
 	 }
 	 
-	 public void takeStepScreenShot(ProcessInstanceStep processInstanceStep, String description) {
+	 public void takeStepScreenShot(ProcessInstanceStep processInstanceStep, String description, boolean toAttach) {
 		 String ssFileName = selenium.screenShot(processInstanceStep.getProcessInstance());
 		 ProcessInstanceStepFile file=new ProcessInstanceStepFile();
 		 file.setFileName(ssFileName);
 		 file.setFileType(ProcessInstanceStepFile.TYPE_SS);
 		 file.setDescription(description);
 		 file.setProcessInstanceStep(processInstanceStep);
+		 file.setAttach(toAttach);
 		 processInstanceStep.getFiles().add(file);
 	 }
 	 

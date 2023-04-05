@@ -43,6 +43,7 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseDiscoverer {
 			hmVars.put("markaAdi", "patrades");
 			hmVars.put("takipNumarasi", "TKP_%s".formatted(String.valueOf(System.currentTimeMillis())));
 			hmVars.put("basvuruTuru", "MARKA");
+			hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
 			hmVars.put("islemAdi", "Marka Yenileme");
 			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺2.450,00"));
 			hmVars.put("talepTuru", "Tam");

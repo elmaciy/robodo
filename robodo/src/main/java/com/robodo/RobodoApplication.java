@@ -114,7 +114,7 @@ public class RobodoApplication {
 			markaYenilemeProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
 			markaYenilemeProcess.setSingleAtATime(true);
 			markaYenilemeProcess.setDiscovererClass("DiscoverOdenecekMarkaYenilemeUcretleri");
-			markaYenilemeProcess.setActive(true);
+			markaYenilemeProcess.setActive(false);
 			
 			ProcessDefinitionStep stepMarkaYenilemeDosyaOku=new ProcessDefinitionStep();
 			stepMarkaYenilemeDosyaOku.setCode("MARKA_YENILEME_DOSYASINI_OKU");
@@ -132,13 +132,13 @@ public class RobodoApplication {
 			stepMarkeYenilemeTahakkukOlustur.setCommands("runStepClass MarkaYenilemeTahakkukOlustur");
 			stepMarkeYenilemeTahakkukOlustur.setProcessDefinition(markaYenilemeProcess);
 			
-			ProcessDefinitionStep steparkeYenilemeOnay=new ProcessDefinitionStep();
-			steparkeYenilemeOnay.setCode("MARKA_ONAY_BEKLE");
-			steparkeYenilemeOnay.setDescription("Marke yenileme tahakkuk ödeme için onay bekle");
-			steparkeYenilemeOnay.setOrderNo("03");
-			steparkeYenilemeOnay.setSingleAtATime(true);
-			steparkeYenilemeOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
-			steparkeYenilemeOnay.setProcessDefinition(markaYenilemeProcess);
+			ProcessDefinitionStep stepMarkaYenilemeOnay=new ProcessDefinitionStep();
+			stepMarkaYenilemeOnay.setCode("MARKA_ONAY_BEKLE");
+			stepMarkaYenilemeOnay.setDescription("Marke yenileme tahakkuk ödeme için onay bekle");
+			stepMarkaYenilemeOnay.setOrderNo("03");
+			stepMarkaYenilemeOnay.setSingleAtATime(true);
+			stepMarkaYenilemeOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
+			stepMarkaYenilemeOnay.setProcessDefinition(markaYenilemeProcess);
 			
 			ProcessDefinitionStep stepMarkaOde=new ProcessDefinitionStep();
 			stepMarkaOde.setCode("MARKA_TAHAKKUK_ODE");
@@ -158,12 +158,75 @@ public class RobodoApplication {
 			
 			//markaYenilemeProcess.getSteps().add(stepMarkaYenilemeDosyaOku);
 			markaYenilemeProcess.getSteps().add(stepMarkeYenilemeTahakkukOlustur);
-			markaYenilemeProcess.getSteps().add(steparkeYenilemeOnay);
+			markaYenilemeProcess.getSteps().add(stepMarkaYenilemeOnay);
 			markaYenilemeProcess.getSteps().add(stepMarkaOde);
 			//markaYenilemeProcess.getSteps().add(stepMarkaDekontIsle);
 
 			if (processDefinitionRepo.findByCode(markaYenilemeProcess.getCode()).isEmpty()) {
 				processDefinitionRepo.save(markaYenilemeProcess);
+			}
+			
+			//--------------------------------------------
+			
+			
+			ProcessDefinition markaItiraz2=new ProcessDefinition();
+			markaItiraz2.setCode("MARKA_2NCI_ITIRAZ");
+			markaItiraz2.setDescription("Marka Yayıma İtirazın Yeniden İncelenmesi (YİDD) süreci");
+			markaItiraz2.setMaxRetryCount(1);
+			markaItiraz2.setMaxThreadCount(2);
+			markaItiraz2.setSteps(new ArrayList<ProcessDefinitionStep>());
+			markaItiraz2.setSingleAtATime(true);
+			markaItiraz2.setDiscovererClass("DiscoverMarka2nciItiraz");
+			markaItiraz2.setActive(true);
+			
+			ProcessDefinitionStep stepMarka2nciItirazDosyaOku=new ProcessDefinitionStep();
+			stepMarka2nciItirazDosyaOku.setCode("MARKA_2NCI_ITIRAZ_DOSYASINI_OKU");
+			stepMarka2nciItirazDosyaOku.setDescription("Marka Yayıma itirazın yeniden inceleneceği kayıtların okunması");
+			stepMarka2nciItirazDosyaOku.setOrderNo("01");
+			stepMarka2nciItirazDosyaOku.setSingleAtATime(false);
+			stepMarka2nciItirazDosyaOku.setCommands("runStepClass Marka2nciItirazOkuSteps");
+			stepMarka2nciItirazDosyaOku.setProcessDefinition(markaItiraz2);
+
+			ProcessDefinitionStep stepMarka2nciItirazOlustur=new ProcessDefinitionStep();
+			stepMarka2nciItirazOlustur.setCode("MARKA_YENILEME_TAHAKKUK");
+			stepMarka2nciItirazOlustur.setDescription("Marka yenileme tahakkuk oluşturma");
+			stepMarka2nciItirazOlustur.setOrderNo("02");
+			stepMarka2nciItirazOlustur.setSingleAtATime(false);
+			stepMarka2nciItirazOlustur.setCommands("runStepClass Marka2nciItirazOlusturSteps");
+			stepMarka2nciItirazOlustur.setProcessDefinition(markaItiraz2);
+			
+			ProcessDefinitionStep stepMarka2nciItirazOnay=new ProcessDefinitionStep();
+			stepMarka2nciItirazOnay.setCode("MARKA_2NCI_ITIRAZ_ONAY");
+			stepMarka2nciItirazOnay.setDescription("Marka 2nci itiraz tahakkuk ödeme için onay bekle");
+			stepMarka2nciItirazOnay.setOrderNo("03");
+			stepMarka2nciItirazOnay.setSingleAtATime(true);
+			stepMarka2nciItirazOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
+			stepMarka2nciItirazOnay.setProcessDefinition(markaItiraz2);
+			
+			ProcessDefinitionStep stepMarka2nciItirazOde=new ProcessDefinitionStep();
+			stepMarka2nciItirazOde.setCode("MARKA_2NCI_ITIRAZ_ODE");
+			stepMarka2nciItirazOde.setDescription("Tahakkuk ödeme");
+			stepMarka2nciItirazOde.setOrderNo("04");
+			stepMarka2nciItirazOde.setSingleAtATime(false);
+			stepMarka2nciItirazOde.setCommands("runStepClass GenelTahakkukOdeme");
+			stepMarka2nciItirazOde.setProcessDefinition(markaItiraz2);
+			
+			ProcessDefinitionStep stepMarka2nciItirazDekontIsle=new ProcessDefinitionStep();
+			stepMarka2nciItirazDekontIsle.setCode("MARKA_2NCI_ITIRAZ_DEKONT_KAYDET");
+			stepMarka2nciItirazDekontIsle.setDescription("Ödeme dekont bilgisini sisteme kaydet");
+			stepMarka2nciItirazDekontIsle.setOrderNo("05");
+			stepMarka2nciItirazDekontIsle.setSingleAtATime(false);
+			stepMarka2nciItirazDekontIsle.setCommands("runStepClass GenelDekontKaydetSteps");
+			stepMarka2nciItirazDekontIsle.setProcessDefinition(markaItiraz2);
+			
+			//markaItiraz2.getSteps().add(stepMarka2nciItirazDosyaOku);
+			markaItiraz2.getSteps().add(stepMarka2nciItirazOlustur);
+			markaItiraz2.getSteps().add(stepMarka2nciItirazOnay);
+			markaItiraz2.getSteps().add(stepMarka2nciItirazOde);
+			//markaItiraz2.getSteps().add(stepMarka2nciItirazDekontIsle);
+
+			if (processDefinitionRepo.findByCode(markaItiraz2.getCode()).isEmpty()) {
+				processDefinitionRepo.save(markaItiraz2);
 			}
 			
 			//--------------------------------------------

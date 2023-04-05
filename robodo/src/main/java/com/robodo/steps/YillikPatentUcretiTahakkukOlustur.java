@@ -16,7 +16,8 @@ public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 	@Override
 	public void run() {
 		sistemeGiris();
-		dosyaAraIslemSec();
+		dosyaAra();
+		islemSec();
 		basvuruYap();
 		dosyaBilgisiDogrulaDevamEt();
 		hizmetDokumuDevamEt();

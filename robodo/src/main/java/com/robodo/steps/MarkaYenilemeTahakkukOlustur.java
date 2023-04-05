@@ -16,7 +16,8 @@ public class MarkaYenilemeTahakkukOlustur extends BaseEpatsSteps {
 	@Override
 	public void run() {
 		sistemeGiris();
-		dosyaAraIslemSec();
+		dosyaAra();
+		islemSec();
 		basvuruYap();
 		dosyaBilgisiDogrulaDevamEt();
 		talepTuruTamSecVeDevamEt();

@@ -24,14 +24,6 @@ public class PageEpatsBenimSayfam extends PageEpatsBase {
 	@FindBy(xpath=ROOT_XPATH_GRID_DOSYALAR+"//span[text()='Başvuru Türü']/../..//input")
 	WebElement inputDosyaTuru;
 	
-	private static final String ISLEM_COMBO_BASE_XPATH="//*[text()='Başvuru Sonrası İşlemler']/../../../../..//div[@class='form-item-control' and contains(@ng-if,'selectbox')]";
-	
-	@FindBy(xpath=ISLEM_COMBO_BASE_XPATH)
-	WebElement elIslemCombo;
-	
-	
-	@FindBy(xpath=ROOT_XPATH_DOSYALARIM+"//div[@class='btn btn-default' and text()='Git']")
-	WebElement elIslemeGit;
 	
 	
 	
@@ -55,9 +47,13 @@ public class PageEpatsBenimSayfam extends PageEpatsBase {
 	}
 
 
-	public void islemSec(String islemAdi) {
-		selenium.scrollToElement(elIslemCombo);
-		setComboboxByTitleContains(elIslemCombo, islemAdi);
+	public void islemSec(String islemGrubu, String islemAdi) {
+		String xpath="//*[text()='%s']/../../../../..//div[@class='form-item-control' and contains(@ng-if,'selectbox')]".formatted(islemGrubu);
+		WebElement elComboIslem=selenium.getWebDriver().findElement(By.xpath(xpath));
+		selenium.scrollToElement(elComboIslem);
+		setComboboxByTitleContains(elComboIslem, islemAdi);
+		xpath="//div[contains(text(),'%s')]/../../../../..//div[@class='btn btn-default' and text()='Git']".formatted(islemGrubu);
+		WebElement elIslemeGit=selenium.getWebDriver().findElement(By.xpath(xpath));
 		selenium.click(elIslemeGit);		
 	}
 }

@@ -29,7 +29,7 @@ public class GenelTahakkukOdeme extends BaseEpatsSteps {
 	private void tahakkukSecVeOdemeyeGit() {
 		String tahakkukNo=getVariable("tahakkukNo");
 		epatsTahakkuklarim.tahakkukNoAramaSecme(tahakkukNo);
-		takeStepScreenShot(this.processInstanceStep, "Tahakkuk seçildi");
+		takeStepScreenShot(this.processInstanceStep, "Tahakkuk seçildi", false);
 		epatsTahakkuklarim.tahakkukOde();
 	}
 	
@@ -41,10 +41,10 @@ public class GenelTahakkukOdeme extends BaseEpatsSteps {
 		
 		karsilastir(HelperUtil.normalizeAmount(epatsTahakkukOde.getOdemeTutari()), HelperUtil.normalizeAmount(getVariable("odemeTutari")), "ödenecek tutarı karşılaştır");
 		epatsTahakkukOde.kartBilgileriniGir(kartNo, kartGecerlilik, kartCVV);
-		takeStepScreenShot(this.processInstanceStep, "Kart bilgileri girildi");
+		takeStepScreenShot(this.processInstanceStep, "Kart bilgileri girildi", false);
 		epatsTahakkukOde.odemeYap();
 		String dekontNo=epatsTahakkukOde.getDekontNo();
-		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.");
+		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
 		selenium.switchToMainFrame();
 		
 		setVariable("dekontNo", dekontNo);

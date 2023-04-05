@@ -23,6 +23,7 @@ public class ProcessInstanceStepFile {
 	String fileType;
 	String description;
 	String fileName;
+	boolean attach;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "process_instance_step_id", nullable = false)
@@ -66,6 +67,14 @@ public class ProcessInstanceStepFile {
 
 	public void setProcessInstanceStep(ProcessInstanceStep processInstanceStep) {
 		this.processInstanceStep = processInstanceStep;
+	}
+
+	public boolean isAttach() {
+		return attach;
+	}
+
+	public void setAttach(boolean attach) {
+		this.attach = attach;
 	}
 	
 

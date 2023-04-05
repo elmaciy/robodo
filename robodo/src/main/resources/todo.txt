@@ -27,7 +27,7 @@
 38. tablolara indexleri koy
 39. decline ettiğinde last stepi yanlış hesaplıyor. 
 40. human interactionda ise retry count u artırmasın
-
+41. grid bulurken kullanilan su xpath i daha düzgün yaz => ROOT_XPATH_GRID_DOSYALAR="//div[@id='datagrid360']";
 
 //----------------------------------------------
 drop table  email_template_seq;        

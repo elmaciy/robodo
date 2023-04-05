@@ -21,7 +21,7 @@ public class DummyGoogleSearchByKeywordSteps extends BaseSteps {
 		String keyword=getVariable("keyword");
 		selenium.setValue(findElement, keyword);
 		selenium.enter();
-		takeStepScreenShot(this.processInstanceStep, keyword);
+		takeStepScreenShot(this.processInstanceStep, keyword, true);
 		selenium.stopDriver();
 		
 	}
