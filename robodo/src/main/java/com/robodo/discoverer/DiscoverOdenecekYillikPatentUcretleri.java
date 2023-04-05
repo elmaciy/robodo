@@ -38,13 +38,12 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
 			HashMap<String, String> hmVars=new HashMap<String, String>();
 			hmVars.put("processInstance.code", instance.getCode());
 			hmVars.put("dosyaNumarasi", "2019/06601");
-			hmVars.put("basvuruSahipKimlikNo", "9250412830");
-			hmVars.put("basvuruSahipUnvani", "VSY BİYOTEKNOLOJİ VE İLAÇ SANAYİ ANONİM ŞİRKETİ");
 			hmVars.put("bulusAdi", "HİYALURONİK ASİT/KİTOSAN/KARBOKSİMETİL SELÜLOZ İÇEREN BİYOUYUMLU, BİYOBOZUNUR VE BİYOEMİLEBİLİR BİR ADEZYON MEMBRAN VE ÜRETİM YÖNTEMİ");
 			hmVars.put("takipNumarasi", "TTuu20029SSSa112");
 			hmVars.put("basvuruTuru", "PATENT");
 			hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
 			hmVars.put("islemAdi", "Yıllık Ücret Ödeme");
+			hmVars.put("eposta", "ipmaintenance.epats@ankarapatent.com");
 			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺1.710,00"));
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			

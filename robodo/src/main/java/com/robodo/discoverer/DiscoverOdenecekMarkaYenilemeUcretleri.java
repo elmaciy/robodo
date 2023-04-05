@@ -38,13 +38,12 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseDiscoverer {
 			HashMap<String, String> hmVars=new HashMap<String, String>();
 			hmVars.put("processInstance.code", instance.getCode());
 			hmVars.put("dosyaNumarasi", "2013/62638");
-			hmVars.put("basvuruSahipKimlikNo", "700694032");
-			hmVars.put("basvuruSahipUnvani", "ANKARA PATENT BÜROSU ANONİM ŞİRKETİ");
 			hmVars.put("markaAdi", "patrades");
 			hmVars.put("takipNumarasi", "TKP_%s".formatted(String.valueOf(System.currentTimeMillis())));
 			hmVars.put("basvuruTuru", "MARKA");
 			hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
 			hmVars.put("islemAdi", "Marka Yenileme");
+			hmVars.put("eposta", "ipmaintenance.epats@ankarapatent.com");
 			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺2.450,00"));
 			hmVars.put("talepTuru", "Tam");
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));

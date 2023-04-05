@@ -10,6 +10,7 @@ import com.robodo.pages.PageEpatsDosyaBilgisi;
 import com.robodo.pages.PageEpatsHizmetDokumu;
 import com.robodo.pages.PageEpatsHome;
 import com.robodo.pages.PageEpatsIslemSonucu;
+import com.robodo.pages.PageEpatsItirazSahibiBilgisi;
 import com.robodo.pages.PageEpatsMenu;
 import com.robodo.pages.PageEpatsOnIzleme;
 import com.robodo.pages.PageEpatsTahakkukOde;
@@ -32,6 +33,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	PageEpatsIslemSonucu epatsIslemSonucu;
 	PageEpatsTahakkukOde epatsTahakkukOde;
 	PageEpatsTalepTuru epatsTalepTuru;
+	PageEpatsItirazSahibiBilgisi epatsItirazSahibiBilgisi;
 	
 	public BaseEpatsSteps(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
@@ -48,6 +50,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		this.epatsIslemSonucu=new PageEpatsIslemSonucu(selenium);
 		this.epatsTahakkukOde=new PageEpatsTahakkukOde(selenium);
 		this.epatsTalepTuru=new PageEpatsTalepTuru(selenium);
+		this.epatsItirazSahibiBilgisi=new PageEpatsItirazSahibiBilgisi(selenium);
 	}
 
 	public void sistemeGiris() {
@@ -79,7 +82,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	
 	
 	public void basvuruYap() {
-		String eposta=runnerUtil.getEnvironmentParameter("eposta");;
+		String eposta=getVariable("eposta");;
 		String cepTel=runnerUtil.getEnvironmentParameter("ceptel");
 		String referansNo=getVariable("takipNumarasi");
 		epatsBasvuruYapan.basvuruBilgileriniDoldur(eposta, cepTel, referansNo);
@@ -95,6 +98,10 @@ public class BaseEpatsSteps extends BaseSteps {
 		return "MARKA".contains(getVariable("basvuruTuru"));
 	}
 	
+	public void dosyaBilgisiAra() {
+		epatsDosyaBilgisi.basvuruNumarasiAra(getVariable("dosyaNumarasi"));
+	}
+	
 	public void dosyaBilgisiDogrulaDevamEt() {
 		setVariable("dosyabilgisi.dosyabilgisi.basvuruNumarasi", epatsDosyaBilgisi.getBasvuruNumarasi());
 		setVariable("dosyabilgisi.dosyabilgisi.basvuruTarihi", epatsDosyaBilgisi.getBasvuruTarihi());
@@ -104,11 +111,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		}
 		if (isMarka()) {
 			setVariable("dosyabilgisi.dosyabilgisi.markaAdi", epatsDosyaBilgisi.getmarkaAdi());
-		}
-		
-		setVariable("dosyabilgisi.dosyabilgisi.sahip.kimlik", epatsDosyaBilgisi.getSahipKimlikVergiNo());
-		setVariable("dosyabilgisi.dosyabilgisi.sahip.unvan", epatsDosyaBilgisi.getSahipUnvan());
-		
+		}		
 		
 		karsilastir(getVariable("dosyabilgisi.dosyabilgisi.basvuruNumarasi"), getVariable("dosyaNumarasi"), "dosya numarası karşılaştırılıyor");
 		
@@ -120,10 +123,16 @@ public class BaseEpatsSteps extends BaseSteps {
 			karsilastir(getVariable("dosyabilgisi.dosyabilgisi.markaAdi"), getVariable("markaAdi"), "marka adı karşılaştırılıyor");
 		}
 
-		karsilastir(getVariable("dosyabilgisi.dosyabilgisi.sahip.kimlik"), getVariable("basvuruSahipKimlikNo"), "başvuru sahibi kimlik/vergi no karşılaştırılıyor");
 		
 		takeStepScreenShot(this.processInstanceStep, "Dosya bilgisi", false);
 		epatsDosyaBilgisi.devamEt();
+	}
+	
+	public void itirazSahibiEkle() {
+		String itirazSahibiAdi= getVariable("itirazSahibiAdi");
+		String itirazSahibiKimlikNo = getVariable("itirazSahibiKimlikNo");
+		
+		epatsItirazSahibiBilgisi.itirazSahibiEkle(itirazSahibiAdi, itirazSahibiKimlikNo);
 	}
 	
 	public void talepTuruTamSecVeDevamEt() {

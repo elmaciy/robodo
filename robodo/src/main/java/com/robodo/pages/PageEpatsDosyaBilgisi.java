@@ -13,6 +13,16 @@ public class PageEpatsDosyaBilgisi extends PageEpatsBase {
 		super(selenium);
 	}
 	
+	@FindBy(xpath="//div[text()='*Başvuru Numarası']/..//input") 
+	WebElement elEditBasvuruNumarasi;
+	
+	@FindBy(css="div.btn.btn-default:has(i.fa.fa-search)")
+	WebElement elBtnBascuruNumarasiAra;
+	
+	@FindBy(xpath = "//div[text()='Devam Et  >']")
+	WebElement btDevam;
+	
+	
 	@FindBy(xpath = "//div[text()='Başvuru Numarası']/../div/div/div")
 	WebElement elBasvuruNumarasi;
 	
@@ -25,13 +35,8 @@ public class PageEpatsDosyaBilgisi extends PageEpatsBase {
 	@FindBy(xpath = "//div[text()='Marka Adı']/../div/div/div")
 	WebElement elMarkaAdi;
 	
-
 	
-	@FindBy(xpath="//bmm-table//tbody/tr//span")
-	List<WebElement> elSahipBilgileri;
 	
-	@FindBy(xpath = "//div[text()='Devam Et  >']")
-	WebElement btDevam;
 	
 	public String getBasvuruNumarasi() {
 		return elBasvuruNumarasi.getText();
@@ -49,15 +54,11 @@ public class PageEpatsDosyaBilgisi extends PageEpatsBase {
 		return elMarkaAdi.getText();
 	}
 	
-	public String getSahipKimlikVergiNo() {
-		return elSahipBilgileri.get(0).getText();
+	
+	public void basvuruNumarasiAra(String basvuruNumarasi) {
+		selenium.setValue(elEditBasvuruNumarasi, basvuruNumarasi);
+		selenium.click(elBtnBascuruNumarasiAra);
 	}
-	
-	public String getSahipUnvan() {
-		return elSahipBilgileri.get(1).getText();
-	}
-	
-	
 	
 	public void devamEt() {
 		selenium.click(btDevam);

@@ -2,6 +2,7 @@ package com.robodo.pages;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -25,7 +26,37 @@ public class PageEpatsBase extends BasePage {
 		selenium.tab();
 	}
 	
+	private WebElement getGridContainerElement(String gridTitle) {
+		String xpathforparent="//div[text()='%s']/../../../../..".formatted(gridTitle);
+		WebElement elGridContainer = selenium.getWebDriver().findElement(By.xpath(xpathforparent));
+		return elGridContainer;
+	}
 	
+	public void setGridFilterByTitle(String gridTitle, String title, String value) {
+		
+		String xpath=".//span[text()='%s']/../..//input".formatted(title);
+		WebElement elFilter = getGridContainerElement(gridTitle).findElement(By.xpath(xpath));
+		selenium.setValue(elFilter, value);
+		selenium.enter();
+	}
+	
+	public void selectGridRowByUniqueContent(String gridTitle, String content) {
+		String xpath=".//div[contains(@class,'ui-grid-cell-contents') and text()='%s']/../../..".formatted(content);
+		WebElement element = getGridContainerElement(gridTitle).findElement(By.xpath(xpath));
+		selenium.click(element);
+	}
+	
+	public void selectGridFirstRow(String gridTitle) {
+		String xpath=".//div[@style='overflow: scroll;']//div[@class='ui-grid-row']";
+		List<WebElement> rows = getGridContainerElement(gridTitle).findElements(By.xpath(xpath));
+		if (rows.size()>0) {
+			selenium.click(rows.get(0));	
+		} else {
+			throw new RuntimeException("no rows to select in the grid, title = '%s'".formatted(gridTitle));
+		}
+		
+		
+	}
 	
 
 }

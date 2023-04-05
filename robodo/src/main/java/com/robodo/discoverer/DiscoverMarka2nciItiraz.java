@@ -38,14 +38,15 @@ public class DiscoverMarka2nciItiraz extends BaseDiscoverer {
 			HashMap<String, String> hmVars=new HashMap<String, String>();
 			hmVars.put("processInstance.code", instance.getCode());
 			hmVars.put("dosyaNumarasi", "2022/203652");
-			hmVars.put("basvuruSahipKimlikNo", "5700020575");
-			hmVars.put("basvuruSahipUnvani", "KOÇ HOLDİNG ANONİM ŞİRKETİ");
 			hmVars.put("markaAdi", "bilal koçotomotiv ticari yedek parça");
 			hmVars.put("takipNumarasi", "TKP_%s".formatted(String.valueOf(System.currentTimeMillis())));
+			hmVars.put("basvuruTuru", "MARKA");
 			hmVars.put("islemGrubu", "Üçüncü Kişi İşlemleri");
 			hmVars.put("islemAdi", "Marka Yayıma İtirazın Yeniden İncelenmesi (YİDD)");
+			hmVars.put("eposta", "legal@ankarapatent.com");
 			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺2.450,00"));
-			hmVars.put("talepTuru", "Tam");
+			hmVars.put("itirazSahibiAdi", "KOÇ HOLDİNG ANONİM ŞİRKETİ");
+			hmVars.put("itirazSahibiKimlikNo", "5700020575");
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			
 			for (var definitedSteps : processDefinition.getSteps()) {

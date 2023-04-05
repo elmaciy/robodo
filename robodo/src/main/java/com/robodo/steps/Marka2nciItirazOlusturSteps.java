@@ -17,7 +17,11 @@ public class Marka2nciItirazOlusturSteps extends BaseEpatsSteps {
 	public void run() {
 		sistemeGiris();
 		islemSec();
-		
+		basvuruYap();
+		dosyaBilgisiAra();
+		dosyaBilgisiDogrulaDevamEt();
+		itirazSahibiEkle();
+		selenium.sleep(10L);
 		selenium.stopDriver();
 	}
 
