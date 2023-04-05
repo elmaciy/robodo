@@ -25,6 +25,25 @@
 36. human interaction bekleyen instancelerde retry count u artırmasın. Human interaction onaylandığında ya da reddedildiğinde de retry count artmasın. 
 37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
 38. tablolara indexleri koy
+39. decline ettiğinde last stepi yanlış hesaplıyor. 
+40. human interactionda ise retry count u artırmasın
+
+
+//----------------------------------------------
+drop table  email_template_seq;        
+drop table email_template;               
+drop table  process_instance_step_files_seq;
+drop table  process_instance_step_files;
+drop table  process_instance_steps_seq;
+drop table  process_instance_steps;
+drop table  process_instances_seq;
+drop table  process_instances;
+drop table  process_definition_steps_seq; 
+drop table  process_definition_steps;    
+drop table  process_definition_seq;    
+drop table  process_definition;      
+
+
 -------------------
 TAMAMLANANLAR 
 -------------------

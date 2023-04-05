@@ -20,7 +20,20 @@ public class PageEpatsHome extends PageEpatsBase {
 	}
 
 	public void open() {
-		selenium.navigate("https://epats.turkpatent.gov.tr/");
+		
+		//bazen Edevlet girisi yerine zebralı giris ekrani geliyor
+		//bunu asmak icin bu şekilde deneme yanılmalı bir döngü kurduk
+		int counter=0;
+		while(true) {
+			if (counter++>=5) break;
+			selenium.navigate("https://epats.turkpatent.gov.tr/");
+			String currentUrl = selenium.getWebDriver().getCurrentUrl();
+			if (currentUrl.contains("TP/EDEVLET/giris")) {
+				break;
+			}
+		}
+		
+		
 		
 	}
 

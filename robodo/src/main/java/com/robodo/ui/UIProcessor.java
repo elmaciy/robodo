@@ -105,7 +105,7 @@ public class UIProcessor extends UIBase {
 		gridProcess.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer");
 
 		gridProcess.addComponentColumn(p -> {
-			Button btnRun = new Button("Discover", new Icon(VaadinIcon.SEARCH));
+			Button btnRun = new Button("", new Icon(VaadinIcon.SEARCH));
 			btnRun.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 			btnRun.setDisableOnClick(true);
 			btnRun.addClickListener(e -> {
@@ -114,7 +114,7 @@ public class UIProcessor extends UIBase {
 				btnRun.setEnabled(true);
 			});
 			return btnRun;
-		}).setHeader("Actions");
+		}).setHeader("Discover");
 		
 
 		gridProcess.addSelectionListener(p -> {
@@ -338,8 +338,8 @@ public class UIProcessor extends UIBase {
 		grid.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setAutoWidth(true);
 		grid.addComponentColumn(p->{
-			Button btnBackward = new Button("Backwards", new Icon(VaadinIcon.BACKWARDS));
-			btnBackward.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+			Button btnBackward = new Button("", new Icon(VaadinIcon.BACKWARDS));
+			btnBackward.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
 			btnBackward.setDisableOnClick(true);
 			btnBackward.addClickListener(e -> {
 				setBackward(p);
@@ -347,7 +347,7 @@ public class UIProcessor extends UIBase {
 			});
 			btnBackward.setEnabled(!p.getStatus().equals(ProcessInstanceStep.STATUS_NEW));
 			return btnBackward; 
-		}).setHeader("Backwards").setAutoWidth(true);
+		}).setHeader("Rollback").setAutoWidth(true);
 		
 		grid.getColumns().forEach(col->{col.setResizable(true);});
 		grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);

@@ -26,75 +26,79 @@ public class RobodoApplication {
 	@Bean
 	public CommandLineRunner demo(ProcessDefinitionRepo processDefinitionRepo, EmailTemplateRepo emailTemplateRepo) {
 		return (args) -> {
-
-			
-			ProcessDefinition yillikPatentUcreti=new ProcessDefinition();
-			//processDef1.setId(1L);
-			yillikPatentUcreti.setCode("PATENT_YILLIK_UCRET");
-			yillikPatentUcreti.setDescription("Yıllık patent ücreti ödeme süreci");
-			yillikPatentUcreti.setMaxRetryCount(1);
-			yillikPatentUcreti.setMaxThreadCount(2);
-			List<ProcessDefinitionStep> steps=new ArrayList<ProcessDefinitionStep>();			
-			yillikPatentUcreti.setSteps(steps);
-			yillikPatentUcreti.setSingleAtATime(true);
-			yillikPatentUcreti.setDiscovererClass("DiscoverOdenecekYillikPatentUcretleri");
-			yillikPatentUcreti.setActive(false);
-			
-			
-			
-			
-			ProcessDefinitionStep stepDosyaOku=new ProcessDefinitionStep();
-			stepDosyaOku.setCode("PATENT_DOSYASINI_OKU");
-			stepDosyaOku.setDescription("Ücreti ödenecek patent dosyasının okunması");
-			stepDosyaOku.setOrderNo("01");
-			stepDosyaOku.setSingleAtATime(false);
-			stepDosyaOku.setCommands("runStepClass YillikPatentUcretDosyasiOkuSteps");
-			stepDosyaOku.setProcessDefinition(yillikPatentUcreti);
 			
 
-			ProcessDefinitionStep stepTahakkukOlustur=new ProcessDefinitionStep();
-			stepTahakkukOlustur.setCode("PATENT_YILLIK_UCRET_TAHAKKUK");
-			stepTahakkukOlustur.setDescription("Patent yıllık ücreti tahakkuk oluşturma");
-			stepTahakkukOlustur.setOrderNo("02");
-			stepTahakkukOlustur.setSingleAtATime(true);
-			stepTahakkukOlustur.setCommands("runStepClass YillikPatentUcretiTahakkukOlustur");
-			stepTahakkukOlustur.setProcessDefinition(yillikPatentUcreti);
+			
+			
+			
+			//----------------------------------------------------------------------
+
+			
+			ProcessDefinition yillikPatentUcretiProcess=new ProcessDefinition();
+			yillikPatentUcretiProcess.setCode("PATENT_YILLIK_UCRET");
+			yillikPatentUcretiProcess.setDescription("Yıllık patent ücreti ödeme süreci");
+			yillikPatentUcretiProcess.setMaxRetryCount(1);
+			yillikPatentUcretiProcess.setMaxThreadCount(2);
+			yillikPatentUcretiProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
+			yillikPatentUcretiProcess.setSingleAtATime(false);
+			yillikPatentUcretiProcess.setDiscovererClass("DiscoverOdenecekYillikPatentUcretleri");
+			yillikPatentUcretiProcess.setActive(false);
+			
+			
+			
+			
+			ProcessDefinitionStep stepPatentDosyaOku=new ProcessDefinitionStep();
+			stepPatentDosyaOku.setCode("PATENT_DOSYASINI_OKU");
+			stepPatentDosyaOku.setDescription("Ücreti ödenecek patent dosyasının okunması");
+			stepPatentDosyaOku.setOrderNo("01");
+			stepPatentDosyaOku.setSingleAtATime(false);
+			stepPatentDosyaOku.setCommands("runStepClass YillikPatentUcretDosyasiOkuSteps");
+			stepPatentDosyaOku.setProcessDefinition(yillikPatentUcretiProcess);
+			
+
+			ProcessDefinitionStep stepPatentTahakkukOlustur=new ProcessDefinitionStep();
+			stepPatentTahakkukOlustur.setCode("PATENT_YILLIK_UCRET_TAHAKKUK");
+			stepPatentTahakkukOlustur.setDescription("Patent yıllık ücreti tahakkuk oluşturma");
+			stepPatentTahakkukOlustur.setOrderNo("02");
+			stepPatentTahakkukOlustur.setSingleAtATime(true);
+			stepPatentTahakkukOlustur.setCommands("runStepClass YillikPatentUcretiTahakkukOlustur");
+			stepPatentTahakkukOlustur.setProcessDefinition(yillikPatentUcretiProcess);
 			
 			ProcessDefinitionStep stepOnay=new ProcessDefinitionStep();
 			stepOnay.setCode("PATENT_ONAY_BEKLE");
 			stepOnay.setDescription("Patent yıllık ücreti ödeme için onay bekle");
 			stepOnay.setOrderNo("03");
 			stepOnay.setSingleAtATime(true);
-			stepOnay.setCommands("waitHumanInteraction YILLIK_UCRET_ONAY");
-			stepOnay.setProcessDefinition(yillikPatentUcreti);
+			stepOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
+			stepOnay.setProcessDefinition(yillikPatentUcretiProcess);
+			
+			ProcessDefinitionStep stepPatentOde=new ProcessDefinitionStep();
+			stepPatentOde.setCode("PATENT_TAHAKKUK_ODE");
+			stepPatentOde.setDescription("Tahakkuk ödeme");
+			stepPatentOde.setOrderNo("04");
+			stepPatentOde.setSingleAtATime(false);
+			stepPatentOde.setCommands("runStepClass GenelTahakkukOdeme");
+			stepPatentOde.setProcessDefinition(yillikPatentUcretiProcess);
 			
 			
-			ProcessDefinitionStep stepOde=new ProcessDefinitionStep();
-			stepOde.setCode("TAHAKKUK_ODE");
-			stepOde.setDescription("Tahakkuk ödeme");
-			stepOde.setOrderNo("04");
-			stepOde.setSingleAtATime(false);
-			stepOde.setCommands("runStepClass GenelTahakkukOdeme");
-			stepOde.setProcessDefinition(yillikPatentUcreti);
+			ProcessDefinitionStep stepPatentDekontIsle=new ProcessDefinitionStep();
+			stepPatentDekontIsle.setCode("PATENT_DEKONT_KAYDET");
+			stepPatentDekontIsle.setDescription("Ödeme dekont bilgisini sisteme kaydet");
+			stepPatentDekontIsle.setOrderNo("05");
+			stepPatentDekontIsle.setSingleAtATime(false);
+			stepPatentDekontIsle.setCommands("runStepClass GenelDekontKaydetSteps");
+			stepPatentDekontIsle.setProcessDefinition(yillikPatentUcretiProcess);
 			
-			
-			ProcessDefinitionStep stepDekontIsle=new ProcessDefinitionStep();
-			stepDekontIsle.setCode("DEKONT_KAYDET");
-			stepDekontIsle.setDescription("Ödeme dekont bilgisini sisteme kaydet");
-			stepDekontIsle.setOrderNo("05");
-			stepDekontIsle.setSingleAtATime(false);
-			stepDekontIsle.setCommands("runStepClass GenelDekontKaydetSteps");
-			stepDekontIsle.setProcessDefinition(yillikPatentUcreti);
 			
 			//yillikPatentUcreti.getSteps().add(stepDosyaOku);
-			yillikPatentUcreti.getSteps().add(stepTahakkukOlustur);
-			yillikPatentUcreti.getSteps().add(stepOnay);
-			yillikPatentUcreti.getSteps().add(stepOde);
-			//yillikPatentUcreti.getSteps().add(stepDekontIsle);
+			yillikPatentUcretiProcess.getSteps().add(stepPatentTahakkukOlustur);
+			yillikPatentUcretiProcess.getSteps().add(stepOnay);
+			yillikPatentUcretiProcess.getSteps().add(stepPatentOde);
+			//yillikPatentUcreti.getSteps().add(stepPatentDekontIsle);
 
 			
-			if (processDefinitionRepo.findByCode(yillikPatentUcreti.getCode()).isEmpty()) {
-				processDefinitionRepo.save(yillikPatentUcreti);
+			if (processDefinitionRepo.findByCode(yillikPatentUcretiProcess.getCode()).isEmpty()) {
+				processDefinitionRepo.save(yillikPatentUcretiProcess);
 			}
 			
 			
@@ -102,6 +106,67 @@ public class RobodoApplication {
 			//--------------------------------------------
 			
 			
+			ProcessDefinition markaYenilemeProcess=new ProcessDefinition();
+			markaYenilemeProcess.setCode("MARKA_YENILEME");
+			markaYenilemeProcess.setDescription("Marka Yenileme Süreci");
+			markaYenilemeProcess.setMaxRetryCount(1);
+			markaYenilemeProcess.setMaxThreadCount(2);
+			markaYenilemeProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
+			markaYenilemeProcess.setSingleAtATime(true);
+			markaYenilemeProcess.setDiscovererClass("DiscoverOdenecekMarkaYenilemeUcretleri");
+			markaYenilemeProcess.setActive(true);
+			
+			ProcessDefinitionStep stepMarkaYenilemeDosyaOku=new ProcessDefinitionStep();
+			stepMarkaYenilemeDosyaOku.setCode("MARKA_YENILEME_DOSYASINI_OKU");
+			stepMarkaYenilemeDosyaOku.setDescription("Ücreti ödenecek marka yenileme dosyasının okunması");
+			stepMarkaYenilemeDosyaOku.setOrderNo("01");
+			stepMarkaYenilemeDosyaOku.setSingleAtATime(false);
+			stepMarkaYenilemeDosyaOku.setCommands("runStepClass MarkaYenilemeDosyasiOkuSteps");
+			stepMarkaYenilemeDosyaOku.setProcessDefinition(markaYenilemeProcess);
+
+			ProcessDefinitionStep stepMarkeYenilemeTahakkukOlustur=new ProcessDefinitionStep();
+			stepMarkeYenilemeTahakkukOlustur.setCode("MARKA_YENILEME_TAHAKKUK");
+			stepMarkeYenilemeTahakkukOlustur.setDescription("Marka yenileme tahakkuk oluşturma");
+			stepMarkeYenilemeTahakkukOlustur.setOrderNo("02");
+			stepMarkeYenilemeTahakkukOlustur.setSingleAtATime(false);
+			stepMarkeYenilemeTahakkukOlustur.setCommands("runStepClass MarkaYenilemeTahakkukOlustur");
+			stepMarkeYenilemeTahakkukOlustur.setProcessDefinition(markaYenilemeProcess);
+			
+			ProcessDefinitionStep steparkeYenilemeOnay=new ProcessDefinitionStep();
+			steparkeYenilemeOnay.setCode("MARKA_ONAY_BEKLE");
+			steparkeYenilemeOnay.setDescription("Marke yenileme tahakkuk ödeme için onay bekle");
+			steparkeYenilemeOnay.setOrderNo("03");
+			steparkeYenilemeOnay.setSingleAtATime(true);
+			steparkeYenilemeOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
+			steparkeYenilemeOnay.setProcessDefinition(markaYenilemeProcess);
+			
+			ProcessDefinitionStep stepMarkaOde=new ProcessDefinitionStep();
+			stepMarkaOde.setCode("MARKA_TAHAKKUK_ODE");
+			stepMarkaOde.setDescription("Tahakkuk ödeme");
+			stepMarkaOde.setOrderNo("04");
+			stepMarkaOde.setSingleAtATime(false);
+			stepMarkaOde.setCommands("runStepClass GenelTahakkukOdeme");
+			stepMarkaOde.setProcessDefinition(markaYenilemeProcess);
+			
+			ProcessDefinitionStep stepMarkaDekontIsle=new ProcessDefinitionStep();
+			stepMarkaDekontIsle.setCode("MARKA_DEKONT_KAYDET");
+			stepMarkaDekontIsle.setDescription("Ödeme dekont bilgisini sisteme kaydet");
+			stepMarkaDekontIsle.setOrderNo("05");
+			stepMarkaDekontIsle.setSingleAtATime(false);
+			stepMarkaDekontIsle.setCommands("runStepClass GenelDekontKaydetSteps");
+			stepMarkaDekontIsle.setProcessDefinition(markaYenilemeProcess);
+			
+			//markaYenilemeProcess.getSteps().add(stepMarkaYenilemeDosyaOku);
+			markaYenilemeProcess.getSteps().add(stepMarkeYenilemeTahakkukOlustur);
+			markaYenilemeProcess.getSteps().add(steparkeYenilemeOnay);
+			markaYenilemeProcess.getSteps().add(stepMarkaOde);
+			//markaYenilemeProcess.getSteps().add(stepMarkaDekontIsle);
+
+			if (processDefinitionRepo.findByCode(markaYenilemeProcess.getCode()).isEmpty()) {
+				processDefinitionRepo.save(markaYenilemeProcess);
+			}
+			
+			//--------------------------------------------
 			
 			ProcessDefinition getTextAndSearchOnGoogle=new ProcessDefinition();
 			//processDef1.setId(1L);
@@ -109,11 +174,10 @@ public class RobodoApplication {
 			getTextAndSearchOnGoogle.setDescription("Get text from somewhere and search on google");
 			getTextAndSearchOnGoogle.setMaxRetryCount(1);
 			getTextAndSearchOnGoogle.setMaxThreadCount(1);
-			List<ProcessDefinitionStep> steps2=new ArrayList<ProcessDefinitionStep>();			
-			getTextAndSearchOnGoogle.setSteps(steps2);
+			getTextAndSearchOnGoogle.setSteps(new ArrayList<ProcessDefinitionStep>());
 			getTextAndSearchOnGoogle.setSingleAtATime(true);
 			getTextAndSearchOnGoogle.setDiscovererClass("DiscoverProcessGooggleSearch");
-			getTextAndSearchOnGoogle.setActive(true);
+			getTextAndSearchOnGoogle.setActive(false);
 			
 			
 			
@@ -147,16 +211,16 @@ public class RobodoApplication {
 			
 			//---------------------------------------------------
 			EmailTemplate emailForYillikPatentUcreti=new EmailTemplate();
-			emailForYillikPatentUcreti.setCode("YILLIK_UCRET_ONAY");
-			emailForYillikPatentUcreti.setToAddress("elmaciy@hotmail.com,y.elmaci@astoundcommerce.com");
+			emailForYillikPatentUcreti.setCode("TAHAKKUK_ONAY");
+			emailForYillikPatentUcreti.setToAddress("elmaciy@hotmail.com");
 			emailForYillikPatentUcreti.setSubject("Onayınız bekleniyor. Dosya No ${dosyaNumarasi}");
 			emailForYillikPatentUcreti.setBody(
 					"Sayın ilgili;"
 					+ "<br>"
 					+ "<br>"
-					+ " ${dosyaNumarasi} numaralı dosyanın ${tahakkukNo} nolu tahakkuk kaydı oluşturulmuştur. "
+					+ " <b>${dosyaNumarasi}</b> numaralı dosyanın, <b>${islemAdi}</b> işlemi için, <b>${tahakkukNo}</b> nolu tahakkuk kaydı oluşturulmuştur. "
 					+ "<br>"
-					+ "Onayınızın ardından ${onizleme.odenecek.genelToplam} tutarındaki ödemesi gerçekleştirilecektir."
+					+ "Onayınızın ardından <b>${onizleme.odenecek.genelToplam}</b> tutarındaki ödemesi gerçekleştirilecektir."
 					+ "<br>"
 					+ "İyi çalışmalar"
 					+ "<hr>"

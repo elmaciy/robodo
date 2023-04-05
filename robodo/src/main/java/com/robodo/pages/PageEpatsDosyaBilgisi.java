@@ -22,6 +22,9 @@ public class PageEpatsDosyaBilgisi extends PageEpatsBase {
 	@FindBy(xpath = "//div[text()='Buluş Başlığı']/../div/div/div")
 	WebElement elBulusBasligi;
 	
+	@FindBy(xpath = "//div[text()='Marka Adı']/../div/div/div")
+	WebElement elMarkaAdi;
+	
 
 	
 	@FindBy(xpath="//bmm-table//tbody/tr//span")
@@ -40,6 +43,10 @@ public class PageEpatsDosyaBilgisi extends PageEpatsBase {
 	
 	public String getBulusBasligi() {
 		return elBulusBasligi.getText();
+	}
+	
+	public String getmarkaAdi() {
+		return elMarkaAdi.getText();
 	}
 	
 	public String getSahipKimlikVergiNo() {

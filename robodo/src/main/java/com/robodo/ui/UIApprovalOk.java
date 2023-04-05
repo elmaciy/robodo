@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.robodo.model.ProcessInstance;
 import com.robodo.services.ProcessService;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -34,8 +32,7 @@ public class UIApprovalOk extends UIBase {
 
 
 	private void drawScreen() {
-		Label result = new Label("Thank you!");
-		add(result);
+		informAndRun("Approval", "Thank you", ()->{});
 	}
 
 

@@ -150,7 +150,7 @@ public class HelperUtil {
 	
 	
 	private static boolean isSecret(String key) {
-		return List.of("instanceId","processinstance.code").stream().anyMatch(p->p.equals(key));
+		return List.of("instanceId","processInstance.code").stream().anyMatch(p->p.equals(key));
 	}
 
 	private static boolean sendEmail(EmailTemplate emailTemplate, RunnerUtil runnerUtil) {

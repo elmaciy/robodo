@@ -14,6 +14,7 @@ import com.robodo.pages.PageEpatsMenu;
 import com.robodo.pages.PageEpatsOnIzleme;
 import com.robodo.pages.PageEpatsTahakkukOde;
 import com.robodo.pages.PageEpatsTahakkuklarim;
+import com.robodo.pages.PageEpatsTalepTuru;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
@@ -30,6 +31,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	PageEpatsOnIzleme epatsOnIzleme;
 	PageEpatsIslemSonucu epatsIslemSonucu;
 	PageEpatsTahakkukOde epatsTahakkukOde;
+	PageEpatsTalepTuru epatsTalepTuru;
 	
 	public BaseEpatsSteps(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
@@ -45,6 +47,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		this.epatsOnIzleme = new PageEpatsOnIzleme(selenium);
 		this.epatsIslemSonucu=new PageEpatsIslemSonucu(selenium);
 		this.epatsTahakkukOde=new PageEpatsTahakkukOde(selenium);
+		this.epatsTalepTuru=new PageEpatsTalepTuru(selenium);
 	}
 
 	public void sistemeGiris() {
@@ -76,20 +79,48 @@ public class BaseEpatsSteps extends BaseSteps {
 		epatsBasvuruYapan.devamEt();
 	}
 	
+	boolean isBulus() {
+		return "PATENT".contains(getVariable("basvuruTuru"));
+	}
+	
+	boolean isMarka() {
+		return "MARKA".contains(getVariable("basvuruTuru"));
+	}
+	
 	public void dosyaBilgisiDogrulaDevamEt() {
 		setVariable("dosyabilgisi.dosyabilgisi.basvuruNumarasi", epatsDosyaBilgisi.getBasvuruNumarasi());
 		setVariable("dosyabilgisi.dosyabilgisi.basvuruTarihi", epatsDosyaBilgisi.getBasvuruTarihi());
-		setVariable("dosyabilgisi.dosyabilgisi.bulusBasligi", epatsDosyaBilgisi.getBulusBasligi());
+		
+		if (isBulus()) {
+			setVariable("dosyabilgisi.dosyabilgisi.bulusBasligi", epatsDosyaBilgisi.getBulusBasligi());
+		}
+		if (isMarka()) {
+			setVariable("dosyabilgisi.dosyabilgisi.markaAdi", epatsDosyaBilgisi.getmarkaAdi());
+		}
+		
 		setVariable("dosyabilgisi.dosyabilgisi.sahip.kimlik", epatsDosyaBilgisi.getSahipKimlikVergiNo());
 		setVariable("dosyabilgisi.dosyabilgisi.sahip.unvan", epatsDosyaBilgisi.getSahipUnvan());
 		
 		
 		karsilastir(getVariable("dosyabilgisi.dosyabilgisi.basvuruNumarasi"), getVariable("dosyaNumarasi"), "dosya numarası karşılaştırılıyor");
-		karsilastir(getVariable("dosyabilgisi.dosyabilgisi.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
+		
+		if (isBulus()) {
+			karsilastir(getVariable("dosyabilgisi.dosyabilgisi.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
+		}
+		
+		if (isMarka()) {
+			karsilastir(getVariable("dosyabilgisi.dosyabilgisi.markaAdi"), getVariable("markaAdi"), "marka adı karşılaştırılıyor");
+		}
+
 		karsilastir(getVariable("dosyabilgisi.dosyabilgisi.sahip.kimlik"), getVariable("basvuruSahipKimlikNo"), "başvuru sahibi kimlik/vergi no karşılaştırılıyor");
 		
 		takeStepScreenShot(this.processInstanceStep, "Dosya bilgisi");
 		epatsDosyaBilgisi.devamEt();
+	}
+	
+	public void talepTuruTamSecVeDevamEt() {
+		epatsTalepTuru.talepTuruSec("Tam");
+		epatsTalepTuru.devamEt();
 	}
 	
 	public void hizmetDokumuDevamEt() {
@@ -101,17 +132,32 @@ public class BaseEpatsSteps extends BaseSteps {
 	}
 
 	public void onizlemeKontrolveTahakkukOlustur() {
+		
 		setVariable("onizleme.odenecek.dosyaNumarasi", epatsOnIzleme.getDosyaNumarasi());
 		setVariable("onizleme.odenecek.referansNumarasi", epatsOnIzleme.getRefeansTakipNumarasi());
-		setVariable("onizleme.odenecek.bulusBasligi", epatsOnIzleme.getBulusBasligi());
-		setVariable("onizleme.odenecek.faturaKimlikNumarasi", epatsOnIzleme.getFaturaKimlikNNumarasi());
-		setVariable("onizleme.odenecek.cezaTutari", epatsOnIzleme.getCezaTutari());
+		
+		if (isBulus()) {			
+			setVariable("onizleme.odenecek.bulusBasligi", epatsOnIzleme.getBulusBasligi());
+		}
+
+		if (isMarka()) {
+			setVariable("onizleme.odenecek.markaAdi", epatsOnIzleme.getMarkaAdi());
+		}
+		
 		setVariable("onizleme.odenecek.genelToplam", epatsOnIzleme.getGenelToplamTutari());
+		
 		
 		karsilastir(getVariable("onizleme.odenecek.dosyaNumarasi"), getVariable("dosyaNumarasi"), "dosya numarası karşılaştırılıyor");
 		karsilastir(getVariable("onizleme.odenecek.referansNumarasi"), getVariable("takipNumarasi"), "başvuru takip/referans numarası karşılaştırılıyor");
-		karsilastir(getVariable("onizleme.odenecek.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
-		karsilastir(getVariable("onizleme.odenecek.faturaKimlikNumarasi"), runnerUtil.getEnvironmentParameter("ankarapatent.vergino"), "ankara patent kimlik/vergi no karşılaştırılıyor");
+		
+		if (isBulus()) {			
+			karsilastir(getVariable("onizleme.odenecek.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
+		}
+		
+		if (isMarka()) {			
+			karsilastir(getVariable("onizleme.odenecek.markaAdi"), getVariable("markaAdi"), "marka adı karşılaştırılıyor");
+		}
+		
 		karsilastir(HelperUtil.normalizeAmount(getVariable("onizleme.odenecek.genelToplam")), HelperUtil.normalizeAmount(getVariable("odemeTutari")), "ödenecek tutar karşılaştırılıyor");
 		
 		takeStepScreenShot(this.processInstanceStep, "Önizleme");

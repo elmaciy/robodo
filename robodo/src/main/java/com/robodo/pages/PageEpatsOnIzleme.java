@@ -32,8 +32,12 @@ public class PageEpatsOnIzleme extends PageEpatsBase {
 		return extractValueByCaption("Buluş Başlığı");
 	}
 	
-	public String getFaturaKimlikNNumarasi() {
-		return extractValueByCaption("TC Kimlik/Vergi No");
+	public String getMarkaAdi() {
+		return extractValueByCaption(" Marka Adı ");
+	}
+	
+	public String getFaturaKimlikNNumarasi(String title) {
+		return extractValueByCaption(title);
 	}
 	
 	public String getCezaTutari() {
