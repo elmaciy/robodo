@@ -25,9 +25,8 @@ public class ProcessDefinition {
 	@OneToMany(mappedBy = "processDefinition", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	List<ProcessDefinitionStep> steps;
 	String discovererClass;
-	Integer maxRetryCount;
+	Integer maxAttemptCount;
 	Integer maxThreadCount;
-	boolean isSingleAtATime;
 	boolean isActive;
 
 	
@@ -67,23 +66,17 @@ public class ProcessDefinition {
 		
 		this.steps = steps;
 	}
-	public Integer getMaxRetryCount() {
-		return maxRetryCount;
+	public Integer getMaxAttemptCount() {
+		return maxAttemptCount;
 	}
-	public void setMaxRetryCount(Integer maxRetryCount) {
-		this.maxRetryCount = maxRetryCount;
+	public void setMaxAttemptCount(Integer maxAttemptCount) {
+		this.maxAttemptCount = maxAttemptCount;
 	}
 	public List<ProcessInstance> getInstances() {
 		return instances;
 	}
 	public void setInstances(List<ProcessInstance> instances) {
 		this.instances = instances;
-	}
-	public boolean isSingleAtATime() {
-		return isSingleAtATime;
-	}
-	public void setSingleAtATime(boolean isSingleAtATime) {
-		this.isSingleAtATime = isSingleAtATime;
 	}
 	public Integer getMaxThreadCount() {
 		return maxThreadCount;
@@ -103,6 +96,10 @@ public class ProcessDefinition {
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
 	}
+	public boolean isSingletonStep(ProcessInstanceStep step) {
+		return this.steps.stream().filter(p->p.getCode().equals(step.stepCode)).anyMatch(p->p.isSingleAtATime());
+	}
+	
 	
 	
 	

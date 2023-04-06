@@ -25,12 +25,15 @@ public class ThreadForInstanceStarter implements Runnable {
 		
 		List<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();
 		List<ProcessDefinition> processDefinitionsActive=processDefinitions.stream().filter(p->p.isActive()).collect(Collectors.toList());
+		
 		for (ProcessDefinition processDefinition : processDefinitionsActive) {
-			
+
 			String threadGroupName=processDefinition.getCode();
 			ThreadGroup thGroup=ThreadGroupSingleton.getInstance().getThreadGroupByName(threadGroupName);
 			int activeInstancesCount=thGroup.activeCount();
+			
 			int remaining=processDefinition.getMaxThreadCount()-activeInstancesCount;
+			
 			if (remaining>0) {
 				List<ProcessInstance> notCompletedInstances = processService.getProcessNotCompletedInstances(processDefinition,remaining);
 				for (ProcessInstance processInstance : notCompletedInstances) {

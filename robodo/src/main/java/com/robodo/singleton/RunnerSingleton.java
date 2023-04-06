@@ -7,7 +7,7 @@ public class RunnerSingleton {
 	
 	private static RunnerSingleton instance;
 	
-	private Hashtable<String,Long> htRunningInstances=new Hashtable<String,Long>();
+	private Hashtable<String,Long> hmRunningInstances=new Hashtable<String,Long>();
 	public static final long TIMEOUT=5*60*1000;
 	
 	private RunnerSingleton() {
@@ -23,12 +23,12 @@ public class RunnerSingleton {
 	}
 	
 	public boolean hasRunningInstance(String runId) {
-		boolean isExists =  htRunningInstances.containsKey(runId);
+		boolean isExists =  hmRunningInstances.containsKey(runId);
 		if (!isExists) {
 			return false;
 		}
 		
-		long startTime=htRunningInstances.get(runId);
+		long startTime=hmRunningInstances.get(runId);
 		if (System.currentTimeMillis()-startTime> TIMEOUT) {
 			stop(runId);
 			return false;
@@ -37,13 +37,17 @@ public class RunnerSingleton {
 	}
 	
 	public void start(String runId) {
-		htRunningInstances.put(runId, System.currentTimeMillis());
+		hmRunningInstances.put(runId, System.currentTimeMillis());
 	}
 	
 	public void stop(String runId) {
-		if (htRunningInstances.containsKey(runId)) {
-			htRunningInstances.remove(runId);
+		if (hmRunningInstances.containsKey(runId)) {
+			hmRunningInstances.remove(runId);
 		}
+	}
+
+	public boolean hasSimilarRunningInstance(String similarRunningKey) {
+		return hmRunningInstances.keySet().stream().anyMatch(p->p.startsWith(similarRunningKey));
 	}
 
 }

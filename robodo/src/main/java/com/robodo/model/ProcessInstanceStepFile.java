@@ -1,5 +1,6 @@
 package com.robodo.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +22,9 @@ public class ProcessInstanceStepFile {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	Long id;
 	String fileType;
+	@Column(length = 1000)
 	String description;
+	@Column(length = 1000)
 	String fileName;
 	boolean attach;
 	

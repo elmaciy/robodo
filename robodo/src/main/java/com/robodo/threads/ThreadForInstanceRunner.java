@@ -27,10 +27,12 @@ public class ThreadForInstanceRunner implements Runnable {
 			String msg=result.getMessage();
 			runner.logger("exception at task : %s => %s".formatted(processInstance.getCode(),msg));
 			return;
+		} 
+		//singleton oldugu icin skip edilen step varsa STALLED olur
+		else if (result.getStatus().equals(ExecutionResultsForInstance.STATUS_STALLED)) {
+			processService.saveProcessInstance(result.getProcessInstance());
 		}
-		else  if (result.getStatus().equals(ExecutionResultsForInstance.STATUS_NOT_ELIGIBLE)) {
-			runner.logger("the instance %s is not eligible for running at the moment, possibbly due to the limitations".formatted(processInstance.getCode()));
-		} else {
+		else {
 			processService.saveProcessInstance(result.getProcessInstance());
 		}
 		

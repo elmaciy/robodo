@@ -8,6 +8,7 @@ import java.util.List;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
+import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
@@ -19,7 +20,8 @@ public class DiscoverProcessGooggleSearch extends BaseDiscoverer {
 
 	@Override
 	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {
-		List<String> keywords = List.of("Yildiray","Elmacı","Eidhoven");
+		//List<String> keywords = List.of("Yildiray","Elmacı","Eidhoven","Sevgi","Saygı","Hürmet");
+		List<String> keywords = List.of("Yildiray");
 		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
 		
 		for (String keyword : keywords) {
@@ -31,7 +33,7 @@ public class DiscoverProcessGooggleSearch extends BaseDiscoverer {
 			instance.setCreated(LocalDateTime.now());
 			instance.setStarted(LocalDateTime.now());
 			instance.setFinished(null);
-			instance.setRetryNo(0);
+			instance.setAttemptNo(0);
 			instance.setStatus(ProcessInstance.STATUS_NEW);
 			instance.setCurrentStepCode(null);
 			instance.setProcessDefinition(processDefinition);
@@ -50,6 +52,8 @@ public class DiscoverProcessGooggleSearch extends BaseDiscoverer {
 				instanceStep.setCommands(definitedSteps.getCommands());
 				instanceStep.setCreated(LocalDateTime.now());
 				instanceStep.setOrderNo(definitedSteps.getOrderNo());
+				instanceStep.setFiles(new ArrayList<ProcessInstanceStepFile>());
+
 				instance.getSteps().add(instanceStep);
 			}
 			

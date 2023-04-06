@@ -22,6 +22,14 @@
 37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
 38. tablolara indexleri koy
 39. decline ettiğinde last stepi yanlış hesaplıyor. 
+40. ödeme stepinin singleAtATime özelliği programatik olarak direk true yap. yani ne olursa olsun o stepten başka olmasın. tanım yanlış da olsa kodda bu ezilsin. 
+41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
+	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
+42. singleAtATime olan stepler doğru çalışıyor mu test et. 
+43. maxThredCount test edilmelidir. sanki çalışmadı. 
+
+
+
 
 //----------------------------------------------
 drop table  email_template_seq;        

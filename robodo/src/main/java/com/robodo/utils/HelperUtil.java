@@ -5,31 +5,33 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import javax.crypto.BadPaddingException;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import javax.mail.BodyPart;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.apache.tomcat.util.json.JSONParser;
 
@@ -37,6 +39,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.robodo.model.EmailTemplate;
+import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 
 public class HelperUtil {
@@ -118,7 +121,7 @@ public class HelperUtil {
 		HashMap<String, String> hmVars=String2HashMap(instanceVariables);
 		emailTemplate.setSubject(replaceVariables(emailTemplate.getSubject(),hmVars));
 		emailTemplate.setBody(replaceVariables(emailTemplate.getBody(), hmVars));
-		return sendEmail(emailTemplate, runnerUtil);
+		return sendEmail(step.getProcessInstance(), emailTemplate, runnerUtil);
 		
 	}
 
@@ -153,7 +156,7 @@ public class HelperUtil {
 		return List.of("instanceId","processInstance.code").stream().anyMatch(p->p.equals(key));
 	}
 
-	private static boolean sendEmail(EmailTemplate emailTemplate, RunnerUtil runnerUtil) {
+	private static boolean sendEmail(ProcessInstance processInstance, EmailTemplate emailTemplate, RunnerUtil runnerUtil) {
 		String from = "yildirayelmaci@gmail.com";
 		Properties properties = System.getProperties();
 		
@@ -169,7 +172,7 @@ public class HelperUtil {
         });
 		
 		//test amacli. silinecek sonra
-		session.setDebug(true);
+		//session.setDebug(true);
 		
 		try {
             MimeMessage message = new MimeMessage(session);
@@ -196,8 +199,46 @@ public class HelperUtil {
                 }
             }
             
+            
             message.setSubject(emailTemplate.getSubject());
-            message.setContent( emailTemplate.getBody(), "text/html; charset=utf-8" );
+            
+            MimeMultipart multipart = new MimeMultipart("related");
+            
+            
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setContent(emailTemplate.getBody(), "text/html; charset=utf-8");
+            multipart.addBodyPart(messageBodyPart);
+            
+            processInstance.getSteps().forEach(s->{
+            	s.getFiles().forEach(f-> {
+            		if (f.isAttach()) {
+            			// second part (the image)
+                        BodyPart  messageImagePart = new MimeBodyPart();
+                        String imagesPath = runnerUtil.getTargetPath(processInstance);
+                        String fileName=imagesPath+File.separator+f.getFileName();
+                        runnerUtil.logger("adding file [%s] to the mail".formatted(fileName));
+            			DataSource fds = new FileDataSource(fileName);
+            			try {
+        					messageImagePart.setDataHandler(new DataHandler(fds));
+        					messageImagePart.setFileName(fileName);
+        					messageImagePart.setDescription(f.getDescription());
+        					//messageImagePart.setText(f.getFileName());
+        	    			messageImagePart.setHeader("Content-ID", "<image>");
+        	                multipart.addBodyPart(messageImagePart);
+        				} catch (MessagingException e) {
+        					e.printStackTrace();
+        					runnerUtil.logger("error attaching file [%s] : %s".formatted(fileName, e.getMessage()));
+        				}
+            		}
+            	});
+    			
+            });
+			 
+            
+            
+            
+            
+            message.setContent(multipart);
             
             runnerUtil.logger("Sending email [%s] to %s".formatted(emailTemplate.getSubject(), emailTemplate.getToAddress()));
             // Send message

@@ -38,43 +38,13 @@ public class RunnerUtil {
 		
 		ExecutionResultsForInstance result=new ExecutionResultsForInstance(processInstance);
 
-		boolean eligibleToRun = isEligibleToRunProcessDefinition(processInstance.getProcessDefinition());
-		if (!eligibleToRun) {
-			String msg="Not eligible for runing for multiple instance";
-			logger(msg);
-			result.setMessage(msg);
-			result.setStatus(ExecutionResultsForInstance.STATUS_NOT_ELIGIBLE);
-			return result;
-		}
-		
-		//aynı processden tek sefer koşulabilmesi için bunu yapıyoruz. 
-		RunnerSingleton.getInstance().start(processInstance.getProcessDefinition().getCode());
-	
-
 		RunnerSingleton.getInstance().start(processInstance.getCode());
-		
-		
-		result.getProcessInstance().setStatus(ProcessInstance.STATUS_RUNNING);
-		processService.saveProcessInstance(result.getProcessInstance());
-		
+				
 		hmExtractedValues = HelperUtil.String2HashMap(result.getProcessInstance().getInstanceVariables());
 		
 
 		List<ProcessInstanceStep> steps = result.getProcessInstance().getSteps();
 
-		boolean isRetrying=false;
-		if (result.getProcessInstance().getRetryNo()==0) {
-			isRetrying=true;
-		} else {
-			ProcessInstanceStep currentStep = result.getProcessInstance().getCurrentStep();
-			if (currentStep!=null && !currentStep.isHumanInteractionStep()) {
-				isRetrying=true;
-			}
-		}
-		
-		if (isRetrying) {
-			result.getProcessInstance().setRetryNo(processInstance.getRetryNo()+1);
-		}
 		
 		for (ProcessInstanceStep step : steps) {
 			if (step.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)) {
@@ -88,10 +58,26 @@ public class RunnerUtil {
 				logs.append(step.getLogs());
 			}
 			
+			result.getProcessInstance().setStatus(ProcessInstance.STATUS_RUNNING);
 			result.getProcessInstance().setCurrentStepCode(step.getStepCode());
 			processService.saveProcessInstance(result.getProcessInstance());
 			
+			String stepRunningKey="%s.%s.%s".formatted(processInstance.getProcessDefinition().getCode(),step.getStepCode(), String.valueOf(step.getId()));
+			
 			try {
+				
+				if (processInstance.getProcessDefinition().isSingletonStep(step)) {
+					String similarRunningKey="%s.%s.".formatted(processInstance.getProcessDefinition().getCode(),step.getStepCode());
+					if (RunnerSingleton.getInstance().hasSimilarRunningInstance(similarRunningKey)) {
+						result.setMessage("");
+						result.setStatus(ExecutionResultsForInstance.STATUS_STALLED);
+						return result;
+					}
+					
+				}
+				
+				RunnerSingleton.getInstance().start(stepRunningKey);
+				
 				runStep(result.getProcessInstance(), step);
 				
 				if (step.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)) {
@@ -112,32 +98,41 @@ public class RunnerUtil {
 				logger("exception at step [%s] at command [%s] : %s".formatted(step.getStepCode(), step.getCommands(),
 						message));
 				step.setLogs(logs.toString());
+				step.setStatus(ProcessInstanceStep.STATUS_FAILED);
+				step.setError(e.getMessage());
+				
+				result.setMessage(e.getMessage());
+				result.setStatus(ExecutionResultsForInstance.STATUS_FAILED);
+				
+				RunnerSingleton.getInstance().stop(stepRunningKey);
+				
 				break;
-			}
+			} 
 
+			RunnerSingleton.getInstance().stop(stepRunningKey);
+			
 			step.setLogs(logs.toString());
 			result.getProcessInstance().setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
 			processService.saveProcessInstance(result.getProcessInstance());
 
 		} //for
-
 		
-		
-
 		boolean allStepsCompleted = result.getProcessInstance().getSteps().stream()
-				.allMatch(p -> p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED));
+				.allMatch(
+						p -> 
+							p.getStatus().equals(ProcessInstanceStep.STATUS_NEW) 
+							||
+							p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED) 
+							|| 
+							p.getStatus().equals(ProcessInstanceStep.STATUS_FAILED)
+						);
 
 		result.getProcessInstance().setStatus(allStepsCompleted ? ProcessInstance.STATUS_COMPLETED : ProcessInstance.STATUS_RUNNING);
+		
 		if (allStepsCompleted) {
 			result.getProcessInstance().setFinished(LocalDateTime.now());
-		} else {
-			boolean isInHumanIntegration = result.getProcessInstance().getSteps().stream()
-					.filter(p -> !p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)).findFirst().get().isHumanInteractionStep();
-			if (isInHumanIntegration) {
-				result.getProcessInstance().setCurrentStepCode(ProcessInstance.STATUS_HUMAN);
-
-			}
-		}
+			result.getProcessInstance().setAttemptNo(processInstance.getAttemptNo()+1);
+		} 
 		
 		result.getProcessInstance().setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
 
@@ -145,23 +140,8 @@ public class RunnerUtil {
 		
 		RunnerSingleton.getInstance().stop(result.getProcessInstance().getCode());
 		
-		RunnerSingleton.getInstance().stop(result.getProcessInstance().getProcessDefinition().getCode());
-		
 		return result;
 
-	}
-
-	public boolean isEligibleToRunProcessDefinition(ProcessDefinition processDefinition) {
-		boolean isSingleton = processDefinition.isSingleAtATime();
-		if (isSingleton) {
-			boolean isRunning = RunnerSingleton.getInstance().hasRunningInstance(processDefinition.getCode());
-			if (isRunning) {
-				logger("singleton process [%s) is already running".formatted(processDefinition.getCode()));
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	private ExecutionResultsForCommand runCommand(ProcessInstanceStep step, String command) {

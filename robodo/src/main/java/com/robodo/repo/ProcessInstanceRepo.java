@@ -11,6 +11,6 @@ public interface ProcessInstanceRepo extends CrudRepository<ProcessInstance, Lon
 	
 	List<ProcessInstance> findByCode(String code);
 	List<ProcessInstance>  findByProcessDefinition(ProcessDefinition processDefinition);
-	List<ProcessInstance>  findByProcessDefinitionAndStatusAndRetryNoLessThan(ProcessDefinition processDefinition,String status, int retryNo);
+	List<ProcessInstance>  findByProcessDefinitionAndStatusAndAttemptNoLessThan(ProcessDefinition processDefinition,String status, int attemptNo);
 
 }

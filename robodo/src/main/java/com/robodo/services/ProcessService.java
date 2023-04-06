@@ -68,7 +68,7 @@ public class ProcessService {
 
 		if (!processDefinition.isActive()) return instances;
 		
-		List<ProcessInstance> newInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndRetryNoLessThan(processDefinition, ProcessInstance.STATUS_NEW, processDefinition.getMaxRetryCount());
+		List<ProcessInstance> newInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThan(processDefinition, ProcessInstance.STATUS_NEW, processDefinition.getMaxAttemptCount());
 		for (ProcessInstance instance : newInstances) {
 			if (instances.size()>=maxInstance) break;
 			instances.add(instance);
@@ -76,7 +76,7 @@ public class ProcessService {
 		
 		if (instances.size()>=maxInstance) return instances;
 		
-		List<ProcessInstance> runningInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndRetryNoLessThan(processDefinition, ProcessInstance.STATUS_RUNNING, processDefinition.getMaxRetryCount());
+		List<ProcessInstance> runningInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThan(processDefinition, ProcessInstance.STATUS_RUNNING, processDefinition.getMaxAttemptCount());
 		
 		for (ProcessInstance instance : runningInstances) {
 			if (instances.size()>=maxInstance) break;

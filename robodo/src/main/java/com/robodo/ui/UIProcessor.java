@@ -53,6 +53,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.theme.lumo.LumoUtility.Margin.Horizontal;
 
 
 @Route("/process")
@@ -100,7 +101,7 @@ public class UIProcessor extends UIBase {
 			});
 			return chActive;
 		}).setHeader("Active").setWidth("2em");
-		gridProcess.addColumn(p -> p.getMaxRetryCount()).setHeader("Retry").setWidth("1em");
+		gridProcess.addColumn(p -> p.getMaxAttemptCount()).setHeader("Attempt").setWidth("1em");
 		gridProcess.addColumn(p -> p.getMaxThreadCount()).setHeader("Thread").setWidth("1em");
 		gridProcess.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer");
 
@@ -162,7 +163,7 @@ public class UIProcessor extends UIBase {
 			return progress;
 		}).setHeader("Progress").setWidth("3em");
 		gridProcessInstance.addColumn(p -> p.getCurrentStepCode()).setHeader("Latest Step").setAutoWidth(true);
-		gridProcessInstance.addColumn(p -> p.getRetryNo()).setHeader("Retried#").setWidth("2em");
+		gridProcessInstance.addColumn(p -> p.getAttemptNo()).setHeader("Attempt#").setWidth("2em");
 		gridProcessInstance.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setAutoWidth(true);
 		gridProcessInstance.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setAutoWidth(true);
 		gridProcessInstance.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setAutoWidth(true);
@@ -395,12 +396,28 @@ public class UIProcessor extends UIBase {
 		
 		
 		grid.addSelectionListener(p -> {
+			tabContent.removeAll();
+			
 			Optional<ProcessInstanceStep> selection = p.getFirstSelectedItem();
 			if (selection.isEmpty()) {
-				logMemo.setValue("");
+				if (tabs.getSelectedTab().equals(tabLogs)) {
+					logMemo.setValue("");
+					tabContent.add(logMemo);
+				} else {
+					tabContent.add(generateTabForFiles(null));
+				}
+				
 			} else {
-				var logs=selection.get().getLogs();
-				logMemo.setValue(logs==null ? "" : logs);
+				
+				if (tabs.getSelectedTab().equals(tabLogs)) {
+					var logs=selection.get().getLogs();
+					logMemo.setValue(logs==null ? "" : logs);
+					tabContent.add(logMemo);
+				} else {
+					tabContent.add(generateTabForFiles(selection.get()));
+				}
+				
+				
 			}
 		});
 		
@@ -456,38 +473,23 @@ public class UIProcessor extends UIBase {
 		processInstance.setStatus(countOfNonNew==0 ? ProcessInstance.STATUS_NEW : ProcessInstance.STATUS_RUNNING);
 		processInstance.setFinished(null);
 		processInstance.setCurrentStepCode(countOfNonNew==0 ? null : "BACKWARDED");
-		processInstance.setRetryNo(Integer.max(processInstance.getRetryNo()-1, 0));
+		processInstance.setAttemptNo(Integer.max(processInstance.getAttemptNo()-1, 0));
 
 		processService.saveProcessInstance(processInstance);
 		
 		notifySuccess("backwarded");
 	}
 
-	private HorizontalLayout generateTabForFiles(ProcessInstanceStep step) {
-		HorizontalLayout lay=new HorizontalLayout();
+	private VerticalLayout generateTabForFiles(ProcessInstanceStep step) {
+		VerticalLayout lay=new VerticalLayout();
+		if (step==null) return lay;
 		
-		VerticalLayout content=new VerticalLayout();
-		content.setSizeFull();
-		
-		Tabs tabs=new Tabs();
-		tabs.setOrientation(Tabs.Orientation.VERTICAL);
-		tabs.setHeightFull();
 		step.getFiles().forEach(file -> {
-			Tab tab = new Tab(VaadinIcon.FILE_PICTURE.create(), new Span(file.getDescription()));
-			tabs.add(tab);
-			tabs.addSelectedChangeListener(event -> {
-				content.removeAll();
-				content.add(getImage(step, file));
-			});
+			lay.add(new H4(file.getDescription()));
+			lay.add(getImage(step, file));
 		});	
 		
-		if (step.getFiles().size()>0) {
-			tabs.setSelectedIndex(0);
-			content.add(getImage(step, step.getFiles().get(0)));
-		}
-		
 		lay.setSizeFull();
-		lay.add(tabs, content);
 		
 		return lay;
 	}
@@ -501,7 +503,6 @@ public class UIProcessor extends UIBase {
 		String targetDir=runnerUtil.getTargetPath(step.getProcessInstance());
 		
 		String imagePath=targetDir+File.separator+imageFileName;
-		System.err.println(imagePath);
 		byte[] imageBytes=HelperUtil.getFileAsByteArray(imagePath);
 		runnerUtil.logger("image file [%s] loaded, (%s) bytes".formatted(imagePath,String.valueOf(imageBytes.length)));
 		StreamResource resource = new StreamResource(imageFileName, () -> new ByteArrayInputStream(imageBytes));

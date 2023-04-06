@@ -3,9 +3,9 @@ package com.robodo.model;
 public class ExecutionResultsForInstance {
 	
 	public static final String STATUS_NEW="NEW";
-	public static final String STATUS_NOT_ELIGIBLE="NOT_ELIGIBLE";
 	public static final String STATUS_SUCCESS="SUCCESS";
 	public static final String STATUS_FAILED="FAILED";
+	public static final String STATUS_STALLED="STALLED";
 	
 	ProcessInstance processInstance;
 	String status;

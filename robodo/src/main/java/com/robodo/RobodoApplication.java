@@ -36,10 +36,9 @@ public class RobodoApplication {
 			ProcessDefinition yillikPatentUcretiProcess=new ProcessDefinition();
 			yillikPatentUcretiProcess.setCode("PATENT_YILLIK_UCRET");
 			yillikPatentUcretiProcess.setDescription("Yıllık patent ücreti ödeme süreci");
-			yillikPatentUcretiProcess.setMaxRetryCount(1);
+			yillikPatentUcretiProcess.setMaxAttemptCount(1);
 			yillikPatentUcretiProcess.setMaxThreadCount(2);
 			yillikPatentUcretiProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
-			yillikPatentUcretiProcess.setSingleAtATime(false);
 			yillikPatentUcretiProcess.setDiscovererClass("DiscoverOdenecekYillikPatentUcretleri");
 			yillikPatentUcretiProcess.setActive(false);
 			
@@ -59,7 +58,7 @@ public class RobodoApplication {
 			stepPatentTahakkukOlustur.setCode("PATENT_YILLIK_UCRET_TAHAKKUK");
 			stepPatentTahakkukOlustur.setDescription("Patent yıllık ücreti tahakkuk oluşturma");
 			stepPatentTahakkukOlustur.setOrderNo("02");
-			stepPatentTahakkukOlustur.setSingleAtATime(true);
+			stepPatentTahakkukOlustur.setSingleAtATime(false);
 			stepPatentTahakkukOlustur.setCommands("runStepClass YillikPatentUcretiTahakkukOlustur");
 			stepPatentTahakkukOlustur.setProcessDefinition(yillikPatentUcretiProcess);
 			
@@ -67,7 +66,7 @@ public class RobodoApplication {
 			stepOnay.setCode("PATENT_ONAY_BEKLE");
 			stepOnay.setDescription("Patent yıllık ücreti ödeme için onay bekle");
 			stepOnay.setOrderNo("03");
-			stepOnay.setSingleAtATime(true);
+			stepOnay.setSingleAtATime(false);
 			stepOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
 			stepOnay.setProcessDefinition(yillikPatentUcretiProcess);
 			
@@ -75,7 +74,7 @@ public class RobodoApplication {
 			stepPatentOde.setCode("PATENT_TAHAKKUK_ODE");
 			stepPatentOde.setDescription("Tahakkuk ödeme");
 			stepPatentOde.setOrderNo("04");
-			stepPatentOde.setSingleAtATime(false);
+			stepPatentOde.setSingleAtATime(true);  //bu ödeme için true olacak
 			stepPatentOde.setCommands("runStepClass GenelTahakkukOdeme");
 			stepPatentOde.setProcessDefinition(yillikPatentUcretiProcess);
 			
@@ -108,10 +107,9 @@ public class RobodoApplication {
 			ProcessDefinition markaYenilemeProcess=new ProcessDefinition();
 			markaYenilemeProcess.setCode("MARKA_YENILEME");
 			markaYenilemeProcess.setDescription("Marka Yenileme Süreci");
-			markaYenilemeProcess.setMaxRetryCount(1);
+			markaYenilemeProcess.setMaxAttemptCount(1);
 			markaYenilemeProcess.setMaxThreadCount(2);
 			markaYenilemeProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
-			markaYenilemeProcess.setSingleAtATime(true);
 			markaYenilemeProcess.setDiscovererClass("DiscoverOdenecekMarkaYenilemeUcretleri");
 			markaYenilemeProcess.setActive(false);
 			
@@ -135,7 +133,7 @@ public class RobodoApplication {
 			stepMarkaYenilemeOnay.setCode("MARKA_ONAY_BEKLE");
 			stepMarkaYenilemeOnay.setDescription("Marke yenileme tahakkuk ödeme için onay bekle");
 			stepMarkaYenilemeOnay.setOrderNo("03");
-			stepMarkaYenilemeOnay.setSingleAtATime(true);
+			stepMarkaYenilemeOnay.setSingleAtATime(false);
 			stepMarkaYenilemeOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
 			stepMarkaYenilemeOnay.setProcessDefinition(markaYenilemeProcess);
 			
@@ -143,7 +141,7 @@ public class RobodoApplication {
 			stepMarkaOde.setCode("MARKA_TAHAKKUK_ODE");
 			stepMarkaOde.setDescription("Tahakkuk ödeme");
 			stepMarkaOde.setOrderNo("04");
-			stepMarkaOde.setSingleAtATime(false);
+			stepMarkaOde.setSingleAtATime(true);  //bu ödeme için true olacak
 			stepMarkaOde.setCommands("runStepClass GenelTahakkukOdeme");
 			stepMarkaOde.setProcessDefinition(markaYenilemeProcess);
 			
@@ -171,12 +169,11 @@ public class RobodoApplication {
 			ProcessDefinition markaItiraz2=new ProcessDefinition();
 			markaItiraz2.setCode("MARKA_2NCI_ITIRAZ");
 			markaItiraz2.setDescription("Marka Yayıma İtirazın Yeniden İncelenmesi (YİDD) süreci");
-			markaItiraz2.setMaxRetryCount(1);
+			markaItiraz2.setMaxAttemptCount(1);
 			markaItiraz2.setMaxThreadCount(2);
 			markaItiraz2.setSteps(new ArrayList<ProcessDefinitionStep>());
-			markaItiraz2.setSingleAtATime(true);
 			markaItiraz2.setDiscovererClass("DiscoverMarka2nciItiraz");
-			markaItiraz2.setActive(true);
+			markaItiraz2.setActive(false);
 			
 			ProcessDefinitionStep stepMarka2nciItirazDosyaOku=new ProcessDefinitionStep();
 			stepMarka2nciItirazDosyaOku.setCode("MARKA_2NCI_ITIRAZ_DOSYASINI_OKU");
@@ -198,7 +195,7 @@ public class RobodoApplication {
 			stepMarka2nciItirazOnay.setCode("MARKA_2NCI_ITIRAZ_ONAY");
 			stepMarka2nciItirazOnay.setDescription("Marka 2nci itiraz tahakkuk ödeme için onay bekle");
 			stepMarka2nciItirazOnay.setOrderNo("03");
-			stepMarka2nciItirazOnay.setSingleAtATime(true);
+			stepMarka2nciItirazOnay.setSingleAtATime(false);
 			stepMarka2nciItirazOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
 			stepMarka2nciItirazOnay.setProcessDefinition(markaItiraz2);
 			
@@ -206,7 +203,7 @@ public class RobodoApplication {
 			stepMarka2nciItirazOde.setCode("MARKA_2NCI_ITIRAZ_ODE");
 			stepMarka2nciItirazOde.setDescription("Tahakkuk ödeme");
 			stepMarka2nciItirazOde.setOrderNo("04");
-			stepMarka2nciItirazOde.setSingleAtATime(false);
+			stepMarka2nciItirazOde.setSingleAtATime(true); //bu ödeme için true olacak
 			stepMarka2nciItirazOde.setCommands("runStepClass GenelTahakkukOdeme");
 			stepMarka2nciItirazOde.setProcessDefinition(markaItiraz2);
 			
@@ -230,44 +227,48 @@ public class RobodoApplication {
 			
 			//--------------------------------------------
 			
-			ProcessDefinition getTextAndSearchOnGoogle=new ProcessDefinition();
-			//processDef1.setId(1L);
-			getTextAndSearchOnGoogle.setCode("GOOGLESEARCH");
-			getTextAndSearchOnGoogle.setDescription("Get text from somewhere and search on google");
-			getTextAndSearchOnGoogle.setMaxRetryCount(1);
-			getTextAndSearchOnGoogle.setMaxThreadCount(1);
-			getTextAndSearchOnGoogle.setSteps(new ArrayList<ProcessDefinitionStep>());
-			getTextAndSearchOnGoogle.setSingleAtATime(true);
-			getTextAndSearchOnGoogle.setDiscovererClass("DiscoverProcessGooggleSearch");
-			getTextAndSearchOnGoogle.setActive(false);
-			
-			
-			
-			
+			ProcessDefinition dummyProcess=new ProcessDefinition();
+			dummyProcess.setCode("GOOGLESEARCH");
+			dummyProcess.setDescription("Get text from somewhere and search on google");
+			dummyProcess.setMaxAttemptCount(1);
+			dummyProcess.setMaxThreadCount(3);
+			dummyProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
+			dummyProcess.setDiscovererClass("DiscoverProcessGooggleSearch");
+			dummyProcess.setActive(true);
+
+
+			ProcessDefinitionStep googleSearchStep=new ProcessDefinitionStep();
+			googleSearchStep.setCode("GOOGLE");
+			googleSearchStep.setDescription("Search on google");
+			googleSearchStep.setOrderNo("01");
+			googleSearchStep.setSingleAtATime(false);
+			googleSearchStep.setCommands("runStepClass DummyGoogleSearchByKeyword");
+			googleSearchStep.setProcessDefinition(dummyProcess);
+
+
 			ProcessDefinitionStep googleWaitApproval=new ProcessDefinitionStep();
 			googleWaitApproval.setCode("WAIT_APPROVAL");
 			googleWaitApproval.setDescription("Wait for approval");
-			googleWaitApproval.setOrderNo("01");
-			googleWaitApproval.setSingleAtATime(true);
+			googleWaitApproval.setOrderNo("02");
+			googleWaitApproval.setSingleAtATime(false);
 			googleWaitApproval.setCommands("waitHumanInteraction GOOGLE");
-			googleWaitApproval.setProcessDefinition(getTextAndSearchOnGoogle);
+			googleWaitApproval.setProcessDefinition(dummyProcess);
+			
+			ProcessDefinitionStep youtubeSearchStep=new ProcessDefinitionStep();
+			youtubeSearchStep.setCode("YOUTUBE");
+			youtubeSearchStep.setDescription("Search on youtube");
+			youtubeSearchStep.setOrderNo("03");
+			youtubeSearchStep.setSingleAtATime(false);
+			youtubeSearchStep.setCommands("runStepClass DummyYoutubeSearchByKeyword");
+			youtubeSearchStep.setProcessDefinition(dummyProcess);
+			
+			dummyProcess.getSteps().add(googleSearchStep);
+			dummyProcess.getSteps().add(googleWaitApproval);
+			dummyProcess.getSteps().add(youtubeSearchStep);
 			
 			
-			
-			ProcessDefinitionStep googleSearchStep=new ProcessDefinitionStep();
-			googleSearchStep.setCode("DOSEARCH");
-			googleSearchStep.setDescription("Search keyword");
-			googleSearchStep.setOrderNo("02");
-			googleSearchStep.setSingleAtATime(true);
-			googleSearchStep.setCommands("runStepClass DummyGoogleSearchByKeywordSteps");
-			googleSearchStep.setProcessDefinition(getTextAndSearchOnGoogle);
-			
-			getTextAndSearchOnGoogle.getSteps().add(googleWaitApproval);
-			getTextAndSearchOnGoogle.getSteps().add(googleSearchStep);
-			
-			
-			if (processDefinitionRepo.findByCode(getTextAndSearchOnGoogle.getCode()).isEmpty()) {
-				processDefinitionRepo.save(getTextAndSearchOnGoogle);
+			if (processDefinitionRepo.findByCode(dummyProcess.getCode()).isEmpty()) {
+				processDefinitionRepo.save(dummyProcess);
 			}
 			
 			

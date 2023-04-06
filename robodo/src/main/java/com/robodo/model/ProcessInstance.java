@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,18 +26,17 @@ public class ProcessInstance {
 	public static final String STATUS_HUMAN="HUMAN";
 	public static final String STATUS_COMPLETED ="COMPLETED";
 
-
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	Long id;
 	String code;
 	String description;
-	int retryNo;
+	int attemptNo;
 	LocalDateTime created;
 	LocalDateTime started;
 	LocalDateTime finished;
 	String status;
+	@Column(length = 255)
 	String currentStepCode;
 	@Column(length = 32000)
 	String error;
@@ -77,12 +75,12 @@ public class ProcessInstance {
 		this.description = description;
 	}
 
-	public int getRetryNo() {
-		return retryNo;
+	public int getAttemptNo() {
+		return attemptNo;
 	}
 
-	public void setRetryNo(int retryNo) {
-		this.retryNo = retryNo;
+	public void setAttemptNo(int attemptNo) {
+		this.attemptNo = attemptNo;
 	}
 
 	public LocalDateTime getCreated() {

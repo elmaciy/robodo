@@ -37,7 +37,7 @@ public class ProcessInstanceStep {
 	LocalDateTime finished;
 	@Column(length = 65000)
 	String logs;
-	@Column(length = 4000)
+	@Column(length = 65000)
 	String error;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
