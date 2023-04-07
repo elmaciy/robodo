@@ -22,6 +22,7 @@ import jakarta.persistence.Table;
 @Table(name = "process_instances")
 public class ProcessInstance {
 	public static final String STATUS_NEW="NEW";
+	public static final String STATUS_RETRY="RETRY";
 	public static final String STATUS_RUNNING="RUNNING";
 	public static final String STATUS_HUMAN="HUMAN";
 	public static final String STATUS_COMPLETED ="COMPLETED";
@@ -40,6 +41,7 @@ public class ProcessInstance {
 	String currentStepCode;
 	@Column(length = 32000)
 	String error;
+	boolean failed=false;
 	@Column(length = 65000)
 	String instanceVariables;
 	
@@ -165,9 +167,18 @@ public class ProcessInstance {
 	public void setError(String error) {
 		this.error = error;
 	}
+	
+
+	public boolean isFailed() {
+		return failed;
+	}
+
+	public void setFailed(boolean failed) {
+		this.failed = failed;
+	}
 
 	public ProcessInstanceStep getCurrentStep() {
-		if (this.getStatus().equals(STATUS_NEW)) {
+		if (this.getStatus().equals(STATUS_NEW) || this.getStatus().equals(STATUS_RETRY)) {
 			return null;
 		}
 		

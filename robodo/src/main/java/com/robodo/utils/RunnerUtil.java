@@ -89,6 +89,7 @@ public class RunnerUtil {
 				if (step.getStatus().equals(ProcessInstanceStep.STATUS_FAILED)) {
 					logger("failed at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
 					step.setLogs(logs.toString());
+					step.setFinished(LocalDateTime.now());
 					break;
 				}
 				
@@ -100,6 +101,7 @@ public class RunnerUtil {
 				step.setLogs(logs.toString());
 				step.setStatus(ProcessInstanceStep.STATUS_FAILED);
 				step.setError(e.getMessage());
+				step.setFinished(LocalDateTime.now());
 				
 				result.setMessage(e.getMessage());
 				result.setStatus(ExecutionResultsForInstance.STATUS_FAILED);
@@ -170,6 +172,7 @@ public class RunnerUtil {
 		} else if (arg0.equalsIgnoreCase("waitHumanInteraction")) {
 			if (!step.isNotificationSent()) {
 				sendEmailNotificationForApproval(step, arg1);
+				step.setNotificationSent(true);
 			}
 			boolean isApproved = step.isApproved();
 			if (isApproved) {
@@ -221,13 +224,14 @@ public class RunnerUtil {
 			logger("Command [%s] execution is failed for step [%s] => %s".formatted(step.getCommands(),step.getStepCode(), result.getMessage()));
 			step.setError(result.getMessage());
 			processInstance.setError(result.getMessage());
+			processInstance.setFailed(true);
 			step.setStatus(ProcessInstanceStep.STATUS_FAILED);
 		} else {
 			boolean isOk = result.getStatus().equals(ExecutionResultsForCommand.STATUS_SUCCESS);
 			step.setStatus(isOk ? ProcessInstanceStep.STATUS_COMPLETED : ProcessInstanceStep.STATUS_RUNNING);
 			step.setError("");
 			processInstance.setError("");
-			step.setFinished(LocalDateTime.now());
+			step.setFinished(isOk ? LocalDateTime.now() : null);
 		}
 		
 		

@@ -14,10 +14,14 @@ import com.robodo.utils.HelperUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -42,95 +46,102 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	String action;
 	String source;
 
-
-	@Override
-	public void beforeEnter(BeforeEnterEvent event) {
-		RouteParameters routeParameters = event.getRouteParameters();
-		Iterator<String> it = routeParameters.getParameterNames().iterator();
-		while (it.hasNext()) {
-			String parameterName=it.next();
-			String value=routeParameters.get(parameterName).get();
-			System.err.println("set parameter[%s=%s]".formatted(parameterName,value));
-			UI.getCurrent().getSession().setAttribute(parameterName, value);			
-		}
-		
-	}
-
 	@Autowired
 	public UIApprover(ProcessService processService) {
 		super(processService);
 		
 		this.processService=processService;
-		
-		
-		this.action=(String) UI.getCurrent().getSession().getAttribute("action");
-		this.instanceId=(String) UI.getCurrent().getSession().getAttribute("instanceId");
-		this.source=(String) UI.getCurrent().getSession().getAttribute("source");
-		
+	}
+
+	@Override
+	public void beforeEnter(BeforeEnterEvent event) {
+		RouteParameters routeParameters = event.getRouteParameters();
+		Iterator<String> it = routeParameters.getParameterNames().iterator();
+
+		while (it.hasNext()) {
+			String parameterName=it.next();
+			String value=routeParameters.get(parameterName).get();
+			if (parameterName.equals("action")) action=value;
+			if (parameterName.equals("instanceId")) instanceId=value;
+			if (parameterName.equals("source")) source=value;
+		}
+				
+		boolean isOk = checkParams();
+
+		if (isOk) {
+			 drawScreen();
+		 }
+
+	}
+
+	private boolean checkParams() {
+
 		if (instanceId==null) {
 			notifyError("instance is not given");
-			return;
+			return false;
 		} else {
 			instanceId=HelperUtil.decrypt(instanceId);
 		}
 		 
 		if (action==null) {
 			notifyError("action is not given");
-			return;
+			return false;
 		}
 		 
 		if ("APPROVE,DECLINE,VIEW".indexOf(action)==-1) {
 			notifyError("invalid action : %s".formatted(action));
-			return;
+			return false;
 		}
 		
 		if ("EMAIL,SCREEN".indexOf(source)==-1) {
 			notifyError("invalid source: %s".formatted(source));
-			return;
+			return false;
 		}
 		 
 		processInstance = processService.getProcessInstanceByCode(instanceId);
 		if (processInstance==null) {
 			notifyError("no instance found : %s".formatted(instanceId));
-			return;
+			return false;
 		}
-		 
-		 
-		drawScreen();
-	}
 
+		return true;
+	}
 
 	private void drawScreen() {
 		Button btApprove = new Button("APPROVE", new Icon(VaadinIcon.CHECK));
 		btApprove.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_LARGE);
-		btApprove.setEnabled(isApproveable(processInstance) && !source.equals("EMAIL"));
+		btApprove.setEnabled(isApproveable(processInstance));
 		btApprove.addClickListener(e -> {
 			approve(processInstance);
 		});
 		
 		Button btDecline = new Button("DECLINE", new Icon(VaadinIcon.CLOSE));
 		btDecline.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_LARGE);
-		btDecline.setEnabled(isApproveable(processInstance)  && !source.equals("EMAIL"));
+		btDecline.setEnabled(isApproveable(processInstance));
 		btDecline.addClickListener(e -> {
 			decline(processInstance);
 		});
 		
-		
-		
-		VerticalLayout verticalLay = new VerticalLayout();
-		verticalLay.setWidthFull();
-		verticalLay.setHeightFull();
-		HorizontalLayout buttonsLayout=new HorizontalLayout(btApprove,btDecline);
+		HorizontalLayout buttonsLayout=new HorizontalLayout(makeBackButton(), btApprove, btDecline);
 		buttonsLayout.setWidthFull();
-		verticalLay.add(buttonsLayout);
+		buttonsLayout.setAlignItems(Alignment.CENTER);
 		
-		
-
 		VerticalLayout instanceLay= makeInstanceLayout(processInstance);
-		verticalLay.add(new H3("PROCESS INSTANCE %s (%s)".formatted(processInstance.getCode(),processInstance.getDescription())));
-		verticalLay.add(instanceLay);
 
-		add(verticalLay);
+		Scroller scroller=new Scroller(instanceLay);
+		scroller.setScrollDirection(Scroller.ScrollDirection.VERTICAL);
+		scroller.setWidth("80%");
+		
+		VerticalLayout main=new VerticalLayout();
+		main.setSizeFull();
+		main.setAlignItems(Alignment.CENTER);
+		
+		
+		main.add(buttonsLayout);
+		main.add(new H3("%s (%s)".formatted(processInstance.getCode(),processInstance.getDescription())));
+		main.add(scroller);
+		
+		add(main);
 		setSizeFull();
 		
 		getElement().getStyle().set("height", "100%");
@@ -146,6 +157,16 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			}
 		}
 		
+	}
+
+	private Button makeBackButton() {
+		Button btBack = new Button("<< Back", new Icon(VaadinIcon.BACKWARDS));
+		btBack.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+		btBack.addClickListener(e -> {
+			UI.getCurrent().navigate("/process");
+		});
+		btBack.setVisible(source.equals("SCREEN"));
+		return btBack;
 	}
 
 	private boolean isApproveable(ProcessInstance processInstance) {
@@ -178,8 +199,18 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		
 	}
 	
-	private VerticalLayout makeInstanceLayout(ProcessInstance processInstance2) {
+	private VerticalLayout makeInstanceLayout(ProcessInstance processInstance) {
 		VerticalLayout layout=new VerticalLayout();
+		processInstance.getSteps().forEach(s->{
+			layout.add(new H1(s.getStepCode()));
+			s.getFiles().forEach(f->{
+				Span title = new Span(f.getDescription());
+				title.getElement().getThemeList().add("badge");
+				title.setWidthFull();
+				layout.add(title);
+				layout.add(getImage(s, f));
+			});
+		});
 		
 		return layout;
 	}
@@ -209,25 +240,21 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		stepForApproval.setApproved(approved);
 		stepForApproval.setApprovalDate(LocalDateTime.now());
 		stepForApproval.setApprovedBy("TBD");
+		stepForApproval.setFinished(LocalDateTime.now());
 		
 		if (!approved) {
-			processInstance.setFinished(LocalDateTime.now());
 			processInstance.setStatus(ProcessInstance.STATUS_COMPLETED);
 			processInstance.setError(approved ? null : "declined by user");
+			processInstance.setFailed(true);
 		} 
 		
 		
 		processService.saveProcessInstance(processInstance);
 		
-		if (source.equals("EMAIL")) {
-			UI.getCurrent().navigate(UIApprovalOk.class);
-			return;
-		}
-
-		informAndRun("Approval", "Successfully %s".formatted(approved? "approved":"declined"), ()->{
-			UI.getCurrent().navigate(UIProcessor.class);
+		informAndRun("Completed", "%s successfully.".formatted(approved ? "Approved" : "Declined"), ()->{
+			UI.getCurrent().navigate("/approve/%s/%s/SCREEN".formatted(HelperUtil.encrypt(instanceId),action));
 		});
-		
+
 	}
 
 }

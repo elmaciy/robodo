@@ -9,19 +9,18 @@
 17. alarm oluştur ve threshold belirle, bu aşılınca mail gitsin biryerlere, bu sayede bir problem olup olmadığını anlarız. 
 	a. uzun süredir hiçbir süreç discover edilmiyor
 	b. kuyruk azalmiyor
-20. eski işi bitenleri belli bir gün geçince silelim. 
+20. eski işi bitenleri belli bir gün geçince arşivleyip silelim. 
 22. instanceleri başlatan kısımdaki lojikten dolayı hep aynı işleri öncelikli alıyor. burada bir dağılım yapmak iyi olabilir. 
 23. kendi timerin yerine düzgün bir timer koy sayfaya
 25. islem yarıda selenium exception alınca (mesela karsilastirma hatası) browser açık kalıyor. 
 26. hata alınca ekran görüntüsü alınsı o anki. sonra selenium kapatılsın. 
 31. human notificationda email gitmezse tekrar deneyecek mi? 
 6. human interaction da onay ekranı olsun. önce maille link gönderilecek sonra onay verecek kişi bu ekrandan tüm detayları görebilecek. 
-33. emaile işaretlenen dosyalar eklensin attachment olarak. ekranı açmak zorunda kalmasın. 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı?
 35. Ödeme aşamalarında bir şekilde o işlemin arada manual ödenip ödenmediğini kontrol edebilir miyiz? 
 37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
 38. tablolara indexleri koy
-39. decline ettiğinde last stepi yanlış hesaplıyor. 
+39. decline ettiğinde last stepi yanlış hesaplıyor. decline testi yapılmalıdır. 
 40. ödeme stepinin singleAtATime özelliği programatik olarak direk true yap. yani ne olursa olsun o stepten başka olmasın. tanım yanlış da olsa kodda bu ezilsin. 
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
@@ -62,4 +61,5 @@ TAMAMLANANLAR
 14. aynı anda birden fazla süreç koşabibir mi? teoride koşabilir. test edilecek. 
 13. instance için baştan al gibi bir seçenek gerekir mi? 
 3. genel olarak bir thread count parametresi koyalım. propertiesden alsın. bu sayıdan fazla thread olmasın. 
+33. emaile işaretlenen dosyalar eklensin attachment olarak. ekranı açmak zorunda kalmasın. 
 

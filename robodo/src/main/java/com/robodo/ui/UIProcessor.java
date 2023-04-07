@@ -1,7 +1,5 @@
 package com.robodo.ui;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -12,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 
 import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessDefinition;
@@ -37,7 +34,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -50,10 +46,8 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import com.vaadin.flow.theme.lumo.LumoUtility.Margin.Horizontal;
 
 
 @Route("/process")
@@ -64,12 +58,9 @@ public class UIProcessor extends UIBase {
 
 	private static final long serialVersionUID = 1L;
 	
-
-
 	static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
 	ProcessService processService;
-	Environment env;
 
 	Grid<ProcessDefinition> gridProcess;
 	Grid<ProcessDefinitionStep> gridProcessSteps;
@@ -81,8 +72,7 @@ public class UIProcessor extends UIBase {
 		startUpdaterThread();
 
 		this.processService = processService;
-		this.env = env;
-
+		
 		gridProcess = new Grid<>(ProcessDefinition.class, false);
 		gridProcess.addColumn(p -> p.getId()).setHeader("#").setWidth("3em");
 		gridProcess.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
@@ -270,8 +260,8 @@ public class UIProcessor extends UIBase {
 		getElement().getStyle().set("height", "100%");
 
 		fillGrid();
-
 	}
+
 
 	private String dateFormat(LocalDateTime local) {
 		if (local==null) return null;
@@ -470,7 +460,7 @@ public class UIProcessor extends UIBase {
 		
 		long countOfNonNew=steps.stream().filter(p->!p.getStatus().equals(ProcessInstanceStep.STATUS_NEW)).count();
 		
-		processInstance.setStatus(countOfNonNew==0 ? ProcessInstance.STATUS_NEW : ProcessInstance.STATUS_RUNNING);
+		processInstance.setStatus(countOfNonNew==0 ? (processInstance.getAttemptNo()==0 ? ProcessInstance.STATUS_NEW : ProcessInstance.STATUS_RETRY) : ProcessInstance.STATUS_RUNNING);
 		processInstance.setFinished(null);
 		processInstance.setCurrentStepCode(countOfNonNew==0 ? null : "BACKWARDED");
 		processInstance.setAttemptNo(Integer.max(processInstance.getAttemptNo()-1, 0));
@@ -485,7 +475,10 @@ public class UIProcessor extends UIBase {
 		if (step==null) return lay;
 		
 		step.getFiles().forEach(file -> {
-			lay.add(new H4(file.getDescription()));
+			Span title = new Span(file.getDescription());
+			title.setWidthFull();
+			title.getElement().getThemeList().add("badge");
+			lay.add(title);
 			lay.add(getImage(step, file));
 		});	
 		
@@ -497,21 +490,7 @@ public class UIProcessor extends UIBase {
 
 
 
-	private Image getImage(ProcessInstanceStep step, ProcessInstanceStepFile file) {
-		String imageFileName=file.getFileName();
-		RunnerUtil runnerUtil = new RunnerUtil(processService);
-		String targetDir=runnerUtil.getTargetPath(step.getProcessInstance());
-		
-		String imagePath=targetDir+File.separator+imageFileName;
-		byte[] imageBytes=HelperUtil.getFileAsByteArray(imagePath);
-		runnerUtil.logger("image file [%s] loaded, (%s) bytes".formatted(imagePath,String.valueOf(imageBytes.length)));
-		StreamResource resource = new StreamResource(imageFileName, () -> new ByteArrayInputStream(imageBytes));
-		Image image = new Image(resource, file.getDescription());
 
-		add(image);
-		image.setSizeFull();
-		return image;
-	}
 
 	private void showVariables(ProcessInstance processInstance) {
 		Dialog dialog = new Dialog();

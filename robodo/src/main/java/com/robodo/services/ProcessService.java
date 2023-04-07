@@ -76,6 +76,14 @@ public class ProcessService {
 		
 		if (instances.size()>=maxInstance) return instances;
 		
+		List<ProcessInstance> retryInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThan(processDefinition, ProcessInstance.STATUS_RETRY, processDefinition.getMaxAttemptCount());
+		for (ProcessInstance instance : retryInstances) {
+			if (instances.size()>=maxInstance) break;
+			instances.add(instance);
+		}
+		
+		if (instances.size()>=maxInstance) return instances;
+
 		List<ProcessInstance> runningInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThan(processDefinition, ProcessInstance.STATUS_RUNNING, processDefinition.getMaxAttemptCount());
 		
 		for (ProcessInstance instance : runningInstances) {
@@ -87,6 +95,30 @@ public class ProcessService {
 		return instances;
 	}
 	
+	public List<ProcessInstance> getProcessFailedAndToBeRetriedInstances(ProcessDefinition processDefinition, int maxInstance) {
+		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
+
+		if (!processDefinition.isActive()) return instances;
+		
+		List<ProcessInstance> newInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThanAndFailed(processDefinition, ProcessInstance.STATUS_COMPLETED, processDefinition.getMaxAttemptCount(),true);
+		for (ProcessInstance instance : newInstances) {
+			if (instances.size()>=maxInstance) break;
+			instances.add(instance);
+		}
+		
+		if (instances.size()>=maxInstance) return instances;
+		
+		List<ProcessInstance> runningInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThanAndFailed(processDefinition, ProcessInstance.STATUS_COMPLETED, processDefinition.getMaxAttemptCount(), true);
+		
+		for (ProcessInstance instance : runningInstances) {
+			if (instances.size()>=maxInstance) break;
+			instances.add(instance);
+		}
+		
+	
+		return instances;
+	}
+
 	public Environment getEnv() {
 		return env;
 	}

@@ -230,7 +230,7 @@ public class RobodoApplication {
 			ProcessDefinition dummyProcess=new ProcessDefinition();
 			dummyProcess.setCode("GOOGLESEARCH");
 			dummyProcess.setDescription("Get text from somewhere and search on google");
-			dummyProcess.setMaxAttemptCount(1);
+			dummyProcess.setMaxAttemptCount(2);
 			dummyProcess.setMaxThreadCount(3);
 			dummyProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
 			dummyProcess.setDiscovererClass("DiscoverProcessGooggleSearch");

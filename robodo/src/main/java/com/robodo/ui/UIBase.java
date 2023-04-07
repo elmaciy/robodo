@@ -1,10 +1,19 @@
 package com.robodo.ui;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+
+import com.robodo.model.ProcessInstanceStep;
+import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
+import com.robodo.utils.HelperUtil;
+import com.robodo.utils.RunnerUtil;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
@@ -72,5 +81,21 @@ public class UIBase extends Div {
 		});
 		dialog.open();
 	}	
+	
+	public Image getImage(ProcessInstanceStep step, ProcessInstanceStepFile file) {
+		String imageFileName=file.getFileName();
+		RunnerUtil runnerUtil = new RunnerUtil(processService);
+		String targetDir=runnerUtil.getTargetPath(step.getProcessInstance());
+		
+		String imagePath=targetDir+File.separator+imageFileName;
+		byte[] imageBytes=HelperUtil.getFileAsByteArray(imagePath);
+		runnerUtil.logger("image file [%s] loaded, (%s) bytes".formatted(imagePath,String.valueOf(imageBytes.length)));
+		StreamResource resource = new StreamResource(imageFileName, () -> new ByteArrayInputStream(imageBytes));
+		Image image = new Image(resource, file.getDescription());
+
+		add(image);
+		image.setSizeFull();
+		return image;
+	}
 
 }
