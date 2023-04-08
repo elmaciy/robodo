@@ -36,7 +36,7 @@ public class Marka2nciItirazOlusturSteps extends BaseEpatsSteps {
 		epatsMenu.cikis();
 		
 		selenium.sleep(10L);
-		selenium.stopDriver();
+		//selenium.stopDriver();
 	}
 
 

@@ -46,7 +46,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	
 	public BaseEpatsSteps(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
-		selenium.startWebDriver();
+		
 		this.home=new PageEpatsHome(selenium);
 		this.edevletLogin=new PageEdevletLogin(selenium);
 		this.epatsMenu=new PageEpatsMenu(selenium);
@@ -63,6 +63,24 @@ public class BaseEpatsSteps extends BaseSteps {
 		this.epatsItirazGerekceleri=new PageEpatsItirazGerekceleri(selenium);
 		this.epatsItirazaIliskinBilgiler=new PageEpatsItirazaIliskinBilgiler(selenium);
 		this.epatsItirazaIliskinEkler=new PageEpatsItirazaIliskinEkler(selenium);
+	}
+	
+	
+	@Override
+	public void setup() {
+		selenium.startWebDriver();
+		
+	}
+	
+	@Override
+	public void run() {
+	}
+
+	@Override
+	public void teardown() {
+		takeStepScreenShot(processInstanceStep, "end of step", false);
+		selenium.stopDriver();
+		
 	}
 
 	public void sistemeGiris() {
@@ -287,10 +305,9 @@ public class BaseEpatsSteps extends BaseSteps {
 		throw new RuntimeException("%s. v1=%s, v2=%s".formatted(mesaj,v1, v2));
 	}
 
+
+
 	
-	@Override
-	public void run() {
-	}
 
 
 

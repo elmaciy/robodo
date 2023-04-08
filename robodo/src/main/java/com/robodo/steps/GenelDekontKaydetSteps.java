@@ -11,9 +11,7 @@ public class GenelDekontKaydetSteps extends BaseEpatsSteps {
 
 	@Override
 	public void run() {
-		selenium.startWebDriver();
 		selenium.sleep(5L);
-		selenium.stopDriver();
 
 	}
 

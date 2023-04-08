@@ -251,20 +251,20 @@ public class RobodoApplication {
 			googleWaitApproval.setDescription("Wait for approval");
 			googleWaitApproval.setOrderNo("02");
 			googleWaitApproval.setSingleAtATime(false);
-			googleWaitApproval.setCommands("waitHumanInteraction GOOGLE");
+			googleWaitApproval.setCommands("waitHumanInteraction SEARCH");
 			googleWaitApproval.setProcessDefinition(dummyProcess);
 			
-			ProcessDefinitionStep youtubeSearchStep=new ProcessDefinitionStep();
-			youtubeSearchStep.setCode("YOUTUBE");
-			youtubeSearchStep.setDescription("Search on youtube");
-			youtubeSearchStep.setOrderNo("03");
-			youtubeSearchStep.setSingleAtATime(false);
-			youtubeSearchStep.setCommands("runStepClass DummyYoutubeSearchByKeyword");
-			youtubeSearchStep.setProcessDefinition(dummyProcess);
+			ProcessDefinitionStep bingSearchStep=new ProcessDefinitionStep();
+			bingSearchStep.setCode("BING");
+			bingSearchStep.setDescription("Search on bing");
+			bingSearchStep.setOrderNo("03");
+			bingSearchStep.setSingleAtATime(true);
+			bingSearchStep.setCommands("runStepClass DummyBingSearchByKeyword");
+			bingSearchStep.setProcessDefinition(dummyProcess);
 			
 			dummyProcess.getSteps().add(googleSearchStep);
-			dummyProcess.getSteps().add(googleWaitApproval);
-			dummyProcess.getSteps().add(youtubeSearchStep);
+			//dummyProcess.getSteps().add(googleWaitApproval);
+			dummyProcess.getSteps().add(bingSearchStep);
 			
 			
 			if (processDefinitionRepo.findByCode(dummyProcess.getCode()).isEmpty()) {
@@ -305,7 +305,7 @@ public class RobodoApplication {
 			
 			//---------------------------------------------------
 			EmailTemplate emailForGoogleSearch=new EmailTemplate();
-			emailForGoogleSearch.setCode("GOOGLE");
+			emailForGoogleSearch.setCode("SEARCH");
 			emailForGoogleSearch.setToAddress("elmaciy@hotmail.com");
 			emailForGoogleSearch.setSubject("Onayınız bekleniyor. Aranacak Kelime : ${keyword}");
 			emailForGoogleSearch.setBody(

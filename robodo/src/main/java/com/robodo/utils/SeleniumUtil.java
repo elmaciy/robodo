@@ -158,6 +158,7 @@ public class SeleniumUtil {
 
 
 	public String screenShot(ProcessInstance processInstance) {
+		waitPageLoaded();
 		String targetDir=runnerUtil.getTargetPath(processInstance);
 		TakesScreenshot scrShot =((TakesScreenshot) webDriver);
 		File SrcFile=scrShot.getScreenshotAs(OutputType.FILE);
@@ -247,6 +248,16 @@ public class SeleniumUtil {
 	public void sendKeys(WebElement el, String value) {
 		runnerUtil.logger("send keys '%s : element %s".formatted(value,el2Str(el)));
 		el.sendKeys(value);
+	}
+
+	public void waitPageLoaded() {
+		while(true) {
+			 JavascriptExecutor executor = (JavascriptExecutor) webDriver;
+			boolean readyStateComplete = ((String) executor.executeScript("return document.readyState")).equals("complete"); 
+			if (readyStateComplete) break;
+			sleep(1L);
+		}
+		
 	}
 
 	

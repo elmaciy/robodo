@@ -19,7 +19,6 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
-import com.robodo.singleton.SingletonForUIUpdate;
 import com.robodo.steps.BaseSteps;
 
 public class RunnerUtil {
@@ -57,10 +56,8 @@ public class RunnerUtil {
 			if (step.getLogs() != null) {
 				logs.append(step.getLogs());
 			}
-			
-			result.getProcessInstance().setStatus(ProcessInstance.STATUS_RUNNING);
-			result.getProcessInstance().setCurrentStepCode(step.getStepCode());
 			processService.saveProcessInstance(result.getProcessInstance());
+
 			
 			String stepRunningKey="%s.%s.%s".formatted(processInstance.getProcessDefinition().getCode(),step.getStepCode(), String.valueOf(step.getId()));
 			
@@ -68,13 +65,20 @@ public class RunnerUtil {
 				
 				if (processInstance.getProcessDefinition().isSingletonStep(step)) {
 					String similarRunningKey="%s.%s.".formatted(processInstance.getProcessDefinition().getCode(),step.getStepCode());
-					if (RunnerSingleton.getInstance().hasSimilarRunningInstance(similarRunningKey)) {
+					boolean hasSimilarInstance=RunnerSingleton.getInstance().hasSimilarRunningInstance(similarRunningKey);
+
+					if (hasSimilarInstance) {
 						result.setMessage("");
 						result.setStatus(ExecutionResultsForInstance.STATUS_STALLED);
+						RunnerSingleton.getInstance().stop(processInstance.getCode());
 						return result;
 					}
 					
 				}
+				
+
+				result.getProcessInstance().setStatus(ProcessInstance.STATUS_RUNNING);
+				result.getProcessInstance().setCurrentStepCode(step.getStepCode());
 				
 				RunnerSingleton.getInstance().start(stepRunningKey);
 				
@@ -270,18 +274,31 @@ public class RunnerUtil {
 
 	private ExecutionResultsForCommand runStepClass(ProcessInstanceStep step,  String className) {
 		ExecutionResultsForCommand result = new ExecutionResultsForCommand();
+		BaseSteps stepClassInstance=null;
 		try {
 			String packageName = processService.getEnv().getProperty("steps.package");
 			Class<?> clazz = Class.forName(packageName + "." + className);
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class, ProcessInstanceStep.class);
-			BaseSteps stepClassInstance = (BaseSteps) constructor.newInstance(this, step);
+		
+			stepClassInstance = (BaseSteps) constructor.newInstance(this, step);
+			if (stepClassInstance!=null) {
+				stepClassInstance.setup();
+			}
+			
 			step.getFiles().clear();
 			stepClassInstance.run();
-			return result.succeeded();
+			result = result.succeeded();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return result.failed().withMessage(e.getMessage());
+			result = result.failed().withMessage(e.getMessage());
+		} finally {
+			if (stepClassInstance!=null) {
+				stepClassInstance.teardown();
+			}
 		}
+		
+		
+		return result;
 
 	}
 
@@ -298,7 +315,6 @@ public class RunnerUtil {
 			Class<?> clazz = Class.forName(packageName + "." + processDefinition.getDiscovererClass());
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class);
 			BaseDiscoverer discovererInstance = (BaseDiscoverer) constructor.newInstance(this);
-			SingletonForUIUpdate.getInstance().setLastUpdate();
 			return discovererInstance.discover(processDefinition);
 		} catch (Exception e) {
 			e.printStackTrace();

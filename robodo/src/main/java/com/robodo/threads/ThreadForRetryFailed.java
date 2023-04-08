@@ -9,6 +9,7 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
+import com.robodo.singleton.RunnerSingleton;
 
 public class ThreadForRetryFailed implements Runnable {
 	
@@ -20,6 +21,15 @@ public class ThreadForRetryFailed implements Runnable {
 
 	@Override
 	public void run() {
+		
+		String threadName=this.getClass().getName();
+		
+		if (RunnerSingleton.getInstance().hasRunningInstance(threadName)) {
+			return;
+		}
+		
+		RunnerSingleton.getInstance().start(threadName);
+		
 		List<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();
 		List<ProcessDefinition> processDefinitionsActive=processDefinitions.stream().filter(p->p.isActive()).collect(Collectors.toList());
 		
@@ -30,6 +40,8 @@ public class ThreadForRetryFailed implements Runnable {
 				processService.saveProcessInstance(instance);
 			});
 		}
+		
+		RunnerSingleton.getInstance().stop(threadName);
 
 	}
 

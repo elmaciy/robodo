@@ -18,6 +18,15 @@ public class ThreadForDiscoverers implements Runnable {
 
 	@Override
 	public void run() {
+		
+		String threadName=this.getClass().getName();
+		
+		if (RunnerSingleton.getInstance().hasRunningInstance(threadName)) {
+			return;
+		}
+		
+		RunnerSingleton.getInstance().start(threadName);
+		
 		List<ProcessDefinition> processDefinitions=processService.getProcessDefinitions();
 		for (ProcessDefinition processDefinition : processDefinitions) {
 			if (!processDefinition.isActive()) continue;
@@ -47,6 +56,9 @@ public class ThreadForDiscoverers implements Runnable {
 			
 			RunnerSingleton.getInstance().stop(processId);	
 		}
+		
+		RunnerSingleton.getInstance().stop(threadName);
+		
 		
 	}
 

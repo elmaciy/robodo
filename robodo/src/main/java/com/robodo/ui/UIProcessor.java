@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,19 +22,20 @@ import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.singleton.ThreadGroupSingleton;
 import com.robodo.threads.ThreadForInstanceRunner;
-import com.robodo.threads.ThreadForUIUpdating;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -65,11 +67,12 @@ public class UIProcessor extends UIBase {
 	Grid<ProcessDefinition> gridProcess;
 	Grid<ProcessDefinitionStep> gridProcessSteps;
 	Grid<ProcessInstance> gridProcessInstance;
+	
+
 
 	@Autowired
 	public UIProcessor(ProcessService processService) {
 		super(processService);
-		startUpdaterThread();
 
 		this.processService = processService;
 		
@@ -100,25 +103,22 @@ public class UIProcessor extends UIBase {
 			btnRun.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 			btnRun.setDisableOnClick(true);
 			btnRun.addClickListener(e -> {
-				gridProcess.select(p);
 				runProcessDiscoverer(p);
+				gridProcess.select(p);
+				fillProcessInstanceGrid(p);
 				btnRun.setEnabled(true);
 			});
 			return btnRun;
 		}).setHeader("Discover");
 		
 
-		gridProcess.addSelectionListener(p -> {
-			Optional<ProcessDefinition> selection = p.getFirstSelectedItem();
+		gridProcess.addSelectionListener(e -> {
+			Optional<ProcessDefinition> selection = e.getFirstSelectedItem();
 			if (selection.isEmpty()) {
 				gridProcessSteps.setItems(Collections.emptyList());
 				gridProcessInstance.setItems(Collections.emptyList());
 			} else {
-				/*
-				gridProcessSteps.setItems(selection.get().getSteps());
-				gridProcessInstance.setItems(selection.get().getInstances());
-				*/
-				setData(selection.get());
+				fillProcessInstanceGrid(selection.get());
 			}
 		});
 		
@@ -135,7 +135,7 @@ public class UIProcessor extends UIBase {
 		
 		//--------------------------------------------------------------------
 		gridProcessInstance = new Grid<>(ProcessInstance.class, false);
-		gridProcessInstance.addColumn(p -> p.getId()).setHeader("#").setFrozen(true);
+		gridProcessInstance.addColumn(p -> p.getId()).setHeader(makeInstaceGridRefresherButton()).setAutoWidth(true).setFrozen(true).setTextAlign(ColumnTextAlign.END);
 		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true).setFrozen(true);
 		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true).setFrozen(true);
 		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("3em").setFrozen(true);
@@ -153,10 +153,10 @@ public class UIProcessor extends UIBase {
 			return progress;
 		}).setHeader("Progress").setWidth("3em");
 		gridProcessInstance.addColumn(p -> p.getCurrentStepCode()).setHeader("Latest Step").setAutoWidth(true);
-		gridProcessInstance.addColumn(p -> p.getAttemptNo()).setHeader("Attempt#").setWidth("2em");
-		gridProcessInstance.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setAutoWidth(true);
-		gridProcessInstance.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setAutoWidth(true);
-		gridProcessInstance.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setAutoWidth(true);
+		gridProcessInstance.addColumn(p -> p.getAttemptNo()).setHeader("Attempt#").setWidth("2em").setTextAlign(ColumnTextAlign.END);
+		gridProcessInstance.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setWidth("3em").setTextAlign(ColumnTextAlign.END);
+		gridProcessInstance.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setWidth("3em").setTextAlign(ColumnTextAlign.END);
+		gridProcessInstance.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setWidth("3em").setTextAlign(ColumnTextAlign.END);
 		gridProcessInstance.addComponentColumn(p -> {
 			Button btnShowVars = new Button("", new Icon(VaadinIcon.LIST));
 			btnShowVars.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SMALL);
@@ -166,7 +166,7 @@ public class UIProcessor extends UIBase {
 				btnShowVars.setEnabled(true);
 			});
 			return btnShowVars;
-		}).setHeader("Vars").setWidth("2em").setFrozenToEnd(true);
+		}).setHeader("Vars").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
 		gridProcessInstance.addComponentColumn(p -> {
 			Button btnShowSteps = new Button("", new Icon(VaadinIcon.OPEN_BOOK));
 			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SMALL);
@@ -176,7 +176,7 @@ public class UIProcessor extends UIBase {
 				btnShowSteps.setEnabled(true);
 			});
 			return btnShowSteps;
-		}).setHeader("Steps").setWidth("2em").setFrozenToEnd(true);
+		}).setHeader("Steps").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
 		
 		
 		gridProcessInstance.addComponentColumn(p -> {
@@ -204,7 +204,7 @@ public class UIProcessor extends UIBase {
 				btnApprove.setEnabled(true);
 			});
 			return btnApprove;
-		}).setHeader("Approve").setAutoWidth(true).setFrozenToEnd(true);
+		}).setHeader("Approve").setAutoWidth(true).setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
 		
 		
 		gridProcessInstance.addComponentColumn(p -> {
@@ -219,7 +219,7 @@ public class UIProcessor extends UIBase {
 			});
 			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.STATUS_COMPLETED));
 			return btnRun;
-		}).setHeader("Run").setAutoWidth(true).setFrozenToEnd(true);
+		}).setHeader("Run").setAutoWidth(true).setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
 		
 
 		
@@ -252,7 +252,7 @@ public class UIProcessor extends UIBase {
 		verticalLay.setHeightFull();
 		verticalLay.add(new H3("Processes"));
 		verticalLay.add(horizontalLay);
-		verticalLay.add(new H4("Instances"));
+		verticalLay.add(headerOfInstancesLayout());
 		verticalLay.add(gridProcessInstance);
 		add(verticalLay);
 		setSizeFull();
@@ -263,18 +263,177 @@ public class UIProcessor extends UIBase {
 	}
 
 
+	private Component makeInstaceGridRefresherButton() {
+		Button btnRefresh = new Button("", new Icon(VaadinIcon.REFRESH));
+		btnRefresh.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+		btnRefresh.setDisableOnClick(true);
+		btnRefresh.addClickListener(e -> {
+			Set<ProcessDefinition> selectedProcessDefiniton = gridProcess.getSelectedItems();
+			if (selectedProcessDefiniton.isEmpty()) {
+				gridProcessInstance.setItems(Collections.emptyList());
+			} else {
+				fillProcessInstanceGrid(selectedProcessDefiniton.iterator().next());
+			}
+			btnRefresh.setEnabled(true);
+		});
+		
+		return btnRefresh;
+	}
+
+	boolean instanceFilterNew=true;
+	boolean instanceFilterCompleted=false;
+	boolean instanceFilterRunning=true;
+	boolean instanceFilterRetry=true;
+	boolean instanceFilterFailed=false;
+	boolean instanceFilterWaitingApproval=false;
+
+
+	private HorizontalLayout headerOfInstancesLayout() {
+		HorizontalLayout layoutForProcessInstanceTop=new HorizontalLayout();
+
+		layoutForProcessInstanceTop.setSizeUndefined();
+		Label title = new Label("Instances");
+		layoutForProcessInstanceTop.add(title);
+		
+		Checkbox checkboxNew = new Checkbox();
+		checkboxNew.setValue(true);
+		checkboxNew.setLabel(ProcessInstance.STATUS_NEW);
+		checkboxNew.setValue(instanceFilterNew);
+		checkboxNew.addValueChangeListener(e->{
+			instanceFilterNew=e.getValue();
+			fillProcessInstanceGrid();
+		});
+		layoutForProcessInstanceTop.add(checkboxNew);
+
+		
+		
+		Checkbox checkboxCompleted= new Checkbox();
+		checkboxCompleted.setValue(true);
+		checkboxCompleted.setLabel(ProcessInstance.STATUS_COMPLETED);
+		checkboxCompleted.setValue(instanceFilterCompleted);
+		checkboxCompleted.addValueChangeListener(e->{
+			instanceFilterCompleted=e.getValue();
+			fillProcessInstanceGrid();
+		});	
+		layoutForProcessInstanceTop.add(checkboxCompleted);
+
+		
+		Checkbox checkboxRunning = new Checkbox();
+		checkboxRunning.setValue(true);
+		checkboxRunning.setLabel(ProcessInstance.STATUS_RUNNING);
+		checkboxCompleted.setValue(instanceFilterRunning);
+		checkboxRunning.addValueChangeListener(e->{
+			instanceFilterRunning=e.getValue();
+			fillProcessInstanceGrid();
+		});	
+		layoutForProcessInstanceTop.add(checkboxRunning);
+
+				
+		Checkbox checkboxRetry = new Checkbox();
+		checkboxRetry.setValue(true);
+		checkboxCompleted.setValue(instanceFilterRetry);
+		checkboxRetry.setLabel(ProcessInstance.STATUS_RETRY);
+		checkboxRetry.addValueChangeListener(e->{
+			instanceFilterRetry=e.getValue();
+			fillProcessInstanceGrid();
+		});	
+		layoutForProcessInstanceTop.add(checkboxRetry);
+
+				
+		
+		Checkbox chError = new Checkbox();
+		chError.setLabel("Failed");
+		checkboxCompleted.setValue(instanceFilterFailed);
+		chError.addValueChangeListener(e->{
+			instanceFilterFailed=e.getValue();
+			fillProcessInstanceGrid();
+		});
+		
+		layoutForProcessInstanceTop.add(chError);
+
+
+		Checkbox chWaitingApproval = new Checkbox();
+		chWaitingApproval.setValue(instanceFilterWaitingApproval);
+		chWaitingApproval.setLabel("Waiting approvval");
+		chWaitingApproval.addValueChangeListener(e->{
+			instanceFilterWaitingApproval=e.getValue();
+			fillProcessInstanceGrid();
+		});
+		
+		layoutForProcessInstanceTop.add(chWaitingApproval);
+		
+		/*
+		IntegerField inDays = new IntegerField();
+		chApproval.setId("inDays");
+		inDays.setValue(1);
+		inDays.setStepButtonsVisible(true);
+		inDays.setMin(1);
+		inDays.setMax(100);
+		inDays.setLabel("days or before");
+		inDays.addValueChangeListener(e->{
+			fillProcessInstanceGrid();
+		});
+		
+		layoutForProcessInstanceTop.add(inDays);
+		*/
+		
+		return layoutForProcessInstanceTop;
+	}
+
+
+
+	
+	private void fillProcessInstanceGrid() {
+		Set<ProcessDefinition> selectedItems = gridProcess.getSelectedItems();
+		if (selectedItems.isEmpty()) {
+			gridProcessInstance.setItems(Collections.emptyList());
+			return;
+		}
+		
+		fillProcessInstanceGrid(selectedItems.iterator().next());
+		
+	}
+	
+
+	private void fillProcessInstanceGrid(ProcessDefinition processDefinition) {
+		List<ProcessInstance> filteredInstances = new ArrayList<ProcessInstance>();
+		
+		if (instanceFilterNew) {
+			List<ProcessInstance> instances = processService.getProcessInstancesByProcessDefinitionAndStatus(processDefinition, ProcessInstance.STATUS_NEW).stream().toList();
+			filteredInstances.addAll(instances);
+		}
+		if (instanceFilterCompleted) {
+			List<ProcessInstance> instances = processService.getProcessInstancesByProcessDefinitionAndStatus(processDefinition, ProcessInstance.STATUS_COMPLETED).stream().toList();
+			filteredInstances.addAll(instances);
+		}
+		if (instanceFilterRunning) {
+			List<ProcessInstance> instances = processService.getProcessInstancesByProcessDefinitionAndStatus(processDefinition, ProcessInstance.STATUS_RUNNING).stream().toList();
+			filteredInstances.addAll(instances);
+		}
+		if (instanceFilterRetry) {
+			List<ProcessInstance> instances = processService.getProcessInstancesByProcessDefinitionAndStatus(processDefinition, ProcessInstance.STATUS_RETRY).stream().toList();
+			filteredInstances.addAll(instances);
+		}
+		
+		if (instanceFilterFailed) {
+			filteredInstances.removeIf((p)->!p.isFailed());
+		}
+		
+		
+		if (instanceFilterWaitingApproval) {
+			filteredInstances.removeIf((p)->!p.isWaitingApproval());
+		}
+
+	
+		gridProcessInstance.setItems(filteredInstances);
+		
+	}
+
+
 	private String dateFormat(LocalDateTime local) {
 		if (local==null) return null;
 		return local.format(formatter);
 	}
-
-
-
-	private void startUpdaterThread() {
-		Thread thread=new Thread(new ThreadForUIUpdating(this));
-		thread.start();
-	}
-
 
 
 	private void approveProcessInstance(ProcessInstance instance) {
@@ -622,16 +781,9 @@ public class UIProcessor extends UIBase {
 		
 		gridProcessSteps.setItems(definitionSteps);
 
-		List<ProcessInstance> instances = processService.getProcessInstancesByProcessDefinition(processDefinition);
-		Collections.sort(instances, new Comparator<ProcessInstance>() {
-			@Override
-			public int compare(ProcessInstance o1, ProcessInstance o2) {
-				return o1.getCreated().compareTo(o2.getCreated());
-			}
-		});
-
-		gridProcessInstance.setItems(instances);
+		fillProcessInstanceGrid(processDefinition);
 	}
+
 
 	private void runProcessDiscoverer(ProcessDefinition processDefinition) {
 		
@@ -661,8 +813,6 @@ public class UIProcessor extends UIBase {
 		
 		RunnerSingleton.getInstance().stop(processId);
 		notifyInfo(discovered==0 ?  "no new instance is discovered " : "%d new instance discovered".formatted(discovered));
-		setData(processDefinition);
-		fillGrid();
 		
 	}
 	
@@ -693,12 +843,6 @@ public class UIProcessor extends UIBase {
 		
 		notifySuccess("tread succssfully started for instance %s, thread id : %s ".formatted(processInstance.getCode(), String.valueOf(thread.getId())));
 		
-	}
-
-
-
-	public long getRefreshInterval() {
-		return 1000;
 	}
 
 }

@@ -26,7 +26,7 @@ public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 		anaSayfayaDon();
 		epatsMenu.cikis();
 		
-		selenium.stopDriver();
+		//selenium.stopDriver();
 	}
 
 

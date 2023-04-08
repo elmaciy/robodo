@@ -37,6 +37,8 @@ public abstract class BaseSteps {
 		 processInstanceStep.getFiles().add(file);
 	 }
 	 
+	 public abstract void setup();
 	 public abstract void run();
+	 public abstract void teardown();
 
 }

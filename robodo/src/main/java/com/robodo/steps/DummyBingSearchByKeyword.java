@@ -6,26 +6,42 @@ import org.openqa.selenium.WebElement;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.utils.RunnerUtil;
 
-public class DummyYoutubeSearchByKeyword extends BaseSteps {
+public class DummyBingSearchByKeyword extends BaseSteps {
 
-	public DummyYoutubeSearchByKeyword(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+	public DummyBingSearchByKeyword(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
 		// TODO Auto-generated constructor stub
+	}
+	
+	@Override
+	public void setup() {
+		selenium.startWebDriver();
+		
+	}
+
+	@Override
+	public void teardown() {
+		selenium.stopDriver();
+		
 	}
 
 	@Override
 	public void run() {
-		selenium.startWebDriver();
-		selenium.navigate("https://www.youtube.com/");
-		WebElement findElement = selenium.getWebDriver().findElement(By.cssSelector("ytd-searchbox#search"));
+		selenium.navigate("https://www.bing.com/");
+		WebElement findElement = selenium.getWebDriver().findElement(By.cssSelector("#sb_form_q"));
 		String keyword=getVariable("keyword");
 		selenium.click(findElement);
-		//selenium.setValue(findElement, keyword);
 		selenium.sendKeys(findElement, keyword);
 		selenium.enter();
+		selenium.sleep(10L);
+		selenium.waitPageLoaded();
 		takeStepScreenShot(this.processInstanceStep, keyword, true);		
-		selenium.stopDriver();
+		
 		
 	}
+	
+
+
+	
 
 }

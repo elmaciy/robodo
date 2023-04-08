@@ -20,8 +20,17 @@ public class ThreadForInstanceStarter implements Runnable {
 	@Override
 	public void run() {
 		
+		String threadName=this.getClass().getName();
+		
+		if (RunnerSingleton.getInstance().hasRunningInstance(threadName)) {
+			return;
+		}
+		
+		RunnerSingleton.getInstance().start(threadName);
+		
+		
 		int maxThreadCount=Integer.valueOf(processService.getEnv().getProperty("max.thread"));
-		int currentThreadCount=ThreadGroupSingleton.getInstance().getActiveThreadCount();
+		int activeThreadCount=ThreadGroupSingleton.getInstance().getActiveThreadCount();
 		
 		List<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();
 		List<ProcessDefinition> processDefinitionsActive=processDefinitions.stream().filter(p->p.isActive()).collect(Collectors.toList());
@@ -42,18 +51,20 @@ public class ThreadForInstanceStarter implements Runnable {
 					}
 					Thread th=new Thread(new ThreadForInstanceRunner(processService, processInstance));
 					th.start();
-					currentThreadCount++;
-					if (currentThreadCount>=maxThreadCount) {
+					activeThreadCount++;
+					if (activeThreadCount>=maxThreadCount) {
 						break;
 					}
 				}
 			}
 			
-			if (currentThreadCount>=maxThreadCount) {
+			if (activeThreadCount>=maxThreadCount) {
 				break;
 			}
 		
 		}
+		
+		RunnerSingleton.getInstance().stop(threadName);
 
 	}
 

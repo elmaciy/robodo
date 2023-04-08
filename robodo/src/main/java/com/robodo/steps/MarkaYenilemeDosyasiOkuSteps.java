@@ -12,7 +12,7 @@ public class MarkaYenilemeDosyasiOkuSteps extends BaseEpatsSteps {
 	@Override
 	public void run() {
 		//selenium.startWebDriver();
-		selenium.stopDriver();
+		//selenium.stopDriver();
 
 	}
 

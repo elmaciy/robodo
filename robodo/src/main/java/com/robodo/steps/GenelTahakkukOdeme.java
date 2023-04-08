@@ -23,7 +23,7 @@ public class GenelTahakkukOdeme extends BaseEpatsSteps {
 		kartGirVeOde();
 		epatsMenu.cikis();
 		
-		selenium.stopDriver();
+		//selenium.stopDriver();
 	}
 	
 	private void tahakkukSecVeOdemeyeGit() {

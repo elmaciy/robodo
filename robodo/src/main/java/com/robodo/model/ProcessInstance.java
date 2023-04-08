@@ -24,7 +24,6 @@ public class ProcessInstance {
 	public static final String STATUS_NEW="NEW";
 	public static final String STATUS_RETRY="RETRY";
 	public static final String STATUS_RUNNING="RUNNING";
-	public static final String STATUS_HUMAN="HUMAN";
 	public static final String STATUS_COMPLETED ="COMPLETED";
 
 	@Id
@@ -187,8 +186,7 @@ public class ProcessInstance {
 		}
 		
 		List<ProcessInstanceStep> runningSteps = this.steps.stream()
-				.filter(p->p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING) || p.getStatus()
-				.equals(ProcessInstanceStep.STATUS_FAILED))
+				.filter(p->p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING) || p.getStatus().equals(ProcessInstanceStep.STATUS_FAILED))
 				.collect(Collectors.toList());
 		
 		if (runningSteps.size()==0) {
@@ -206,6 +204,22 @@ public class ProcessInstance {
 	public List<ProcessInstanceStep> getNextSteps(ProcessInstanceStep refStep) {
 		return this.steps.stream().filter(p->p.getOrderNo().compareTo(refStep.getOrderNo())>0)
 				.collect(Collectors.toList());
+	}
+
+	public boolean isWaitingApproval() {
+		if (!this.status.equals(STATUS_RUNNING)) {
+			return false;
+		}
+		
+		ProcessInstanceStep currentStep = getCurrentStep();
+		if (currentStep==null) {
+			return false;
+		}
+		
+		return 	currentStep.isHumanInteractionStep() && 
+				currentStep.isNotificationSent() &&
+				currentStep.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING) && 
+				!currentStep.isApproved();
 	}
 	
 	

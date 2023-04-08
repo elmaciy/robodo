@@ -15,7 +15,6 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.repo.EmailTemplateRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
 import com.robodo.repo.ProcessInstanceRepo;
-import com.robodo.singleton.SingletonForUIUpdate;
 
 @Service
 public class ProcessService {
@@ -39,7 +38,6 @@ public class ProcessService {
 
 	public void saveProcessInstance(ProcessInstance processInstance) {
 		processInstanceRepo.save(processInstance);
-		SingletonForUIUpdate.getInstance().setLastUpdate();
 	}
 
 	public boolean saveProcessDefinition(ProcessDefinition p) {
@@ -125,6 +123,10 @@ public class ProcessService {
 
 	public List<ProcessInstance> getProcessInstancesByProcessDefinition(ProcessDefinition processDefinition) {
 		return processInstanceRepo.findByProcessDefinition(processDefinition);
+	}
+	
+	public List<ProcessInstance> getProcessInstancesByProcessDefinitionAndStatus(ProcessDefinition processDefinition, String status) {
+		return processInstanceRepo.findByProcessDefinitionAndStatus(processDefinition, status);
 	}
 	
 	public EmailTemplate getEmailTemplateByCode(String code) {
