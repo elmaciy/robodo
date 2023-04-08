@@ -614,7 +614,6 @@ public class UIProcessor extends UIBase {
 		stepToBackward.setApprovedBy(null);
 		stepToBackward.setNotificationSent(false);
 		stepToBackward.setError(null);
-		stepToBackward.setFiles(new ArrayList<ProcessInstanceStepFile>());
 		stepToBackward.setLogs(null);
 		
 		long countOfNonNew=steps.stream().filter(p->!p.getStatus().equals(ProcessInstanceStep.STATUS_NEW)).count();
@@ -633,7 +632,9 @@ public class UIProcessor extends UIBase {
 		VerticalLayout lay=new VerticalLayout();
 		if (step==null) return lay;
 		
-		step.getFiles().forEach(file -> {
+		List<ProcessInstanceStepFile> files= processService.getProcessInstanceStepFilesByStepId(step);
+		
+		files.forEach(file -> {
 			Span title = new Span(file.getDescription());
 			title.setWidthFull();
 			title.getElement().getThemeList().add("badge");

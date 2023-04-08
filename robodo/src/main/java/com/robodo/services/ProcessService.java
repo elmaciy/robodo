@@ -1,6 +1,8 @@
 package com.robodo.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -11,10 +13,14 @@ import org.springframework.stereotype.Service;
 
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
+import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
+import com.robodo.model.ProcessInstanceStep;
+import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.repo.EmailTemplateRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
 import com.robodo.repo.ProcessInstanceRepo;
+import com.robodo.repo.ProcessInstanceStepFileRepo;
 
 @Service
 public class ProcessService {
@@ -28,6 +34,10 @@ public class ProcessService {
 	
 	@Autowired
 	ProcessInstanceRepo processInstanceRepo;
+	
+
+	@Autowired
+	ProcessInstanceStepFileRepo processInstanceStepFileRepo;
 	
 	@Autowired
 	EmailTemplateRepo emailTemplateRepo;
@@ -135,6 +145,24 @@ public class ProcessService {
 			return null;
 		}
 		return list.get(0);
+	}
+
+	public List<ProcessInstanceStepFile> getProcessInstanceStepFilesByStepId(ProcessInstanceStep step) {
+		var list = processInstanceStepFileRepo.findByProcessInstanceStepId(step.getId());
+		Collections.sort(list, new Comparator<ProcessInstanceStepFile>() {
+
+			@Override
+			public int compare(ProcessInstanceStepFile o1, ProcessInstanceStepFile o2) {
+				return Integer.compare(o1.getFileOrder(), o2.getFileOrder());
+			}
+		});
+		
+		return list;
+	}
+
+	public void saveProcessInstanceStepFile(ProcessInstanceStepFile file) {
+		processInstanceStepFileRepo.save(file);
+		
 	}
 
 	

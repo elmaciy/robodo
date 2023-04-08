@@ -41,6 +41,7 @@ import com.google.common.base.Splitter;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
+import com.robodo.model.ProcessInstanceStepFile;
 
 public class HelperUtil {
 	
@@ -209,19 +210,20 @@ public class HelperUtil {
             messageBodyPart.setContent(emailTemplate.getBody(), "text/html; charset=utf-8");
             multipart.addBodyPart(messageBodyPart);
             
-            processInstance.getSteps().forEach(s->{
-            	s.getFiles().forEach(f-> {
-            		if (f.isAttach()) {
+            processInstance.getSteps().forEach(step->{
+            	List<ProcessInstanceStepFile> files= runnerUtil.processService.getProcessInstanceStepFilesByStepId(step);
+            	files.forEach(file-> {
+            		if (file.isAttach()) {
             			// second part (the image)
                         BodyPart  messageImagePart = new MimeBodyPart();
                         String imagesPath = runnerUtil.getTargetPath(processInstance);
-                        String fileName=imagesPath+File.separator+f.getFileName();
+                        String fileName=imagesPath+File.separator+file.getFileName();
                         runnerUtil.logger("adding file [%s] to the mail".formatted(fileName));
             			DataSource fds = new FileDataSource(fileName);
             			try {
         					messageImagePart.setDataHandler(new DataHandler(fds));
         					messageImagePart.setFileName(fileName);
-        					messageImagePart.setDescription(f.getDescription());
+        					messageImagePart.setDescription(file.getDescription());
         					//messageImagePart.setText(f.getFileName());
         	    			messageImagePart.setHeader("Content-ID", "<image>");
         	                multipart.addBodyPart(messageImagePart);

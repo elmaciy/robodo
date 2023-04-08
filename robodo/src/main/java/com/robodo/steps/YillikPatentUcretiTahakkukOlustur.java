@@ -12,6 +12,7 @@ public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 	
 	}
 
+
 	
 	@Override
 	public void run() {

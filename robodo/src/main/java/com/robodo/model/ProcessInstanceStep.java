@@ -35,9 +35,9 @@ public class ProcessInstanceStep {
 	LocalDateTime created;
 	LocalDateTime started;
 	LocalDateTime finished;
-	@Column(length = 65000)
+	@Column(columnDefinition = "mediumtext")
 	String logs;
-	@Column(length = 65000)
+	@Column(columnDefinition = "mediumtext")
 	String error;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -48,9 +48,6 @@ public class ProcessInstanceStep {
 	boolean approved;
 	String approvedBy;
 	LocalDateTime approvalDate;
-	
-	@OneToMany(mappedBy = "processInstanceStep", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	List<ProcessInstanceStepFile> files;
 
 	public Long getId() {
 		return id;
@@ -171,15 +168,6 @@ public class ProcessInstanceStep {
 	public void setError(String error) {
 		this.error = error;
 	}
-
-	public List<ProcessInstanceStepFile> getFiles() {
-		return files;
-	}
-
-	public void setFiles(List<ProcessInstanceStepFile> files) {
-		this.files = files;
-	}
-
 	public boolean isHumanInteractionStep() {
 		return this.getCommands().startsWith("waitHumanInteraction");
 	}

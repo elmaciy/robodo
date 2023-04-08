@@ -23,7 +23,7 @@ public class EmailTemplate {
 	String bcc;
 	@Column(length = 4000)
 	String subject;
-	@Column(length = 65000)
+	@Column(columnDefinition = "mediumtext")
 	String body;
 	
 	

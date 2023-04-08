@@ -1,12 +1,12 @@
 package com.robodo.singleton;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Hashtable;
 
 public class RunnerSingleton {
 	
 	private static RunnerSingleton instance;
 	
-	private ConcurrentHashMap<String,Long> hmRunningInstances=new ConcurrentHashMap<String,Long>();
+	private Hashtable<String,Long> hmRunningInstances=new Hashtable<String,Long>();
 	public static final long TIMEOUT=5*60*1000;
 	
 	private RunnerSingleton() {
@@ -24,7 +24,7 @@ public class RunnerSingleton {
 	
 	private synchronized  boolean syncaction(String runId, String action, Long param) {
 		if (action.equals("PUT")) {
-			hmRunningInstances.put(action, param);
+			hmRunningInstances.put(runId, param);
 			return true;
 		} else if (action.equals("GET")) {
 			return hmRunningInstances.containsKey(runId);
@@ -50,11 +50,12 @@ public class RunnerSingleton {
 			stop(runId);
 			return false;
 		}
+		
+		
 		return true;
 	}
 	
 	public void start(String runId) {
-		//hmRunningInstances.put(runId, System.currentTimeMillis());
 		syncaction(runId, "PUT", System.currentTimeMillis());
 	}
 	

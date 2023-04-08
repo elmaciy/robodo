@@ -56,7 +56,6 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseDiscoverer {
 				instanceStep.setCommands(definitedSteps.getCommands());
 				instanceStep.setCreated(LocalDateTime.now());
 				instanceStep.setOrderNo(definitedSteps.getOrderNo());
-				instanceStep.setFiles(new ArrayList<ProcessInstanceStepFile>());
 
 				instance.getSteps().add(instanceStep);
 			}

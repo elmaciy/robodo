@@ -61,7 +61,16 @@ public class PageEpatsBase extends BasePage {
 	
 	public void waitProcessorGone() {
 		WebDriverWait waiter=new WebDriverWait(selenium.getWebDriver(), selenium.getWebDriver().manage().timeouts().getImplicitWaitTimeout());
-		waiter.until(ExpectedConditions.invisibilityOf(selenium.getWebDriver().findElement(By.cssSelector("div.sweet-overlay"))));
+		try {
+			List<WebElement> els = selenium.getWebDriver().findElements(By.cssSelector("div.sweet-overlay"));
+			if (els.size()>0) {
+				waiter.until(ExpectedConditions.invisibilityOf(els.get(0)));
+			}
+			
+		} catch(Exception e) {
+			
+		}
+		
 		
 	}
 	

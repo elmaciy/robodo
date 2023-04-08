@@ -17,13 +17,14 @@ import com.robodo.model.ExecutionResultsForInstance;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
+import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.steps.BaseSteps;
 
 public class RunnerUtil {
 
-	ProcessService processService;
+	public ProcessService processService;
 	WebElement locatedWebElement;
 	String valueExtracted;
 	HashMap<String, String> hmExtractedValues = new HashMap<>();
@@ -284,8 +285,8 @@ public class RunnerUtil {
 			if (stepClassInstance!=null) {
 				stepClassInstance.setup();
 			}
-			
-			step.getFiles().clear();
+
+
 			stepClassInstance.run();
 			result = result.succeeded();
 		} catch (Exception e) {

@@ -45,13 +45,18 @@ public class ThreadForInstanceStarter implements Runnable {
 			
 			if (remaining>0) {
 				List<ProcessInstance> notCompletedInstances = processService.getProcessNotCompletedInstances(processDefinition,remaining);
+				
 				for (ProcessInstance processInstance : notCompletedInstances) {
-					if (RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode())) {
+					boolean isAlreadyRunning = RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode());
+					
+					if (isAlreadyRunning) {
 						continue;
 					}
+					
 					Thread th=new Thread(new ThreadForInstanceRunner(processService, processInstance));
 					th.start();
 					activeThreadCount++;
+					
 					if (activeThreadCount>=maxThreadCount) {
 						break;
 					}

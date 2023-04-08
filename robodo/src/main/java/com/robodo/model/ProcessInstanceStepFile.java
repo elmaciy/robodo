@@ -2,12 +2,9 @@ package com.robodo.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,15 +19,13 @@ public class ProcessInstanceStepFile {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	Long id;
 	String fileType;
+	int fileOrder;
 	@Column(length = 1000)
 	String description;
 	@Column(length = 1000)
 	String fileName;
 	boolean attach;
-	
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "process_instance_step_id", nullable = false)
-	ProcessInstanceStep processInstanceStep;
+	Long processInstanceStepId;
 
 	public Long getId() {
 		return id;
@@ -64,12 +59,14 @@ public class ProcessInstanceStepFile {
 		this.description = description;
 	}
 
-	public ProcessInstanceStep getProcessInstanceStep() {
-		return processInstanceStep;
+	
+
+	public Long getProcessInstanceStepId() {
+		return processInstanceStepId;
 	}
 
-	public void setProcessInstanceStep(ProcessInstanceStep processInstanceStep) {
-		this.processInstanceStep = processInstanceStep;
+	public void setProcessInstanceStepId(Long processInstanceStepId) {
+		this.processInstanceStepId = processInstanceStepId;
 	}
 
 	public boolean isAttach() {
@@ -78,6 +75,14 @@ public class ProcessInstanceStepFile {
 
 	public void setAttach(boolean attach) {
 		this.attach = attach;
+	}
+
+	public int getFileOrder() {
+		return fileOrder;
+	}
+
+	public void setFileOrder(int fileOrder) {
+		this.fileOrder = fileOrder;
 	}
 	
 

@@ -38,10 +38,10 @@ public class ProcessInstance {
 	String status;
 	@Column(length = 255)
 	String currentStepCode;
-	@Column(length = 32000)
+	@Column(columnDefinition = "mediumtext")
 	String error;
 	boolean failed=false;
-	@Column(length = 65000)
+	@Column(columnDefinition = "mediumtext")
 	String instanceVariables;
 	
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)

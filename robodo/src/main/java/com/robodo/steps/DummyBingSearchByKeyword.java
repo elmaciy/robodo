@@ -33,7 +33,7 @@ public class DummyBingSearchByKeyword extends BaseSteps {
 		selenium.click(findElement);
 		selenium.sendKeys(findElement, keyword);
 		selenium.enter();
-		selenium.sleep(10L);
+		selenium.sleep(20L);
 		selenium.waitPageLoaded();
 		takeStepScreenShot(this.processInstanceStep, keyword, true);		
 		

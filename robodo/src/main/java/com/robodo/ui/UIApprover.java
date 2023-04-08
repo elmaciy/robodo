@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
+import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
 import com.robodo.utils.HelperUtil;
 import com.vaadin.flow.component.UI;
@@ -201,15 +202,19 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	
 	private VerticalLayout makeInstanceLayout(ProcessInstance processInstance) {
 		VerticalLayout layout=new VerticalLayout();
-		processInstance.getSteps().forEach(s->{
-			layout.add(new H1(s.getStepCode()));
-			s.getFiles().forEach(f->{
-				Span title = new Span(f.getDescription());
-				title.getElement().getThemeList().add("badge");
-				title.setWidthFull();
-				layout.add(title);
-				layout.add(getImage(s, f));
-			});
+		processInstance.getSteps().forEach(step->{
+			List<ProcessInstanceStepFile> files= processService.getProcessInstanceStepFilesByStepId(step);
+			
+			if (!files.isEmpty()) {
+				layout.add(new H1(step.getStepCode()));
+				files.forEach(file->{
+					Span title = new Span(file.getDescription());
+					title.getElement().getThemeList().add("badge");
+					title.setWidthFull();
+					layout.add(title);
+					layout.add(getImage(step, file));
+				});
+			}
 		});
 		
 		return layout;

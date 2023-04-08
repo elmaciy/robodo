@@ -61,7 +61,6 @@ public class ThreadForRetryFailed implements Runnable {
 			step.setLogs(null);
 			step.setStarted(null);
 			step.setFinished(null);
-			step.setFiles(new ArrayList<ProcessInstanceStepFile>());
 			step.setNotificationSent(false);
 			step.setStatus(ProcessInstanceStep.STATUS_NEW);
 			

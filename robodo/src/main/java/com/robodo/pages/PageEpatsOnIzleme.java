@@ -51,6 +51,12 @@ public class PageEpatsOnIzleme extends PageEpatsBase {
 	public void tahakkukOlustur() {
 		selenium.click(btTahakkukOlustur);
 	}
+
+
+	public void scrollToCenteElement() {
+		selenium.scrollToElement(selenium.getWebDriver().findElement(By.xpath("//td[b[text()='GENEL TOPLAM']]")));
+		
+	}
 	
 	
 	
