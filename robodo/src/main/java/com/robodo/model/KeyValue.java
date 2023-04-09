@@ -4,6 +4,10 @@ public class KeyValue {
 	String key;
 	String value;
 	
+	public KeyValue() {
+		
+	}
+	
 	
 	public KeyValue(String key, String value) {
 		super();

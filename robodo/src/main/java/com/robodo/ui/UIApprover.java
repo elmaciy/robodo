@@ -11,6 +11,7 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
+import com.robodo.singleton.QueueSingleton;
 import com.robodo.utils.HelperUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -255,6 +256,10 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		
 		
 		processService.saveProcessInstance(processInstance);
+		
+		if (approved && !QueueSingleton.getInstance().inQueue(processInstance)) {
+			QueueSingleton.getInstance().add(processInstance);
+		}
 		
 		informAndRun("Completed", "%s successfully.".formatted(approved ? "Approved" : "Declined"), ()->{
 			UI.getCurrent().navigate("/approve/%s/%s/SCREEN".formatted(HelperUtil.encrypt(instanceId),action));

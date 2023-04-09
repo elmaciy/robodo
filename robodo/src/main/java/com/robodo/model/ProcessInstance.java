@@ -41,6 +41,7 @@ public class ProcessInstance {
 	LocalDateTime created;
 	LocalDateTime started;
 	LocalDateTime finished;
+	LocalDateTime queued;
 	String status;
 	@Column(length = 255)
 	String currentStepCode;
@@ -112,6 +113,14 @@ public class ProcessInstance {
 
 	public void setFinished(LocalDateTime finished) {
 		this.finished = finished;
+	}
+
+	public LocalDateTime getQueued() {
+		return queued;
+	}
+
+	public void setQueued(LocalDateTime queued) {
+		this.queued = queued;
 	}
 
 	public String getStatus() {

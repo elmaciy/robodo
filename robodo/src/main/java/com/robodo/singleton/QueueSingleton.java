@@ -32,7 +32,8 @@ public class QueueSingleton {
 	 }
 	 
 	 public void add(ProcessInstance processInstance) {
-		 this.queue.add(processInstance);
+		System.err.println("+QUEUE : %s".formatted(processInstance.getCode()));
+		this.queue.add(processInstance);
 	 }
 	 
 	 public boolean inQueue(ProcessInstance processInstance) {
@@ -44,10 +45,15 @@ public class QueueSingleton {
 	 }
 
 	public void remove(ProcessInstance processInstance) {
+		System.err.println("-DEQUEUE : %s".formatted(processInstance.getCode()));
 		if (this.queue.contains(processInstance)) {
 			this.queue.remove(processInstance);
 		}
 		
+	}
+
+	public int getQueueLength() {
+		return this.queue.size();
 	}
 
 }

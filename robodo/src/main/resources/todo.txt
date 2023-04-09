@@ -1,4 +1,3 @@
-5. gizli bilgilerin girileceği bir ekran yap. (kredi kartı bilgileri vs..)
 15. login ekranı konulacak
 16. kurulan yerde chrome güncellenmemeli
 17. alarm oluştur ve threshold belirle, bu aşılınca mail gitsin biryerlere, bu sayede bir problem olup olmadığını anlarız. 
@@ -10,7 +9,7 @@
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı?
 35. Ödeme aşamalarında bir şekilde o işlemin arada manual ödenip ödenmediğini kontrol edebilir miyiz? 
 37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
-38. mail parametrelerin properties dosyasına al
+38. gizli bilgileirn, mail parametrelerini, kredi kartı gibi kuruma özel bilgileri properties yerine parametre dosyasından aldır. Bussinessvariables olsun bunlar
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
 40. ödeme stepinin singleAtATime özelliği programatik olarak direk true yap. yani ne olursa olsun o stepten başka olmasın. tanım yanlış da olsa kodda bu ezilsin. 
@@ -18,7 +17,8 @@
 48. instance gridine sıralama koy. kolonlarına da filtre koy. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
 50. ss leri koydugumuz dizin process name e gore olusturuldugundan, sikinti olabilir. Burada baska bir yontem bulunsun. 
-
+51. Mail üzerinden onay çalışmadı. onay alsa da onaylamadı. Ekran refresh olmadı. 
+52. retry edildiginde imaj dosyalari temizlenmelidi. 
 
 //----------------------------------------------
 drop table  email_template_seq;        
@@ -57,4 +57,6 @@ TAMAMLANANLAR
 4. thread ların görünebileceği bir ekran yap. 
 25. islem yarıda selenium exception alınca (mesela karsilastirma hatası) browser açık kalıyor. 
 22. instanceleri başlatan kısımdaki lojikten dolayı hep aynı işleri öncelikli alıyor. burada bir dağılım yapmak iyi olabilir. 
+52. Kuyruğa alırken eğer STALLED edilecekse, yani human interaction bekliyor ve alamadıysa boşuna kuyruğa almayalım. 
+53. onaydan sonra direk kuyruğa mı atsak? 
 

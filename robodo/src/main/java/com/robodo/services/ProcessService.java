@@ -1,5 +1,6 @@
 package com.robodo.services;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
-import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
@@ -46,7 +46,12 @@ public class ProcessService {
 		return StreamSupport.stream(processDefinitionRepo.findAll().spliterator(), false).collect(Collectors.toList());
 	}
 
-	public void saveProcessInstance(ProcessInstance processInstance) {
+	public void saveProcessInstance(ProcessInstance processInstance) {		
+		processInstanceRepo.save(processInstance);
+	}
+	
+	public void updateQueueDate(ProcessInstance processInstance) {
+		processInstance.setQueued(LocalDateTime.now());
 		processInstanceRepo.save(processInstance);
 	}
 
@@ -55,6 +60,7 @@ public class ProcessService {
 			processDefinitionRepo.save(p);
 			return true;
 		} catch(Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 	}

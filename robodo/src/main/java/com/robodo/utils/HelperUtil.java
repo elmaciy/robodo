@@ -11,7 +11,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -33,12 +32,11 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.tomcat.util.json.JSONParser;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
+import com.nimbusds.jose.shaded.json.JSONArray;
 import com.robodo.model.EmailTemplate;
+import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
@@ -91,18 +89,25 @@ public class HelperUtil {
 	}
 	
 	public static String hashMap2String(HashMap<String,String> hm) {
+		/*
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			String json = mapper.writeValueAsString(hm);
+			String json = mapper.writeValueAsString(hm);			
 			return json;
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
 		return null;
+		*/
+		List<KeyValue> list = hm.keySet().stream().map(key-> {
+			return new KeyValue(key, hm.get(key));
+		}).toList();
+		String jsonStr = JSONArray.toJSONString(list);
+		return jsonStr;
 	}
 	
 	public static HashMap<String,String>  String2HashMap(String data) {
-		
+		/*
 		HashMap<String,String> hm= new HashMap<String,String>();
 		try {
 			JSONParser parser = new JSONParser(data);
@@ -115,6 +120,19 @@ public class HelperUtil {
 			e.printStackTrace();
 		}
 		return new HashMap<String,String>();
+		*/
+		HashMap<String,String> hm= new HashMap<String,String>();
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			KeyValue[] values = mapper.readValue(data, KeyValue[].class);
+			for (KeyValue kv : values) {
+				hm.put(kv.getKey(), kv.getValue());
+			}
+			return hm;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static boolean sendEmailByTemplate(EmailTemplate emailTemplate, ProcessInstanceStep step, RunnerUtil runnerUtil) {
