@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.robodo.threads.ThreadForDiscoverers;
 import com.robodo.threads.ThreadForInstanceStarter;
+import com.robodo.threads.ThreadForQueueManager;
 import com.robodo.threads.ThreadForRetryFailed;
 
 @Component
@@ -23,7 +24,13 @@ public class ScheduledTasks {
 		Thread th=new Thread(new ThreadForDiscoverers(processService));
 		th.start();
 	}
-	
+
+	@Scheduled(fixedRate = 10000, initialDelay = 0)
+	public void manageQueue() {
+		Thread th=new Thread(new ThreadForQueueManager(processService));
+		th.start();
+	}
+
 	
 	@Scheduled(fixedRate = 10000, initialDelay = 0)
 	public void runProcessInstances() {

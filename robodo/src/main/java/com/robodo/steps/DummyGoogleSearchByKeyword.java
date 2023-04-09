@@ -21,7 +21,7 @@ public class DummyGoogleSearchByKeyword extends BaseSteps {
 
 	@Override
 	public void teardown() {
-		selenium.stopDriver();
+		selenium.stopWebDriver();
 		
 	}
 	

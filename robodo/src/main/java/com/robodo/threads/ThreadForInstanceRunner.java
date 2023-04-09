@@ -3,7 +3,6 @@ package com.robodo.threads;
 import com.robodo.model.ExecutionResultsForInstance;
 import com.robodo.model.ProcessInstance;
 import com.robodo.services.ProcessService;
-import com.robodo.singleton.RunnerSingleton;
 import com.robodo.utils.RunnerUtil;
 
 public class ThreadForInstanceRunner implements Runnable {
@@ -34,7 +33,6 @@ public class ThreadForInstanceRunner implements Runnable {
 		} 
 		//singleton oldugu icin skip edilen step varsa STALLED olur
 		else if (result.getStatus().equals(ExecutionResultsForInstance.STATUS_STALLED)) {
-			System.err.println("xxxxxxxxxxxxxxxxxxxxxxxxxxx Stalled and skipped instance : %s".formatted(result.getProcessInstance().getCode()));
 			processService.saveProcessInstance(result.getProcessInstance());
 		}
 		else {

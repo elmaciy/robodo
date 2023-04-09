@@ -1,7 +1,11 @@
 package com.robodo.singleton;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import com.robodo.model.KeyValue;
 
 public class ThreadGroupSingleton {
 	private static ThreadGroupSingleton instance;
@@ -33,9 +37,27 @@ public class ThreadGroupSingleton {
 		int counter=0;
 		Iterator<String> it = hmThreadGroups.keys().asIterator();
 		while(it.hasNext()) {
-			counter+=hmThreadGroups.get(it.next()).activeCount();
+			String key=it.next();
+			ThreadGroup tg = hmThreadGroups.get(key);
+			counter+= filteredActiveThreadCount(tg);
 		}
+
 		return counter;
 	}
+
+	public List<KeyValue> getThreadGroupsAsKeyValue() {
+		return hmThreadGroups.entrySet().stream().map(e->{
+			return new KeyValue(e.getKey(), String.valueOf(filteredActiveThreadCount(e.getValue())));
+		}).collect(Collectors.toList());
+	}
+
+	public int filteredActiveThreadCount(ThreadGroup tg) {
+		Thread[] list=new Thread[tg.activeCount()];
+		tg.enumerate(list);
+		List<Thread> arr = List.of(list).stream().filter(p->p.getName().equals("Exec Default Executor")).toList();
+		return arr.size();
+	}
+
+	
 
 }

@@ -71,7 +71,7 @@ public class ProcessService {
 		
 	}
 
-	public List<ProcessInstance> getProcessNotCompletedInstances(ProcessDefinition processDefinition, int maxInstance) {
+	public List<ProcessInstance> getNotCompletedInstances(ProcessDefinition processDefinition, int maxInstance) {
 		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
 
 		if (!processDefinition.isActive()) return instances;

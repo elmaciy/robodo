@@ -1,5 +1,3 @@
-1. Takılan instanceler nasıl tekrar kuyruğa alınacak? Heartbeat mantığı mı getirsek? 
-4. thread ların görünebileceği bir ekran yap. 
 5. gizli bilgilerin girileceği bir ekran yap. (kredi kartı bilgileri vs..)
 15. login ekranı konulacak
 16. kurulan yerde chrome güncellenmemeli
@@ -7,21 +5,15 @@
 	a. uzun süredir hiçbir süreç discover edilmiyor
 	b. kuyruk azalmiyor
 20. eski işi bitenleri belli bir gün geçince arşivleyip silelim. 
-22. instanceleri başlatan kısımdaki lojikten dolayı hep aynı işleri öncelikli alıyor. burada bir dağılım yapmak iyi olabilir. 
-25. islem yarıda selenium exception alınca (mesela karsilastirma hatası) browser açık kalıyor. 
 26. hata alınca ekran görüntüsü alınsı o anki. sonra selenium kapatılsın. 
 31. human notificationda email gitmezse tekrar deneyecek mi? 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı?
 35. Ödeme aşamalarında bir şekilde o işlemin arada manual ödenip ödenmediğini kontrol edebilir miyiz? 
 37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
-38. tablolara indexleri koy
+38. mail parametrelerin properties dosyasına al
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
-42. singleAtATime olan stepler doğru çalışıyor mu test et. 
 40. ödeme stepinin singleAtATime özelliği programatik olarak direk true yap. yani ne olursa olsun o stepten başka olmasın. tanım yanlış da olsa kodda bu ezilsin. 
-44. retry, discoverer gibi thread ların aynı anda bir kez çalışmasını sağla
-45. yeni bir thread olacak. dakikada bir çalışacak ve ölmüş threadların silinmesini sağlayacak. timeout parametresi properties den alınsın. 10 dk falan olsa yeter. 
-46. stepler de disable edilebilsin. disabled stepe gelince stalled gibi olsun aynı singleton step gibi
 47. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 48. instance gridine sıralama koy. kolonlarına da filtre koy. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
@@ -33,12 +25,12 @@ drop table  email_template_seq;
 drop table email_template;               
 drop table  process_instance_step_files_seq;
 drop table  process_instance_step_files;
-drop table  process_instance_steps_seq;
-drop table  process_instance_steps;
-drop table  process_instances_seq;
-drop table  process_instances;
-drop table  process_definition_steps_seq; 
-drop table  process_definition_steps;    
+drop table  process_instance_step_seq;
+drop table  process_instance_step;
+drop table  process_instance_seq;
+drop table  process_instance;
+drop table  process_definition_step_seq; 
+drop table  process_definition_step;    
 drop table  process_definition_seq;    
 drop table  process_definition;      
 
@@ -61,3 +53,8 @@ TAMAMLANANLAR
 3. genel olarak bir thread count parametresi koyalım. propertiesden alsın. bu sayıdan fazla thread olmasın. 
 33. emaile işaretlenen dosyalar eklensin attachment olarak. ekranı açmak zorunda kalmasın. 
 6. human interaction da onay ekranı olsun. önce maille link gönderilecek sonra onay verecek kişi bu ekrandan tüm detayları görebilecek. 
+38. tablolara indexleri koy
+4. thread ların görünebileceği bir ekran yap. 
+25. islem yarıda selenium exception alınca (mesela karsilastirma hatası) browser açık kalıyor. 
+22. instanceleri başlatan kısımdaki lojikten dolayı hep aynı işleri öncelikli alıyor. burada bir dağılım yapmak iyi olabilir. 
+

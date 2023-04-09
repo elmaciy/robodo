@@ -1,22 +1,26 @@
 package com.robodo.model;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "process_instance_steps")
+@Table(name = "process_instance_step", 
+indexes = {
+		@Index(name="ndx_instance_step_instance_id", columnList = "process_instance_id"),
+		@Index(name="ndx_instance_step_step_code", columnList = "stepCode"),
+		@Index(name="ndx_instance_step_status", columnList = "status")
+			}
+)
 public class ProcessInstanceStep {
 	
 	public static final String STATUS_NEW="NEW";

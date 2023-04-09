@@ -3,9 +3,6 @@ package com.robodo.steps;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Splitter;
 import com.robodo.model.ProcessInstanceStep;
@@ -81,7 +78,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	@Override
 	public void teardown() {
 		takeStepScreenShot(processInstanceStep, "end of step", false, ()->waitProcessorGone());
-		selenium.stopDriver();
+		selenium.stopWebDriver();
 		
 	}
 	
@@ -120,7 +117,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	
 	
 	public void basvuruYap() {
-		String eposta=getVariable("eposta");;
+		String eposta=getVariable("eposta");
 		String cepTel=runnerUtil.getEnvironmentParameter("ceptel");
 		String referansNo=getVariable("takipNumarasi");
 		epatsBasvuruYapan.basvuruBilgileriniDoldur(eposta, cepTel, referansNo);

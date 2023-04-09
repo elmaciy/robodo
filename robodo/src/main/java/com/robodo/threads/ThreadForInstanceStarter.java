@@ -6,8 +6,10 @@ import java.util.stream.Collectors;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.services.ProcessService;
+import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.singleton.ThreadGroupSingleton;
+import com.robodo.utils.HelperUtil;
 
 public class ThreadForInstanceStarter implements Runnable {
 	
@@ -30,45 +32,46 @@ public class ThreadForInstanceStarter implements Runnable {
 		
 		
 		int maxThreadCount=Integer.valueOf(processService.getEnv().getProperty("max.thread"));
-		int activeThreadCount=ThreadGroupSingleton.getInstance().getActiveThreadCount();
-		
-		List<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();
-		List<ProcessDefinition> processDefinitionsActive=processDefinitions.stream().filter(p->p.isActive()).collect(Collectors.toList());
-		
-		for (ProcessDefinition processDefinition : processDefinitionsActive) {
+						
+		while(true) {
 
-			String threadGroupName=processDefinition.getCode();
-			ThreadGroup thGroup=ThreadGroupSingleton.getInstance().getThreadGroupByName(threadGroupName);
-			int activeInstancesCount=thGroup.activeCount();
-			
-			int remaining=processDefinition.getMaxThreadCount()-activeInstancesCount;
-			
-			if (remaining>0) {
-				List<ProcessInstance> notCompletedInstances = processService.getProcessNotCompletedInstances(processDefinition,remaining);
-				
-				for (ProcessInstance processInstance : notCompletedInstances) {
-					boolean isAlreadyRunning = RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode());
-					
-					if (isAlreadyRunning) {
-						continue;
-					}
-					
-					Thread th=new Thread(new ThreadForInstanceRunner(processService, processInstance));
-					th.start();
-					activeThreadCount++;
-					
-					if (activeThreadCount>=maxThreadCount) {
-						break;
-					}
-				}
+			ProcessInstance processInstance=QueueSingleton.getInstance().get();
+			if (processInstance==null) {
+				break;
 			}
 			
+			String threadGroupName=processInstance.getProcessDefinition().getCode();
+			ThreadGroup thGroup=ThreadGroupSingleton.getInstance().getThreadGroupByName(threadGroupName);
+			int activeInstancesCount=ThreadGroupSingleton.getInstance().filteredActiveThreadCount(thGroup);
+			
+			int remaining=processInstance.getProcessDefinition().getMaxThreadCount()-activeInstancesCount;
+			
+			if (remaining<=0) {
+				break;
+			}
+			
+
+			boolean isAlreadyRunning = RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode());
+			
+			if (isAlreadyRunning) {
+				continue;
+			}
+			
+			
+			Thread th=new Thread(thGroup, new ThreadForInstanceRunner(processService, processInstance));
+			th.start();
+			HelperUtil.sleep(300L);
+
+			QueueSingleton.getInstance().remove(processInstance);
+			
+			
+			int activeThreadCount=ThreadGroupSingleton.getInstance().getActiveThreadCount();
+
 			if (activeThreadCount>=maxThreadCount) {
 				break;
 			}
-		
 		}
-		
+
 		RunnerSingleton.getInstance().stop(threadName);
 
 	}

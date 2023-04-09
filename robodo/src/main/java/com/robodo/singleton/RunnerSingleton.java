@@ -1,6 +1,10 @@
 package com.robodo.singleton;
 
 import java.util.Hashtable;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.robodo.model.KeyValue;
 
 public class RunnerSingleton {
 	
@@ -63,8 +67,12 @@ public class RunnerSingleton {
 		syncaction(runId, "REMOVE", null);
 	}
 
-	public boolean hasSimilarRunningInstance(String similarRunningKey) {
-		return hmRunningInstances.keySet().stream().anyMatch(p->p.startsWith(similarRunningKey) && hasRunningInstance(p));
+	public List<KeyValue> getProcesses() {
+		return hmRunningInstances.entrySet().stream().map(e->{
+			return new KeyValue(e.getKey(), String.valueOf(e.getValue()));
+		}).collect(Collectors.toList());
+		
 	}
+
 
 }

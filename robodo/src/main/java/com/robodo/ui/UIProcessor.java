@@ -19,6 +19,7 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
+import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.singleton.ThreadGroupSingleton;
 import com.robodo.threads.ThreadForInstanceRunner;
@@ -34,7 +35,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -42,6 +43,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -64,8 +67,7 @@ public class UIProcessor extends UIBase {
 
 	ProcessService processService;
 
-	Grid<ProcessDefinition> gridProcess;
-	Grid<ProcessDefinitionStep> gridProcessSteps;
+	Grid<ProcessDefinition> gridProcessDefinition;
 	Grid<ProcessInstance> gridProcessInstance;
 	
 
@@ -76,11 +78,11 @@ public class UIProcessor extends UIBase {
 
 		this.processService = processService;
 		
-		gridProcess = new Grid<>(ProcessDefinition.class, false);
-		gridProcess.addColumn(p -> p.getId()).setHeader("#").setWidth("3em");
-		gridProcess.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
-		gridProcess.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
-		gridProcess.addComponentColumn(p -> {
+		gridProcessDefinition = new Grid<>(ProcessDefinition.class, false);
+		gridProcessDefinition.addColumn(p -> p.getId()).setHeader("#").setWidth("3em");
+		gridProcessDefinition.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
+		gridProcessDefinition.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
+		gridProcessDefinition.addComponentColumn(p -> {
 			Checkbox chActive=new Checkbox(p.isActive());
 			chActive.addValueChangeListener(e->{
 				boolean newVal = e.getValue();
@@ -94,28 +96,36 @@ public class UIProcessor extends UIBase {
 			});
 			return chActive;
 		}).setHeader("Active").setWidth("2em");
-		gridProcess.addColumn(p -> p.getMaxAttemptCount()).setHeader("Attempt").setWidth("1em");
-		gridProcess.addColumn(p -> p.getMaxThreadCount()).setHeader("Thread").setWidth("1em");
-		gridProcess.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer");
+		gridProcessDefinition.addColumn(p -> p.getMaxAttemptCount()).setHeader("Attempt").setWidth("1em");
+		gridProcessDefinition.addColumn(p -> p.getMaxThreadCount()).setHeader("Thread").setWidth("1em");
+		gridProcessDefinition.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer");
 
-		gridProcess.addComponentColumn(p -> {
+		gridProcessDefinition.addComponentColumn(p -> {
 			Button btnRun = new Button("", new Icon(VaadinIcon.SEARCH));
-			btnRun.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+			btnRun.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
 			btnRun.setDisableOnClick(true);
 			btnRun.addClickListener(e -> {
 				runProcessDiscoverer(p);
-				gridProcess.select(p);
+				gridProcessDefinition.select(p);
 				fillProcessInstanceGrid(p);
 				btnRun.setEnabled(true);
 			});
 			return btnRun;
 		}).setHeader("Discover");
+		gridProcessDefinition.addComponentColumn(p -> {
+			Button btnShowSteps = new Button("", new Icon(VaadinIcon.LINES_LIST));
+			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+			btnShowSteps.setDisableOnClick(true);
+			btnShowSteps.addClickListener(e -> {
+				showProcessDefinitionSteps(p);
+				btnShowSteps.setEnabled(true);
+			});
+			return btnShowSteps;
+		}).setHeader("Steps");
 		
-
-		gridProcess.addSelectionListener(e -> {
+		gridProcessDefinition.addSelectionListener(e -> {
 			Optional<ProcessDefinition> selection = e.getFirstSelectedItem();
 			if (selection.isEmpty()) {
-				gridProcessSteps.setItems(Collections.emptyList());
 				gridProcessInstance.setItems(Collections.emptyList());
 			} else {
 				fillProcessInstanceGrid(selection.get());
@@ -123,14 +133,6 @@ public class UIProcessor extends UIBase {
 		});
 		
 		
-		//--------------------------------------------------------------------
-
-		gridProcessSteps = new Grid<>(ProcessDefinitionStep.class, false);
-		gridProcessSteps.addColumn(p -> p.getId()).setHeader("#").setWidth("2em");
-		gridProcessSteps.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("2em");
-		gridProcessSteps.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
-		gridProcessSteps.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
-		gridProcessSteps.addColumn(p -> p.getCommands()).setHeader("Command to run").setAutoWidth(true);
 		
 		
 		//--------------------------------------------------------------------
@@ -220,41 +222,28 @@ public class UIProcessor extends UIBase {
 			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.STATUS_COMPLETED));
 			return btnRun;
 		}).setHeader("Run").setAutoWidth(true).setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
-		
 
-		
-		gridProcess.setWidthFull();
-		gridProcessSteps.setWidthFull();
+		gridProcessDefinition.setWidthFull();
 		gridProcessInstance.setWidthFull();
 		
-		gridProcess.setMaxHeight(200, Unit.EM);
-		gridProcessSteps.setMaxHeight(200, Unit.EM);
 		
-		gridProcess.getColumns().forEach(col->{col.setResizable(true);});
-		gridProcessSteps.getColumns().forEach(col->{col.setResizable(true);});
+		gridProcessDefinition.getColumns().forEach(col->{col.setResizable(true);});
 		gridProcessInstance.getColumns().forEach(col->{col.setResizable(true);});
 		
-		gridProcess.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
-		gridProcessSteps.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
+		gridProcessDefinition.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 		gridProcessInstance.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
-		
-		
-		HorizontalLayout horizontalLay = new HorizontalLayout(gridProcess,gridProcessSteps);
-		horizontalLay.setFlexGrow(5, gridProcess);
-		horizontalLay.setFlexGrow(2, gridProcessSteps);
-		horizontalLay.setWidthFull();
-		
-
-
-		VerticalLayout verticalLay = new VerticalLayout();
+		VerticalLayout verticalLay=new VerticalLayout(headerOfInstancesLayout(),gridProcessInstance);
 		verticalLay.setWidthFull();
-		verticalLay.setHeightFull();
-		verticalLay.add(new H3("Processes"));
-		verticalLay.add(horizontalLay);
-		verticalLay.add(headerOfInstancesLayout());
-		verticalLay.add(gridProcessInstance);
-		add(verticalLay);
+		
+		VerticalLayout layGridTop=new VerticalLayout(gridProcessDefinition);
+		layGridTop.setWidthFull();
+		layGridTop.setHeight(30, Unit.PERCENTAGE);
+
+		SplitLayout  splitter = new SplitLayout(layGridTop, verticalLay);
+		splitter.setOrientation(Orientation.VERTICAL);
+		splitter.setSplitterPosition(.30);
+		add(splitter);
 		setSizeFull();
 		
 		getElement().getStyle().set("height", "100%");
@@ -263,12 +252,13 @@ public class UIProcessor extends UIBase {
 	}
 
 
+
 	private Component makeInstaceGridRefresherButton() {
 		Button btnRefresh = new Button("", new Icon(VaadinIcon.REFRESH));
 		btnRefresh.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 		btnRefresh.setDisableOnClick(true);
 		btnRefresh.addClickListener(e -> {
-			Set<ProcessDefinition> selectedProcessDefiniton = gridProcess.getSelectedItems();
+			Set<ProcessDefinition> selectedProcessDefiniton = gridProcessDefinition.getSelectedItems();
 			if (selectedProcessDefiniton.isEmpty()) {
 				gridProcessInstance.setItems(Collections.emptyList());
 			} else {
@@ -362,6 +352,16 @@ public class UIProcessor extends UIBase {
 		
 		layoutForProcessInstanceTop.add(chWaitingApproval);
 		
+		
+		Button btnShowThreads = new Button("Show Threads", new Icon(VaadinIcon.COG));
+		btnShowThreads.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+		btnShowThreads.setDisableOnClick(true);
+		btnShowThreads.addClickListener(e -> {
+			showThreads();
+			btnShowThreads.setEnabled(true);
+		});
+		layoutForProcessInstanceTop.add(btnShowThreads);
+		
 		/*
 		IntegerField inDays = new IntegerField();
 		chApproval.setId("inDays");
@@ -384,7 +384,7 @@ public class UIProcessor extends UIBase {
 
 	
 	private void fillProcessInstanceGrid() {
-		Set<ProcessDefinition> selectedItems = gridProcess.getSelectedItems();
+		Set<ProcessDefinition> selectedItems = gridProcessDefinition.getSelectedItems();
 		if (selectedItems.isEmpty()) {
 			gridProcessInstance.setItems(Collections.emptyList());
 			return;
@@ -724,6 +724,116 @@ public class UIProcessor extends UIBase {
 		
 	}
 
+	private void showProcessDefinitionSteps(ProcessDefinition processDefinition) {
+		Dialog dialog = new Dialog();
+		String title="steps for %s (%s)".formatted(processDefinition.getCode(), processDefinition.getDescription());
+		dialog.setHeaderTitle(title);
+		
+		VerticalLayout dialogLayout = new VerticalLayout();
+		dialogLayout.setSizeFull();
+
+		//--------------------------------------------------------------------
+		Grid<ProcessDefinitionStep> gridProcessDefinitionSteps = new Grid<>(ProcessDefinitionStep.class, false);
+		gridProcessDefinitionSteps.addColumn(p -> p.getId()).setHeader("#").setWidth("2em");
+		gridProcessDefinitionSteps.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("2em");
+		gridProcessDefinitionSteps.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
+		gridProcessDefinitionSteps.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
+		gridProcessDefinitionSteps.addColumn(p -> p.getCommands()).setHeader("Command to run").setAutoWidth(true);
+		gridProcessDefinitionSteps.addColumn(p -> p.isSingleAtATime()).setHeader("Single").setAutoWidth(true);
+
+		gridProcessDefinitionSteps.setWidthFull();
+		gridProcessDefinitionSteps.setHeightFull();
+		gridProcessDefinitionSteps.setMaxHeight(200, Unit.EM);
+		gridProcessDefinitionSteps.getColumns().forEach(col->{col.setResizable(true);});
+		gridProcessDefinitionSteps.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
+
+		gridProcessDefinitionSteps.setItems(processDefinition.getSteps());
+		
+		dialogLayout.add(gridProcessDefinitionSteps);
+	
+		dialog.add(dialogLayout);
+		Button cancelButton = new Button("Close", e -> dialog.close());
+		dialog.getFooter().add(cancelButton);
+		dialog.setWidth("80%");
+		dialog.setHeight("60%");
+		dialog.setResizable(true);
+		dialog.setCloseOnEsc(true);
+		dialog.setCloseOnOutsideClick(true);
+		dialog.open();
+		
+	}
+
+	private void showThreads() {
+		Dialog dialog = new Dialog();
+		String title="Threads";
+		dialog.setHeaderTitle(title);
+		
+		VerticalLayout dialogLayout = new VerticalLayout();
+		dialogLayout.setSizeFull();
+		
+		
+
+		//--------------------------------------------------------------------
+		Grid<KeyValue> gridRunningProcessKeys = new Grid<>(KeyValue.class, false);
+		gridRunningProcessKeys.addColumn(p -> p.getKey()).setHeader("Process Key").setAutoWidth(true);
+		gridRunningProcessKeys.addColumn(p -> p.getValue()).setHeader("Start Time").setAutoWidth(true);
+
+		gridRunningProcessKeys.setWidthFull();
+		gridRunningProcessKeys.getColumns().forEach(col->{col.setResizable(true);});
+		gridRunningProcessKeys.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
+
+		gridRunningProcessKeys.setItems(RunnerSingleton.getInstance().getProcesses());
+		
+	
+		//--------------------------------------------------------------------
+		Grid<KeyValue> gridRunningThreadGroup = new Grid<>(KeyValue.class, false);
+		gridRunningThreadGroup.addColumn(p -> p.getKey()).setHeader("Thread group").setAutoWidth(true);
+		gridRunningThreadGroup.addColumn(p -> p.getValue()).setHeader("Active Thread Count").setAutoWidth(true);
+
+		gridRunningThreadGroup.setWidthFull();
+		gridRunningThreadGroup.getColumns().forEach(col->{col.setResizable(true);});
+		gridRunningThreadGroup.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
+
+		gridRunningThreadGroup.setItems(ThreadGroupSingleton.getInstance().getThreadGroupsAsKeyValue());
+
+		//--------------------------------------------------------------------
+		Grid<KeyValue> gridQueue = new Grid<>(KeyValue.class, false);
+		gridQueue.addColumn(p -> p.getKey()).setHeader("Queue Instance Code").setAutoWidth(true);
+		gridQueue.addColumn(p -> p.getValue()).setHeader("Status").setAutoWidth(true);
+
+		gridQueue.setWidthFull();
+		gridQueue.getColumns().forEach(col->{col.setResizable(true);});
+		gridQueue.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
+
+		gridQueue.setItems(QueueSingleton.getInstance().getAllAsKeyValue());
+
+		//-----------------------------------------------------------
+		Button btRefresh = new Button("Refresh all", new Icon(VaadinIcon.REFRESH));
+		btRefresh.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+		btRefresh.addClickListener(e -> {
+			gridRunningProcessKeys.setItems(RunnerSingleton.getInstance().getProcesses());
+			gridRunningThreadGroup.setItems(ThreadGroupSingleton.getInstance().getThreadGroupsAsKeyValue());
+			gridQueue.setItems(QueueSingleton.getInstance().getAllAsKeyValue());
+		});
+
+		dialogLayout.add(btRefresh);
+		HorizontalLayout horizontalLayout = new HorizontalLayout(gridRunningProcessKeys,gridRunningThreadGroup,gridQueue);
+		horizontalLayout.setSizeFull();
+		
+		dialogLayout.add(horizontalLayout);
+		
+		
+		dialog.add(dialogLayout);
+		Button cancelButton = new Button("Close", e -> dialog.close());
+		dialog.getFooter().add(cancelButton);
+		dialog.setWidth("90%");
+		dialog.setHeight("60%");
+		dialog.setResizable(true);
+		dialog.setCloseOnEsc(true);
+		dialog.setCloseOnOutsideClick(true);
+		dialog.open();
+		
+	}
 
 	private void setVariableGridItems(Grid<KeyValue> gridVars, HashMap<String, String> hmVars) {
 		List<KeyValue> items=new ArrayList<KeyValue>();
@@ -753,7 +863,7 @@ public class UIProcessor extends UIBase {
 			return false;
 		}
 		
-		var selection = gridProcess.getSelectedItems();
+		var selection = gridProcessDefinition.getSelectedItems();
 		if (selection.isEmpty()) {
 			return true;
 		}
@@ -767,7 +877,7 @@ public class UIProcessor extends UIBase {
 
 	private void fillGrid() {
 		List<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();
-		gridProcess.setItems(processDefinitions);
+		gridProcessDefinition.setItems(processDefinitions);
 
 		if (!processDefinitions.isEmpty()) {
 			setData(processDefinitions.get(0));
@@ -776,12 +886,7 @@ public class UIProcessor extends UIBase {
 	}
 
 	private void setData(ProcessDefinition processDefinition) {
-		gridProcess.select(processDefinition);
-		
-		List<ProcessDefinitionStep> definitionSteps = processDefinition.getSteps();
-		
-		gridProcessSteps.setItems(definitionSteps);
-
+		gridProcessDefinition.select(processDefinition);
 		fillProcessInstanceGrid(processDefinition);
 	}
 

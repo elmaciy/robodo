@@ -13,13 +13,19 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "process_instances")
+@Table(name = "process_instance", 
+	indexes = {
+			@Index(name="ndx_instance_code", columnList = "code", unique = true),
+			@Index(name="ndx_instance_status", columnList = "status")
+				}
+)
 public class ProcessInstance {
 	public static final String STATUS_NEW="NEW";
 	public static final String STATUS_RETRY="RETRY";
@@ -221,8 +227,6 @@ public class ProcessInstance {
 				currentStep.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING) && 
 				!currentStep.isApproved();
 	}
-	
-	
-	
+
 
 }

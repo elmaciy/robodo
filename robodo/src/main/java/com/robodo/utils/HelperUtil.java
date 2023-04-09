@@ -348,14 +348,13 @@ public class HelperUtil {
         return digit;
     }
 
-	
-    
-    public static void main(String[] args) {
-    	String str="YıldırayElmacı/123";
-    	String encrypted = new String(encrypt(str));
-    	System.err.println("encrypted : "+encrypted);
-    	String decrypted = new String(decrypt(encrypted));
-    	System.err.println("encrypted : "+decrypted);
-    }
+	public static void sleep(long ms) {
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+	}
  
 }

@@ -234,7 +234,7 @@ public class RobodoApplication {
 			dummyProcess.setMaxThreadCount(4);
 			dummyProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
 			dummyProcess.setDiscovererClass("DiscoverProcessGooggleSearch");
-			dummyProcess.setActive(true);
+			dummyProcess.setActive(false);
 
 
 			ProcessDefinitionStep googleSearchStep=new ProcessDefinitionStep();

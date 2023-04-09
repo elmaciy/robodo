@@ -15,9 +15,9 @@ import com.robodo.model.EmailTemplate;
 import com.robodo.model.ExecutionResultsForCommand;
 import com.robodo.model.ExecutionResultsForInstance;
 import com.robodo.model.ProcessDefinition;
+import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
-import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.steps.BaseSteps;
@@ -59,16 +59,15 @@ public class RunnerUtil {
 			}
 			processService.saveProcessInstance(result.getProcessInstance());
 
-			
-			String stepRunningKey="%s.%s.%s".formatted(processInstance.getProcessDefinition().getCode(),step.getStepCode(), String.valueOf(step.getId()));
-			
+			ProcessDefinition processDefinition = processInstance.getProcessDefinition();
+			ProcessDefinitionStep stepDef = processDefinition.getSteps().stream().filter(p->p.getOrderNo().equals(step.getOrderNo())).findAny().get();
+			String stepRunningKey="$STEP_%s".formatted(stepDef.getCode());
 			try {
 				
-				if (processInstance.getProcessDefinition().isSingletonStep(step)) {
-					String similarRunningKey="%s.%s.".formatted(processInstance.getProcessDefinition().getCode(),step.getStepCode());
-					boolean hasSimilarInstance=RunnerSingleton.getInstance().hasSimilarRunningInstance(similarRunningKey);
+				if (stepDef.isSingleAtATime()) {
+					boolean hasRunningInstance=RunnerSingleton.getInstance().hasRunningInstance(stepRunningKey);
 
-					if (hasSimilarInstance) {
+					if (hasRunningInstance) {
 						result.setMessage("");
 						result.setStatus(ExecutionResultsForInstance.STATUS_STALLED);
 						RunnerSingleton.getInstance().stop(processInstance.getCode());

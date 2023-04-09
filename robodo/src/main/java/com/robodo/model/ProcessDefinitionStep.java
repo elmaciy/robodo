@@ -11,7 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "process_definition_steps")
+@Table(name = "process_definition_step")
 public class ProcessDefinitionStep {
 
 	@Id

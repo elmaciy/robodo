@@ -45,21 +45,27 @@ public class SeleniumUtil {
 		
 		ChromeOptions ops = new ChromeOptions();
 		ops.addArguments("--remote-allow-origins=*");
-		
+		ops.addArguments("--disable-extensions");
+		ops.addArguments("--disable-gpu");
+		ops.addArguments("--no-sandbox");
+		//ops.addArguments("--headless");
+
 		var driver=new ChromeDriver(ops);
+		driver.manage().window().maximize();
 		driver.manage().window().maximize();
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(Long.valueOf(imlicitWaitStr)));
 		this.webDriver = driver;
 	}
 	
-	public void stopDriver() {
+	public void stopWebDriver() {
 		if (this.webDriver==null) {
 			return;
 		}
 		
 		try {
-			this.webDriver.close();;
+			this.webDriver.quit();
 		} catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 

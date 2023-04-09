@@ -21,7 +21,7 @@ public class DummyBingSearchByKeyword extends BaseSteps {
 
 	@Override
 	public void teardown() {
-		selenium.stopDriver();
+		selenium.stopWebDriver();
 		
 	}
 
@@ -33,7 +33,6 @@ public class DummyBingSearchByKeyword extends BaseSteps {
 		selenium.click(findElement);
 		selenium.sendKeys(findElement, keyword);
 		selenium.enter();
-		selenium.sleep(20L);
 		selenium.waitPageLoaded();
 		takeStepScreenShot(this.processInstanceStep, keyword, true);		
 		

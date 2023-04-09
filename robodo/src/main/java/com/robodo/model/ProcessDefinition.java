@@ -96,9 +96,9 @@ public class ProcessDefinition {
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
 	}
-	public boolean isSingletonStep(ProcessInstanceStep step) {
-		return this.steps.stream().filter(p->p.getCode().equals(step.stepCode)).anyMatch(p->p.isSingleAtATime());
-	}
+
+
+	
 	
 	
 	

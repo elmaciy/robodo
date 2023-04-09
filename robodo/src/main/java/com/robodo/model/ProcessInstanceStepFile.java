@@ -5,10 +5,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "process_instance_step_files")
+@Table(name = "process_instance_step_file", 
+indexes = {
+		@Index(name="ndx_instance_step_file_instance_id", columnList = "processInstanceStepId")
+			}
+)
 public class ProcessInstanceStepFile {
 
 	public static final String TYPE_SS="SCREENSHOT";
@@ -25,6 +30,7 @@ public class ProcessInstanceStepFile {
 	@Column(length = 1000)
 	String fileName;
 	boolean attach;
+	
 	Long processInstanceStepId;
 
 	public Long getId() {
