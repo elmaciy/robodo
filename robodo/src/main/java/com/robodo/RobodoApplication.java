@@ -1,6 +1,7 @@
 package com.robodo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -11,8 +12,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessDefinitionStep;
+import com.robodo.model.User;
+import com.robodo.model.UserRole;
 import com.robodo.repo.EmailTemplateRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
+import com.robodo.repo.UserRepo;
+import com.robodo.utils.HelperUtil;
 
 @SpringBootApplication
 @EnableScheduling
@@ -23,11 +28,34 @@ public class RobodoApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demo(ProcessDefinitionRepo processDefinitionRepo, EmailTemplateRepo emailTemplateRepo) {
+	public CommandLineRunner demo(ProcessDefinitionRepo processDefinitionRepo, EmailTemplateRepo emailTemplateRepo, UserRepo userRepo) {
 		return (args) -> {
 			
 
 			
+			User admin=new User();
+			admin.setEmail("admin@hotmail.com");
+			admin.setUsername("admin");
+			admin.setPassword(HelperUtil.encrypt("admin123"));
+			admin.setFullname("Administrator");
+			admin.setValid(true);
+			admin.setRoles(List.of(new UserRole(admin,UserRole.ROLE_USER), new UserRole(admin,UserRole.ROLE_ADMIN)));
+			
+			if (userRepo.findByUsername(admin.getUsername()).isEmpty()) {
+				userRepo.save(admin);
+			}
+			
+			User user=new User();
+			user.setEmail("elmaciy@hotmail.com");
+			user.setUsername("elmaciy");
+			user.setPassword(HelperUtil.encrypt("123"));
+			user.setFullname("Yıldıray Elmacı");
+			user.setValid(true);
+			user.setRoles(List.of(new UserRole(user,UserRole.ROLE_USER)));
+			
+			if (userRepo.findByUsername(user.getUsername()).isEmpty()) {
+				userRepo.save(user);
+			}
 			
 			
 			//----------------------------------------------------------------------

@@ -28,7 +28,7 @@ public class ThreadForExpiredTokenRemoval implements Runnable {
 		RunnerSingleton.getInstance().start(threadName);
 
 		List<Tokenization> tokensToRemove = processService.getTokensToRemove();
-		System.err.println(tokensToRemove.size()==0 ? "no expired token to remove" : "%d expired tokens to remove".formatted(tokensToRemove.size()));
+		//System.err.println(tokensToRemove.size()==0 ? "no expired token to remove" : "%d expired tokens to remove".formatted(tokensToRemove.size()));
 		for (Tokenization token : tokensToRemove) {
 			System.err.println("removing [%s (%s)] token : %s".formatted(token.getPurpose(), token.getPurposeDetail(), token.getToken()));
 			processService.removeToken(token);

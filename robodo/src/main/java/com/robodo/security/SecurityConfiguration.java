@@ -1,22 +1,27 @@
-package com.robodo.utils;
+package com.robodo.security;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import com.robodo.services.ProcessService;
 import com.robodo.ui.UILogin;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
 @EnableWebSecurity 
 @Configuration
 public class SecurityConfiguration extends VaadinWebSecurity {
+	
+	@Autowired
+	ProcessService processService;
 	
 	@Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -41,30 +46,49 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
         // This is important to register your login view to the
         // view access checker mechanism:
-        setLoginView(http, UILogin.class);
-	}
-	
-	@Override
+        setLoginView(http, UILogin.class); 
+    }
+
+    @Override
     public void configure(WebSecurity web) throws Exception {
         // Customize your WebSecurity configuration.
         super.configure(web);
-    }	
-	
-	@Bean
+    }
+
+    @Bean
     public UserDetailsManager userDetailsService() {
+        System.err.println("ssssssssssssssssssssssss");
+    	/*
         UserDetails user =
                 User.withUsername("user")
-                        .password("user")
+                        .password("{noop}user")
                         .roles("USER")
                         .build();
         UserDetails admin =
                 User.withUsername("admin")
-                        .password("admin")
+                        .password("{noop}admin")
                         .roles("ADMIN")
                         .build();
-        return new InMemoryUserDetailsManager(user, admin);
+        var userDetailManager = new InMemoryUserDetailsManager(user, admin);
+        
+        */
+        
+        
+        
+    	var userDetailManager = new InMemoryUserDetailsManager();
+
+    	List<com.robodo.model.User> activeUsers = processService.getActiveUsers();
+    	System.err.println("size : %d".formatted(activeUsers.size()));
+        for (var user : activeUsers) {
+        	System.err.println("adding user %s with password %s".formatted(user.getUsername(), user.getPassword()));
+        	userDetailManager.createUser(user.asUserDetails(processService));
+        }
+        
+        
+        return userDetailManager;
+        
+        
     }
-	
-	
+
 
 }

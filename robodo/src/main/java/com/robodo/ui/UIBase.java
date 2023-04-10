@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
+import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
-import com.robodo.services.SecurityService;
 import com.robodo.utils.HelperUtil;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -32,9 +32,11 @@ public class UIBase extends Div {
 	ProcessService processService;
 	SecurityService securityService;
 	
+	
 	public UIBase(ProcessService processService, SecurityService securityService) {
 		this.processService=processService;
 		this.securityService=securityService;
+		setSizeFull();
 	}
 	
 	
@@ -130,7 +132,6 @@ public class UIBase extends Div {
 		StreamResource resource = new StreamResource("%s.png".formatted(String.valueOf(file.getId())), () -> new ByteArrayInputStream(imageBytes));
 		Image image = new Image(resource, file.getDescription());
 
-		add(image);
 		image.setSizeFull();
 		return image;
 	}

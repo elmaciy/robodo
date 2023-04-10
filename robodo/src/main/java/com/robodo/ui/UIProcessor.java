@@ -19,8 +19,9 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.model.Tokenization;
+import com.robodo.model.UserRole;
+import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
-import com.robodo.services.SecurityService;
 import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.singleton.ThreadGroupSingleton;
@@ -55,14 +56,14 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
-import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 
 
 @Route("/process")
 @PageTitle("Robodo - Processes")
 @SpringComponent
 @UIScope
-@PermitAll
+@RolesAllowed({UserRole.ROLE_USER, UserRole.ROLE_ADMIN})
 public class UIProcessor extends UIBase {
 
 	private static final long serialVersionUID = 1L;

@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
+import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
-import com.robodo.services.SecurityService;
 import com.robodo.singleton.QueueSingleton;
 import com.robodo.utils.HelperUtil;
 import com.vaadin.flow.component.UI;
@@ -44,7 +44,6 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 
 	private static final long serialVersionUID = 1L;
 
-	ProcessService processService;
 	ProcessInstance processInstance;
 	
 	String instanceId;
@@ -55,8 +54,6 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	@Autowired
 	public UIApprover(ProcessService processService, SecurityService securityService) {
 		super(processService, securityService);
-		
-		this.processService=processService;
 	}
 
 	@Override

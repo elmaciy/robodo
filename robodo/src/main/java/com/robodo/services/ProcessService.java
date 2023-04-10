@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -25,6 +26,7 @@ import com.robodo.repo.ProcessInstanceRepo;
 import com.robodo.repo.ProcessInstanceStepFileRepo;
 import com.robodo.repo.TokenizationRepo;
 import com.robodo.repo.UserRepo;
+import com.robodo.utils.HelperUtil;
 
 @Service
 public class ProcessService {
@@ -216,9 +218,20 @@ public class ProcessService {
 	}
 
 	public User getUserByUsernameAndPassword(String username, String password) {
-		List<User> userList = userRepo.findByUsernameAndPassword(username, password);
+		String passwordEncoded = HelperUtil.encrypt(password);
+		List<User> userList = userRepo.findByUsernameAndPassword(username, passwordEncoded);
 		if (userList.isEmpty()) return null;
 		return userList.get(0);
+	}
+	
+	public User getUserByUsername(String username) {
+		List<User> userList = userRepo.findByUsername(username);
+		if (userList.isEmpty()) return null;
+		return userList.get(0);
+	}
+
+	public List<User> getActiveUsers() {
+		return userRepo.findByValid(true);		
 	}
 
 	
