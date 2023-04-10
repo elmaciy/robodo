@@ -110,16 +110,18 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	}
 
 	private void drawScreen() {
+		removeAll();
+		
 		Button btApprove = new Button("APPROVE", new Icon(VaadinIcon.CHECK));
 		btApprove.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_LARGE);
-		btApprove.setEnabled(isApproveable(processInstance));
+		btApprove.setVisible(isApproveable(processInstance));
 		btApprove.addClickListener(e -> {
 			approve(processInstance);
 		});
 		
 		Button btDecline = new Button("DECLINE", new Icon(VaadinIcon.CLOSE));
 		btDecline.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_LARGE);
-		btDecline.setEnabled(isApproveable(processInstance));
+		btDecline.setVisible(isApproveable(processInstance));
 		btDecline.addClickListener(e -> {
 			decline(processInstance);
 		});
@@ -261,9 +263,13 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			QueueSingleton.getInstance().add(processInstance);
 		}
 		
+		/*
 		informAndRun("Completed", "%s successfully.".formatted(approved ? "Approved" : "Declined"), ()->{
 			UI.getCurrent().navigate("/approve/%s/%s/SCREEN".formatted(HelperUtil.encrypt(instanceId),action));
 		});
+		*/
+		this.action="VIEW";
+		drawScreen();
 
 	}
 

@@ -8,5 +8,7 @@ import com.robodo.model.ProcessInstanceStepFile;
 
 public interface ProcessInstanceStepFileRepo extends CrudRepository<ProcessInstanceStepFile, Long> {
 	List<ProcessInstanceStepFile> findByProcessInstanceStepId(Long processInstanceStepId);
+	void deleteByProcessInstanceStepId(Long processInstanceStepId);
+	
 
 }

@@ -1,5 +1,6 @@
 package com.robodo.model;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -11,6 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
@@ -33,6 +36,8 @@ public class ProcessDefinition {
 	@OneToMany(mappedBy = "processDefinition", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	List<ProcessInstance> instances;
 	
+	LocalDateTime created;
+	LocalDateTime updated;
 	
 	public Long getId() {
 		return id;
@@ -96,12 +101,28 @@ public class ProcessDefinition {
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
 	}
-
-
 	
 	
+	public LocalDateTime getCreated() {
+		return created;
+	}
+	public void setCreated(LocalDateTime created) {
+		this.created = created;
+	}
+	public LocalDateTime getUpdated() {
+		return updated;
+	}
+	public void setUpdated(LocalDateTime updated) {
+		this.updated = updated;
+	}
 	
+	@PrePersist
+	protected void onCreate() {
+		this.created = LocalDateTime.now();
+	}
 	
-	
-	
+	@PreUpdate
+	protected void onUpdate() {
+		this.updated= LocalDateTime.now();
+	}
 }

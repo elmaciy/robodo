@@ -171,6 +171,11 @@ public class ProcessService {
 		
 	}
 
+	public void deleteAllStepFiles(ProcessInstanceStep step) {
+		processInstanceStepFileRepo.deleteByProcessInstanceStepId(step.getId());
+		
+	}
+
 	
 
 }

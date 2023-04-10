@@ -1,12 +1,12 @@
-15. login ekranı konulacak
-16. kurulan yerde chrome güncellenmemeli
 17. alarm oluştur ve threshold belirle, bu aşılınca mail gitsin biryerlere, bu sayede bir problem olup olmadığını anlarız. 
 	a. uzun süredir hiçbir süreç discover edilmiyor
 	b. kuyruk azalmiyor
 20. eski işi bitenleri belli bir gün geçince arşivleyip silelim. 
-26. hata alınca ekran görüntüsü alınsı o anki. sonra selenium kapatılsın. 
+56. isin sonunda notifikasyon gonderilmesi gerekir mi? 
 31. human notificationda email gitmezse tekrar deneyecek mi? 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı?
+15. login ekranı konulacak
+16. kurulan yerde chrome güncellenmemeli
 35. Ödeme aşamalarında bir şekilde o işlemin arada manual ödenip ödenmediğini kontrol edebilir miyiz? 
 37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
 38. gizli bilgileirn, mail parametrelerini, kredi kartı gibi kuruma özel bilgileri properties yerine parametre dosyasından aldır. Bussinessvariables olsun bunlar
@@ -16,26 +16,10 @@
 47. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 48. instance gridine sıralama koy. kolonlarına da filtre koy. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
-51. Mail üzerinden onay çalışmadı. onay alsa da onaylamadı. Ekran refresh olmadı. 
-52. step başında retry edildiginde tüm file kayıtları dosyalari temizlenmelidir	. 
 53. tablolara update date ve create date alanları koyalım 
 55. screenshotta exception oldugunda browser acik kaldi. teardown calismadi. neden? 
-56. isin sonunda notifikasyon gonderilmesi gerekir mi? 
+56. email template ekranı yaz 
 
-//----------------------------------------------
-drop table  email_template_seq;        
-drop table email_template;               
-drop table  process_instance_step_files_seq;
-drop table  process_instance_step_files;
-drop table  process_instance_step_seq;
-drop table  process_instance_step;
-drop table  process_instance_seq;
-drop table  process_instance;
-drop table  process_definition_step_seq; 
-drop table  process_definition_step;    
-drop table  process_definition_seq;    
-drop table  process_definition;      
-50. ss leri koydugumuz dizin process name e gore olusturuldugundan, sikinti olabilir. Burada baska bir yontem bulunsun. 
 
 
 -------------------
@@ -62,4 +46,7 @@ TAMAMLANANLAR
 22. instanceleri başlatan kısımdaki lojikten dolayı hep aynı işleri öncelikli alıyor. burada bir dağılım yapmak iyi olabilir. 
 52. Kuyruğa alırken eğer STALLED edilecekse, yani human interaction bekliyor ve alamadıysa boşuna kuyruğa almayalım. 
 53. onaydan sonra direk kuyruğa mı atsak? 
+52. step başında retry edildiginde tüm file kayıtları dosyalari temizlenmelidir	. 
+51. Onaydan sonra ekran refresh olmuyor. 
+50. ss leri koydugumuz dizin process name e gore olusturuldugundan, sikinti olabilir. Burada baska bir yontem bulunsun. 
 

@@ -208,6 +208,8 @@ public class RunnerUtil {
 			step.setStarted(LocalDateTime.now());
 			processService.saveProcessInstance(processInstance);
 		}
+		
+		processService.deleteAllStepFiles(step);
 
 		String normalizedCommand = normalize(step.getCommands());
 		

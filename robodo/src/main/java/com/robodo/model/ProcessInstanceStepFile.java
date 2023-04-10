@@ -1,6 +1,7 @@
 package com.robodo.model;
 
 import java.sql.Blob;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -36,6 +38,9 @@ public class ProcessInstanceStepFile {
 	
 	Long processInstanceStepId;
 
+	LocalDateTime created;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -102,6 +107,17 @@ public class ProcessInstanceStepFile {
 		this.mimeType = mimeType;
 	}
 
+	public LocalDateTime getCreated() {
+		return created;
+	}
 
+	public void setCreated(LocalDateTime created) {
+		this.created = created;
+	}
+
+	@PrePersist
+	protected void onCreate() {
+		this.created = LocalDateTime.now();
+	}
 
 }
