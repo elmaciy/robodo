@@ -11,6 +11,7 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
+import com.robodo.services.SecurityService;
 import com.robodo.singleton.QueueSingleton;
 import com.robodo.utils.HelperUtil;
 import com.vaadin.flow.component.UI;
@@ -30,13 +31,15 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParameters;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
-@Route(value = "/approve/:instanceId/:action/:source")
+@Route(value = "/approve/:instanceId/:action/:source/:token")
 @PageTitle("Robodo - Approval")
 @SpringComponent
 @UIScope
+@AnonymousAllowed
 public class UIApprover extends UIBase   implements BeforeEnterObserver {
 
 	private static final long serialVersionUID = 1L;
@@ -47,10 +50,11 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	String instanceId;
 	String action;
 	String source;
+	String token;
 
 	@Autowired
-	public UIApprover(ProcessService processService) {
-		super(processService);
+	public UIApprover(ProcessService processService, SecurityService securityService) {
+		super(processService, securityService);
 		
 		this.processService=processService;
 	}
@@ -66,6 +70,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			if (parameterName.equals("action")) action=value;
 			if (parameterName.equals("instanceId")) instanceId=value;
 			if (parameterName.equals("source")) source=value;
+			if (parameterName.equals("token")) token=value;
 		}
 				
 		boolean isOk = checkParams();
@@ -89,6 +94,11 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			notifyError("action is not given");
 			return false;
 		}
+
+		if (token==null) {
+			notifyError("token is not given");
+			return false;
+		}
 		 
 		if ("APPROVE,DECLINE,VIEW".indexOf(action)==-1) {
 			notifyError("invalid action : %s".formatted(action));
@@ -99,10 +109,18 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			notifyError("invalid source: %s".formatted(source));
 			return false;
 		}
-		 
+		
+		
+		
 		processInstance = processService.getProcessInstanceByCode(instanceId);
 		if (processInstance==null) {
 			notifyError("no instance found : %s".formatted(instanceId));
+			return false;
+		}
+		
+		boolean isValid = processService.isValidToken(token, "FOR_APPROVAL", processInstance.getCode());
+		if (!isValid) {
+			notifyError("invalid token supplied");
 			return false;
 		}
 

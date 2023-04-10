@@ -1,10 +1,8 @@
 package com.robodo.utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Blob;
@@ -18,7 +16,6 @@ import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import javax.mail.BodyPart;
@@ -42,6 +39,7 @@ import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
+import com.robodo.model.Tokenization;
 
 public class HelperUtil {
 	
@@ -104,10 +102,12 @@ public class HelperUtil {
 	public static boolean sendEmailByTemplate(EmailTemplate emailTemplate, ProcessInstanceStep step, RunnerUtil runnerUtil) {
 		String instanceVariables = step.getProcessInstance().getInstanceVariables();
 		HashMap<String, String> hmVars=String2HashMap(instanceVariables);
+		long tokenDuration=Long.valueOf(runnerUtil.processService.getEnv().getProperty("token.duration"));
+		Tokenization token = Tokenization.generateNewToken(runnerUtil.processService,"FOR_APPROVAL",step.getProcessInstance().getCode(),  tokenDuration);
+		hmVars.put("token", token.getToken());
 		emailTemplate.setSubject(replaceVariables(emailTemplate.getSubject(),hmVars));
 		emailTemplate.setBody(replaceVariables(emailTemplate.getBody(), hmVars));
 		return sendEmail(step.getProcessInstance(), emailTemplate, runnerUtil);
-		
 	}
 
 	

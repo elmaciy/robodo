@@ -18,7 +18,9 @@ import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
+import com.robodo.model.Tokenization;
 import com.robodo.services.ProcessService;
+import com.robodo.services.SecurityService;
 import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.singleton.ThreadGroupSingleton;
@@ -35,7 +37,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -54,11 +55,14 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
+import jakarta.annotation.security.PermitAll;
+
 
 @Route("/process")
 @PageTitle("Robodo - Processes")
 @SpringComponent
 @UIScope
+@PermitAll
 public class UIProcessor extends UIBase {
 
 	private static final long serialVersionUID = 1L;
@@ -73,8 +77,8 @@ public class UIProcessor extends UIBase {
 
 
 	@Autowired
-	public UIProcessor(ProcessService processService) {
-		super(processService);
+	public UIProcessor(ProcessService processService, SecurityService securityService) {
+		super(processService, securityService);
 
 		this.processService = processService;
 		
@@ -96,8 +100,26 @@ public class UIProcessor extends UIBase {
 			});
 			return chActive;
 		}).setHeader("Active").setWidth("2em");
-		gridProcessDefinition.addColumn(p -> p.getMaxAttemptCount()).setHeader("Attempt").setWidth("1em");
-		gridProcessDefinition.addColumn(p -> p.getMaxThreadCount()).setHeader("Thread").setWidth("1em");
+		gridProcessDefinition.addComponentColumn(p->{
+			var fld= makeIntegerMinMaxField(p.getMaxAttemptCount(),1,100);
+			fld.addValueChangeListener(e->{
+				Integer value = e.getValue();
+				p.setMaxAttemptCount(value);
+				processService.saveProcessDefinition(p);
+				notifyInfo("maximum attempt count changed");
+			});
+			return fld;
+		}).setHeader("Attempt").setAutoWidth(true);
+		gridProcessDefinition.addComponentColumn(p->{
+			var fld= makeIntegerMinMaxField(p.getMaxThreadCount(),1,10);
+			fld.addValueChangeListener(e->{
+				Integer value = e.getValue();
+				p.setMaxThreadCount(value);
+				processService.saveProcessDefinition(p);
+				notifyInfo("maximum thread count changed");
+			});
+			return fld;
+		}).setHeader("Thread").setAutoWidth(true);
 		gridProcessDefinition.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer");
 
 		gridProcessDefinition.addComponentColumn(p -> {
@@ -444,10 +466,8 @@ public class UIProcessor extends UIBase {
 			return;
 		}
 
-		
-		UI.getCurrent().navigate("/approve/%s/VIEW/SCREEN".formatted(HelperUtil.encrypt(instance.getCode())));
-		
-		
+		Tokenization token=Tokenization.generateNewToken(processService, "FOR_APPROVAL",instance.getCode(), 30);
+		UI.getCurrent().navigate("/approve/%s/VIEW/SCREEN/%s".formatted(HelperUtil.encrypt(instance.getCode()), token.getToken()));
 	}
 
 

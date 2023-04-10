@@ -1,7 +1,6 @@
 package com.robodo.ui;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,8 +9,8 @@ import java.util.stream.Collectors;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
+import com.robodo.services.SecurityService;
 import com.robodo.utils.HelperUtil;
-import com.robodo.utils.RunnerUtil;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -19,6 +18,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -30,9 +30,11 @@ public class UIBase extends Div {
 	private static final long serialVersionUID = 1L;
 
 	ProcessService processService;
+	SecurityService securityService;
 	
-	public UIBase(ProcessService processService) {
+	public UIBase(ProcessService processService, SecurityService securityService) {
 		this.processService=processService;
+		this.securityService=securityService;
 	}
 	
 	
@@ -124,7 +126,6 @@ public class UIBase extends Div {
 	}	
 	
 	public Image getImage(ProcessInstanceStep step, ProcessInstanceStepFile file) {
-		RunnerUtil runnerUtil = new RunnerUtil(processService);
 		byte[] imageBytes=HelperUtil.byteArr2Blob(file.getBinarycontent());
 		StreamResource resource = new StreamResource("%s.png".formatted(String.valueOf(file.getId())), () -> new ByteArrayInputStream(imageBytes));
 		Image image = new Image(resource, file.getDescription());
@@ -133,5 +134,18 @@ public class UIBase extends Div {
 		image.setSizeFull();
 		return image;
 	}
+	
+	public IntegerField makeIntegerMinMaxField(int current, int min, int max) {
+		IntegerField integerField = new IntegerField();
+		integerField.setWidth("10em");
+		integerField.setMin(min);
+		integerField.setMax(max);
+		integerField.setWidthFull();
+		integerField.setValue(current);
+		integerField.setStepButtonsVisible(true);
+		return integerField;
+	}
+	
+	
 
 }

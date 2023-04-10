@@ -51,6 +51,7 @@ public class ThreadForDiscoverers implements Runnable {
 					runner.logger("skip process [%s]/%s".formatted(processDefinition.getCode(),discoveredInstance.getCode(), processDefinition.getCode()));
 					continue;
 				}
+				
 				processService.saveProcessInstance(discoveredInstance);
 			}
 			

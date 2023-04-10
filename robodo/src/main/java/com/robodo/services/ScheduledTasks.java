@@ -9,6 +9,7 @@ import com.robodo.threads.ThreadForDiscoverers;
 import com.robodo.threads.ThreadForInstanceStarter;
 import com.robodo.threads.ThreadForQueueManager;
 import com.robodo.threads.ThreadForRetryFailed;
+import com.robodo.threads.ThreadForExpiredTokenRemoval;
 
 @Component
 public class ScheduledTasks {
@@ -41,6 +42,13 @@ public class ScheduledTasks {
 	@Scheduled(fixedRate = 10000, initialDelay = 0)
 	public void retryFailedInstances() {
 		Thread th=new Thread(new ThreadForRetryFailed(processService));
+		th.start();
+	}
+	
+	
+	@Scheduled(fixedRate = 30*1000, initialDelay = 0)
+	public void removeExpiredTokens() {
+		Thread th=new Thread(new ThreadForExpiredTokenRemoval(processService));
 		th.start();
 	}
 }

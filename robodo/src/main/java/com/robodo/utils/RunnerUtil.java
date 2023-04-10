@@ -196,6 +196,7 @@ public class RunnerUtil {
 		if (emailTemplate==null) {
 			throw new RuntimeException("email template %s not found");
 		}
+		
 		boolean isMailSend = HelperUtil.sendEmailByTemplate(emailTemplate, step, this);
 		if (!isMailSend) {
 			throw new RuntimeException("email not sent");

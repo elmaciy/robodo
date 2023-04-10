@@ -3,9 +3,9 @@
 	b. kuyruk azalmiyor
 20. eski işi bitenleri belli bir gün geçince arşivleyip silelim. 
 56. isin sonunda notifikasyon gonderilmesi gerekir mi? 
+
 31. human notificationda email gitmezse tekrar deneyecek mi? 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı?
-15. login ekranı konulacak
 16. kurulan yerde chrome güncellenmemeli
 35. Ödeme aşamalarında bir şekilde o işlemin arada manual ödenip ödenmediğini kontrol edebilir miyiz? 
 37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
@@ -16,10 +16,12 @@
 47. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 48. instance gridine sıralama koy. kolonlarına da filtre koy. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
-53. tablolara update date ve create date alanları koyalım 
-55. screenshotta exception oldugunda browser acik kaldi. teardown calismadi. neden? 
+15. login ekranı konulacak
 56. email template ekranı yaz 
+57. file tablosunda step_id+description unique key koy ya da dosya adi olustururken sira noyu da kullan. 
+58. hepsini birden koşunca $STEP_MARKA_ONAY_BEKLE lar kalıyor thread ekranında. 
 
+55. screenshotta exception oldugunda browser acik kaldi. teardown calismadi. neden? 
 
 
 -------------------
@@ -49,4 +51,5 @@ TAMAMLANANLAR
 52. step başında retry edildiginde tüm file kayıtları dosyalari temizlenmelidir	. 
 51. Onaydan sonra ekran refresh olmuyor. 
 50. ss leri koydugumuz dizin process name e gore olusturuldugundan, sikinti olabilir. Burada baska bir yontem bulunsun. 
+53. tablolara update date ve create date alanları koyalım 
 
