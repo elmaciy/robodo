@@ -162,26 +162,13 @@ public class SeleniumUtil {
 		
 	}
 
-
-	public String screenShot(ProcessInstance processInstance) {
+	public byte[] screenShotAsByteArray(ProcessInstance processInstance) {
 		waitPageLoaded();
-		String targetDir=runnerUtil.getTargetPath(processInstance);
 		TakesScreenshot scrShot =((TakesScreenshot) webDriver);
-		File SrcFile=scrShot.getScreenshotAs(OutputType.FILE);
-		new File(targetDir).mkdirs();
-		String fileName="SS_"+System.currentTimeMillis()+".PNG";
-		String fileWithPath=targetDir+File.separator+fileName;
-		File DestFile=new File(fileWithPath);
-		try {
-			FileUtils.copyFile(SrcFile, DestFile);
-			runnerUtil.logger("SCREENSHOT::%s".formatted(fileWithPath));
-			return fileName;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return scrShot.getScreenshotAs(OutputType.BYTES);
 	}
 	
+		
 	
 	public void executeJavascript(WebElement el, String javaScript, String arguments)  {
 		JavascriptExecutor executor = (JavascriptExecutor) webDriver;

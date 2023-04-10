@@ -1,7 +1,12 @@
 package com.robodo.steps;
 
+import java.sql.Blob;
+
+import javax.sql.rowset.serial.SerialBlob;
+
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
+import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 import com.robodo.utils.SeleniumUtil;
 
@@ -35,18 +40,33 @@ public abstract class BaseSteps {
 	 
 	 
 	 public void takeStepScreenShot(ProcessInstanceStep processInstanceStep, String description, boolean toAttach, Runnable actionBefore) {
+		 
+		 if (!HelperUtil.isValidForFileName(description)) {
+			 throw new RuntimeException("the filename is not valid for filename convension : %s".formatted(description));
+		 }
+		 
 		 if (actionBefore!=null) {
 			 actionBefore.run();
 		 }
 		 
-		 String ssFileName = selenium.screenShot(processInstanceStep.getProcessInstance());
+		 byte[] screenShotAsByteArray = selenium.screenShotAsByteArray(processInstanceStep.getProcessInstance());
 		 ProcessInstanceStepFile file=new ProcessInstanceStepFile();
 		 file.setFileOrder(fileOrder++);
-		 file.setFileName(ssFileName);
+		 file.setMimeType(ProcessInstanceStepFile.MIME_TYPE_SCREENSHOT);
+		 Blob blobContent=null;
+		 try {
+			 blobContent= new SerialBlob(screenShotAsByteArray);
+		 } catch(Exception e) {
+			 e.printStackTrace();
+			 throw new RuntimeException("Exception takeStepScreenShot in converting screenshot content : %s".formatted(e.getMessage()));
+		 }
+		 file.setBinarycontent(blobContent);
 		 file.setFileType(ProcessInstanceStepFile.TYPE_SS);
 		 file.setDescription(description);
 		 file.setProcessInstanceStepId(processInstanceStep.getId());
 		 file.setAttach(toAttach);
+		 
+		 
 		 runnerUtil.processService.saveProcessInstanceStepFile(file);
 	 }
 	 

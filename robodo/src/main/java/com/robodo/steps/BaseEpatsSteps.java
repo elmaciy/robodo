@@ -94,7 +94,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		String tckno=runnerUtil.getEnvironmentParameter("tckno");
 		String sifre=runnerUtil.getEnvironmentParameter("sifre");
 		edevletLogin.girisEdevlet(tckno, sifre);
-		takeStepScreenShot(processInstanceStep, "Sisteme giriş yapıldı", false, ()->waitProcessorGone());
+		takeStepScreenShot(processInstanceStep, "Sisteme giris yapildi", false, ()->waitProcessorGone());
 	}
 	
 	
@@ -111,7 +111,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		String islemGrubu=getVariable("islemGrubu");
 		String islemAdi=getVariable("islemAdi");
 		epatsBenimSayfam.islemSec(islemGrubu,islemAdi);
-		takeStepScreenShot(this.processInstanceStep, "Işlem Secimi", false, ()->waitProcessorGone());
+		takeStepScreenShot(this.processInstanceStep, "Islem secimi", false, ()->waitProcessorGone());
 	}
 	
 	
@@ -121,7 +121,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		String cepTel=runnerUtil.getEnvironmentParameter("ceptel");
 		String referansNo=getVariable("takipNumarasi");
 		epatsBasvuruYapan.basvuruBilgileriniDoldur(eposta, cepTel, referansNo);
-		takeStepScreenShot(this.processInstanceStep, "Başvuru bilgileri", false, ()->waitProcessorGone());
+		takeStepScreenShot(this.processInstanceStep, "Basvuru Bilgileri", false, ()->waitProcessorGone());
 		epatsBasvuruYapan.devamEt();
 	}
 	
@@ -170,7 +170,7 @@ public class BaseEpatsSteps extends BaseSteps {
 		
 
 		epatsItirazSahibiBilgisi.devamEt();
-		takeStepScreenShot(processInstanceStep, "İtiraz sahibi eklendi", false, ()->waitProcessorGone());
+		takeStepScreenShot(processInstanceStep, "Itiraz sabibi ekleme", false, ()->waitProcessorGone());
 	}
 	
 	public void itirazGerekceleriEkle() {
@@ -195,7 +195,7 @@ public class BaseEpatsSteps extends BaseSteps {
 			
 		});
 		
-		takeStepScreenShot(processInstanceStep, "İtiraz gerekçeleri işaretlendi", false, ()->waitProcessorGone());
+		takeStepScreenShot(processInstanceStep, "Itiraz gerekceleri isaretlendi", false, ()->waitProcessorGone());
 	}
 	
 	public void itirazaGerekceDosyaNumaralariEkleDevamEt() {
@@ -209,7 +209,7 @@ public class BaseEpatsSteps extends BaseSteps {
 			epatsItirazGerekceleri.itirazaGerekceDosyaEkle(dosya);
 		});
 		
-		takeStepScreenShot(processInstanceStep, "İtiraza gerekçe dosyaları eklendi", false, ()->waitProcessorGone());
+		takeStepScreenShot(processInstanceStep, "Itiraza gerekce dosyalalari ekle", false, ()->waitProcessorGone());
 		
 		epatsItirazGerekceleri.devamEt();
 	}
@@ -217,7 +217,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	public void itirazaIliskibBilgileriEkleDevamEt() {
 		String itirazaIliskinDosya=getVariable("itirazaIliskinDosya");
 		epatsItirazaIliskinBilgiler.itirazaIliskinEvrakYukle(itirazaIliskinDosya);
-		takeStepScreenShot(processInstanceStep, "İtiraza ilişkin bilgilere ait dosya eklendi", false, ()->waitProcessorGone());
+		takeStepScreenShot(processInstanceStep, "İtiraza iliskin bilgilere ait dosya eklendi", false, ()->waitProcessorGone());
 		epatsItirazaIliskinBilgiler.devamEt();
 
 	}
@@ -234,7 +234,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	public void hizmetDokumuDevamEt() {
 		String ankaraPatentKodu=runnerUtil.getEnvironmentParameter("ankarapatent.vergino");
 		epatsHizmetDokumu.basvuruSahibiSec(ankaraPatentKodu);
-		takeStepScreenShot(this.processInstanceStep, "Hizmet dökümü", true, ()->waitProcessorGone());
+		takeStepScreenShot(this.processInstanceStep, "Hizmet dokumu", true, ()->waitProcessorGone());
 		selenium.sleep(3L);
 		epatsHizmetDokumu.devamEt();
 	}
@@ -268,9 +268,9 @@ public class BaseEpatsSteps extends BaseSteps {
 		
 		karsilastir(HelperUtil.normalizeAmount(getVariable("onizleme.odenecek.genelToplam")), HelperUtil.normalizeAmount(getVariable("odemeTutari")), "ödenecek tutar karşılaştırılıyor");
 		
-		takeStepScreenShot(this.processInstanceStep, "Önizleme - 1 ", true, ()->waitProcessorGone());
+		takeStepScreenShot(this.processInstanceStep, "Onizleme - 1 ", true, ()->waitProcessorGone());
 		epatsOnIzleme.scrollToCenteElement();
-		takeStepScreenShot(this.processInstanceStep, "Önizleme - 2", true, ()->waitProcessorGone());
+		takeStepScreenShot(this.processInstanceStep, "Onizleme - 2", true, ()->waitProcessorGone());
 
 		epatsOnIzleme.tahakkukOlustur();
 		
@@ -279,7 +279,7 @@ public class BaseEpatsSteps extends BaseSteps {
 	public void  tahakkukNumarasiAl() {
 		String sonuc = epatsIslemSonucu.sonucAl();
 		setVariable("islemsonucu.sonuc", sonuc);
-		takeStepScreenShot(this.processInstanceStep, "Tahakkuk numarası oluşturuldu", true, ()->waitProcessorGone());
+		takeStepScreenShot(this.processInstanceStep, "Tahakkuk olusturuldu", true, ()->waitProcessorGone());
 		try {
 			String tahakkukNo=StringUtils.substringAfter(sonuc, "Tahakkuk No:");
 			Integer.parseInt(tahakkukNo);

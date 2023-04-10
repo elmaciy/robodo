@@ -1,5 +1,7 @@
 package com.robodo.model;
 
+import java.sql.Blob;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,8 +19,8 @@ indexes = {
 public class ProcessInstanceStepFile {
 
 	public static final String TYPE_SS="SCREENSHOT";
-	public static final String TYPE_DOWNLOADED="DOWNLOADED";
 	public static final String TYPE_OTHER="OTHER";
+	public static final String MIME_TYPE_SCREENSHOT = "image/png";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,9 +29,10 @@ public class ProcessInstanceStepFile {
 	int fileOrder;
 	@Column(length = 1000)
 	String description;
-	@Column(length = 1000)
-	String fileName;
 	boolean attach;
+	@Column(columnDefinition = "longblob")
+	Blob binarycontent;
+	String mimeType;
 	
 	Long processInstanceStepId;
 
@@ -47,14 +50,6 @@ public class ProcessInstanceStepFile {
 
 	public void setFileType(String fileType) {
 		this.fileType = fileType;
-	}
-
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
 	}
 
 	public String getDescription() {
@@ -90,7 +85,23 @@ public class ProcessInstanceStepFile {
 	public void setFileOrder(int fileOrder) {
 		this.fileOrder = fileOrder;
 	}
-	
+
+	public Blob getBinarycontent() {
+		return binarycontent;
+	}
+
+	public void setBinarycontent(Blob binarycontent) {
+		this.binarycontent = binarycontent;
+	}
+
+	public String getMimeType() {
+		return mimeType;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
 
 
 }

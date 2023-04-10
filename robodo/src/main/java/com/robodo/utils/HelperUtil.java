@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Blob;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
@@ -75,30 +77,8 @@ public class HelperUtil {
 		return df.format(tamsayiDbl+ondalikDbl);
 	}
 
-	public static byte[] getFileAsByteArray(String filePath) {
-		File file = new File(filePath);
-		if (!file.exists()) {
-			return null;
-		}
-		try {
-			return  Files.readAllBytes(file.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
 	
 	public static String hashMap2String(HashMap<String,String> hm) {
-		/*
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			String json = mapper.writeValueAsString(hm);			
-			return json;
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		return null;
-		*/
 		List<KeyValue> list = hm.keySet().stream().map(key-> {
 			return new KeyValue(key, hm.get(key));
 		}).toList();
@@ -107,20 +87,6 @@ public class HelperUtil {
 	}
 	
 	public static HashMap<String,String>  String2HashMap(String data) {
-		/*
-		HashMap<String,String> hm= new HashMap<String,String>();
-		try {
-			JSONParser parser = new JSONParser(data);
-			LinkedHashMap<String, Object> linkedList = parser.parseObject();
-			linkedList.keySet().stream().forEach(key->{
-				hm.put(key, (String) linkedList.get(key));
-			});
-			return hm;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new HashMap<String,String>();
-		*/
 		HashMap<String,String> hm= new HashMap<String,String>();
 		try {
 			ObjectMapper mapper = new ObjectMapper();
@@ -234,20 +200,19 @@ public class HelperUtil {
             		if (file.isAttach()) {
             			// second part (the image)
                         BodyPart  messageImagePart = new MimeBodyPart();
-                        String imagesPath = runnerUtil.getTargetPath(processInstance);
-                        String fileName=imagesPath+File.separator+file.getFileName();
-                        runnerUtil.logger("adding file [%s] to the mail".formatted(fileName));
-            			DataSource fds = new FileDataSource(fileName);
+                        runnerUtil.logger("adding file [%s] to the mail".formatted(file.getDescription()));
+            			DataSource bds = new ByteArrayDataSource(byteArr2Blob(file.getBinarycontent()), ProcessInstanceStepFile.MIME_TYPE_SCREENSHOT);
+         
             			try {
-        					messageImagePart.setDataHandler(new DataHandler(fds));
-        					messageImagePart.setFileName(fileName);
+            				
+        					messageImagePart.setDataHandler(new DataHandler(bds));
+        					messageImagePart.setFileName("%s.png".formatted(file.getDescription()));
         					messageImagePart.setDescription(file.getDescription());
-        					//messageImagePart.setText(f.getFileName());
         	    			messageImagePart.setHeader("Content-ID", "<image>");
         	                multipart.addBodyPart(messageImagePart);
         				} catch (MessagingException e) {
         					e.printStackTrace();
-        					runnerUtil.logger("error attaching file [%s] : %s".formatted(fileName, e.getMessage()));
+        					runnerUtil.logger("error attaching file [%s] : %s".formatted(file.getDescription(), e.getMessage()));
         				}
             		}
             	});
@@ -374,5 +339,32 @@ public class HelperUtil {
 		}
 		
 	}
- 
+
+	public static byte[] byteArr2Blob(Blob blob) {
+		try {
+			int blobLength = (int) blob.length();  
+			byte[] blobAsBytes = blob.getBytes(1, blobLength);
+			return blobAsBytes;
+		} catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+
+	public static boolean isValidForFileName(String filename) {
+		File file = new File(filename);
+	    boolean created = false;
+	    try {
+	        created = file.createNewFile();
+	        if (created) {
+	        	file.delete();
+	        }
+	        return created;
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    	return created;
+	    } 
+	}
+	
 }

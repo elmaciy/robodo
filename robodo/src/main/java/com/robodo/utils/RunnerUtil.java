@@ -202,17 +202,6 @@ public class RunnerUtil {
 		}
 	}
 
-	public String getTargetPath(ProcessInstance processInstance) {
-		String workingDir = processService.getEnv().getProperty("working.dir");
-		String executionDir = workingDir + File.separator + "executions";
-		int year = processInstance.getCreated().getYear();
-		int month = processInstance.getCreated().getMonthValue();
-		int day = processInstance.getCreated().getDayOfMonth();
-		String subDir = "%d%s%02d%s%02d%s%s".formatted(year, File.separator, month, File.separator, day, File.separator, processInstance.getCode());
-		String targetDir = executionDir + File.separator + subDir;
-		return targetDir;
-	}
-
 	private ProcessInstanceStep runStep(ProcessInstance processInstance, ProcessInstanceStep step) {
 		if (step.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
 			step.setStatus(ProcessInstanceStep.STATUS_RUNNING);

@@ -124,14 +124,9 @@ public class UIBase extends Div {
 	}	
 	
 	public Image getImage(ProcessInstanceStep step, ProcessInstanceStepFile file) {
-		String imageFileName=file.getFileName();
 		RunnerUtil runnerUtil = new RunnerUtil(processService);
-		String targetDir=runnerUtil.getTargetPath(step.getProcessInstance());
-		
-		String imagePath=targetDir+File.separator+imageFileName;
-		byte[] imageBytes=HelperUtil.getFileAsByteArray(imagePath);
-		//runnerUtil.logger("image file [%s] loaded, (%s) bytes".formatted(imagePath,String.valueOf(imageBytes.length)));
-		StreamResource resource = new StreamResource(imageFileName, () -> new ByteArrayInputStream(imageBytes));
+		byte[] imageBytes=HelperUtil.byteArr2Blob(file.getBinarycontent());
+		StreamResource resource = new StreamResource("%s.png".formatted(String.valueOf(file.getId())), () -> new ByteArrayInputStream(imageBytes));
 		Image image = new Image(resource, file.getDescription());
 
 		add(image);
