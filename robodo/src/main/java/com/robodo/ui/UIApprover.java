@@ -28,7 +28,6 @@ import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -36,7 +35,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
 @Route(value = "/approve/:instanceId/:action/:source/:token")
-@PageTitle("Robodo - Approval")
 @SpringComponent
 @UIScope
 @AnonymousAllowed
@@ -54,6 +52,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	@Autowired
 	public UIApprover(ProcessService processService, SecurityService securityService) {
 		super(processService, securityService);
+		setTitle("Approve");
 	}
 
 	@Override
@@ -115,11 +114,15 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			return false;
 		}
 		
-		boolean isValid = processService.isValidToken(token, "FOR_APPROVAL", processInstance.getCode());
-		if (!isValid) {
-			notifyError("invalid token supplied");
-			return false;
+		if (!isAuthenticated()) {
+			boolean isValid = processService.isValidToken(token, "FOR_APPROVAL", processInstance.getCode());
+			if (!isValid) {
+				notifyError("invalid token supplied");
+				return false;
+			}
 		}
+		
+		
 
 		return true;
 	}
@@ -161,7 +164,8 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		main.add(scroller);
 		
 		add(main);
-		setSizeFull();
+		
+		
 		
 		getElement().getStyle().set("height", "100%");
 		
@@ -179,12 +183,12 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	}
 
 	private Button makeBackButton() {
-		Button btBack = new Button("<< Back", new Icon(VaadinIcon.BACKWARDS));
+		Button btBack = new Button("<< Back <<", new Icon(VaadinIcon.BACKWARDS));
 		btBack.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 		btBack.addClickListener(e -> {
 			UI.getCurrent().navigate("/process");
 		});
-		btBack.setVisible(source.equals("SCREEN"));
+		btBack.setVisible(super.isAuthenticated());
 		return btBack;
 	}
 

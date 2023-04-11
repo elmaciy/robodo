@@ -60,7 +60,6 @@ import jakarta.annotation.security.RolesAllowed;
 
 
 @Route("/process")
-@PageTitle("Robodo - Processes")
 @SpringComponent
 @UIScope
 @RolesAllowed({UserRole.ROLE_USER, UserRole.ROLE_ADMIN})
@@ -80,8 +79,9 @@ public class UIProcessor extends UIBase {
 	@Autowired
 	public UIProcessor(ProcessService processService, SecurityService securityService) {
 		super(processService, securityService);
-
 		this.processService = processService;
+		
+		setTitle("Process");
 		
 		gridProcessDefinition = new Grid<>(ProcessDefinition.class, false);
 		gridProcessDefinition.addColumn(p -> p.getId()).setHeader("#").setWidth("3em");
@@ -110,7 +110,7 @@ public class UIProcessor extends UIBase {
 				notifyInfo("maximum attempt count changed");
 			});
 			return fld;
-		}).setHeader("Attempt").setAutoWidth(true);
+		}).setHeader("Attempt").setWidth("2em");
 		gridProcessDefinition.addComponentColumn(p->{
 			var fld= makeIntegerMinMaxField(p.getMaxThreadCount(),1,10);
 			fld.addValueChangeListener(e->{
@@ -120,7 +120,7 @@ public class UIProcessor extends UIBase {
 				notifyInfo("maximum thread count changed");
 			});
 			return fld;
-		}).setHeader("Thread").setAutoWidth(true);
+		}).setHeader("Thread").setWidth("2em");
 		gridProcessDefinition.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer");
 
 		gridProcessDefinition.addComponentColumn(p -> {
@@ -134,7 +134,7 @@ public class UIProcessor extends UIBase {
 				btnRun.setEnabled(true);
 			});
 			return btnRun;
-		}).setHeader("Discover");
+		}).setHeader("Discover").setWidth("3em");
 		gridProcessDefinition.addComponentColumn(p -> {
 			Button btnShowSteps = new Button("", new Icon(VaadinIcon.LINES_LIST));
 			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
@@ -144,7 +144,7 @@ public class UIProcessor extends UIBase {
 				btnShowSteps.setEnabled(true);
 			});
 			return btnShowSteps;
-		}).setHeader("Steps");
+		}).setHeader("Steps").setWidth("3em");;
 		
 		gridProcessDefinition.addSelectionListener(e -> {
 			Optional<ProcessDefinition> selection = e.getFirstSelectedItem();
@@ -256,6 +256,7 @@ public class UIProcessor extends UIBase {
 		gridProcessDefinition.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 		gridProcessInstance.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
+		/*
 		VerticalLayout verticalLay=new VerticalLayout(headerOfInstancesLayout(),gridProcessInstance);
 		verticalLay.setWidthFull();
 		
@@ -267,9 +268,13 @@ public class UIProcessor extends UIBase {
 		splitter.setOrientation(Orientation.VERTICAL);
 		splitter.setSplitterPosition(.30);
 		add(splitter);
-		setSizeFull();
+		*/
 		
-		getElement().getStyle().set("height", "100%");
+		add(gridProcessDefinition);
+		add(headerOfInstancesLayout());
+		add(gridProcessInstance);
+
+		
 
 		fillGrid();
 	}
@@ -467,8 +472,7 @@ public class UIProcessor extends UIBase {
 			return;
 		}
 
-		Tokenization token=Tokenization.generateNewToken(processService, "FOR_APPROVAL",instance.getCode(), 30);
-		UI.getCurrent().navigate("/approve/%s/VIEW/SCREEN/%s".formatted(HelperUtil.encrypt(instance.getCode()), token.getToken()));
+		UI.getCurrent().navigate("/approve/%s/VIEW/SCREEN/%s".formatted(HelperUtil.encrypt(instance.getCode()), "notoken"));
 	}
 
 

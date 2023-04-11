@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -12,6 +11,7 @@ import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
@@ -29,6 +29,7 @@ import com.robodo.repo.UserRepo;
 import com.robodo.utils.HelperUtil;
 
 @Service
+@Transactional
 public class ProcessService {
 	
 	@Autowired

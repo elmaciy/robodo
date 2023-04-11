@@ -1,6 +1,5 @@
 package com.robodo.utils;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -87,6 +86,7 @@ public class RunnerUtil {
 				if (step.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)) {
 					logger("stopped at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
 					step.setLogs(logs.toString());
+					RunnerSingleton.getInstance().stop(stepRunningKey);
 					break;
 				}
 				
@@ -94,6 +94,7 @@ public class RunnerUtil {
 					logger("failed at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
 					step.setLogs(logs.toString());
 					step.setFinished(LocalDateTime.now());
+					RunnerSingleton.getInstance().stop(stepRunningKey);
 					break;
 				}
 				
@@ -215,6 +216,7 @@ public class RunnerUtil {
 		String normalizedCommand = normalize(step.getCommands());
 		
 		ExecutionResultsForCommand result =  runCommand(step, normalizedCommand);
+		
 		
 		if (result.getStatus().equals(ExecutionResultsForCommand.STATUS_FAILED)) {
 			logger("Command [%s] execution is failed for step [%s] => %s".formatted(step.getCommands(),step.getStepCode(), result.getMessage()));

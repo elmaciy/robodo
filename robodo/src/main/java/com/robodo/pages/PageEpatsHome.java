@@ -38,4 +38,21 @@ public class PageEpatsHome extends PageEpatsBase {
 		
 	}
 
+	public void navigateEdevletGiris() {
+		int counter=0;
+		while(true) {
+			if (counter++>=10) break;
+			selenium.navigate("https://epats.turkpatent.gov.tr/run/TP/EDEVLET/giris");
+			String currentUrl = selenium.getWebDriver().getCurrentUrl();
+			if (currentUrl.contains("TP/EDEVLET/giris")) {
+				break;
+			}
+			selenium.sleep(3L);
+		}
+
+
+		
+		
+	}
+
 }
