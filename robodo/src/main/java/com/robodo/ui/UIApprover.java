@@ -31,12 +31,8 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 
 @Route(value = "/approve/:instanceId/:action/:source/:token")
-@SpringComponent
-@UIScope
 @AnonymousAllowed
 public class UIApprover extends UIBase   implements BeforeEnterObserver {
 

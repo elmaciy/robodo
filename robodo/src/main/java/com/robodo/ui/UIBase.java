@@ -64,14 +64,9 @@ public class UIBase extends AppLayout {
 		
 		titleH1.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "var(--lumo-space-m)");
 
-        addToNavbar(toggle, titleH1);
-        addToDrawer(getTabs());
-        
-       
-        
-		if(!isAuthenticated()) {
-	        toggle.setVisible(false);
-	        setDrawerOpened(false);
+		if (isAuthenticated()) {
+	        addToNavbar(toggle, titleH1);
+	        addToDrawer(getTabs());
 		}
         
         this.setPrimarySection(Section.NAVBAR);
@@ -97,7 +92,6 @@ public class UIBase extends AppLayout {
 		Tab tabDashboard=createTab(VaadinIcon.COG, "Dashboard");
 		Tab tabLogout=createTab(VaadinIcon.COG, "Logout");
 		
-		
         tabs.add(tabProcess);
         tabs.add(tabParameter);
         tabs.add(tabUsers);
@@ -105,7 +99,20 @@ public class UIBase extends AppLayout {
         tabs.add(tabLogout);
         
         ComponentEventListener<SelectedChangeEvent> selectionChangeListener=(e)->{
-        	if(e.getSelectedTab().equals(tabLogout)) {
+        	Tab selectedTab = e.getSelectedTab();
+        	
+        	if(selectedTab.equals(tabProcess)) {
+        		UI.getCurrent().navigate(UIProcessor.class);
+        	}
+        	else if (selectedTab.equals(tabParameter)) {
+        		UI.getCurrent().navigate(UIParameters.class);
+        	} 
+        	else if (selectedTab.equals(tabUsers)) {
+        		UI.getCurrent().navigate(UIUsers.class);
+        	} 
+        	else if (selectedTab.equals(tabDashboard)) {
+        		UI.getCurrent().navigate(UIDashboard.class);
+        	} else if(selectedTab.equals(tabLogout)) {
         		confirmAndRun("Logout", "Sure to logout", ()->securityService.logout());
         	}
         };

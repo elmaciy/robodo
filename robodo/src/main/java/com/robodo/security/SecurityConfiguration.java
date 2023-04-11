@@ -53,7 +53,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
             UserDetails admin =
                     User.withUsername("admin")
                             .password("{noop}admin123")
-                            .roles("ADMIN")
+                            .roles("ADMIN","USER")
                             .build();
             return new InMemoryUserDetailsManager(user, admin);
     	}
@@ -62,9 +62,9 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     	var userDetailManager = new InMemoryUserDetailsManager();
 
     	List<com.robodo.model.User> activeUsers = processService.getActiveUsers();
-    	System.err.println("size : %d".formatted(activeUsers.size()));
+    	//System.err.println("size : %d".formatted(activeUsers.size()));
         for (var user : activeUsers) {
-        	System.err.println("adding user %s with password %s".formatted(user.getUsername(), user.getPassword()));
+        	//System.err.println("adding user %s with password %s".formatted(user.getUsername(), user.getPassword()));
         	userDetailManager.createUser(user.asUserDetails(processService));
         }
         
