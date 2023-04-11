@@ -658,7 +658,7 @@ public class UIProcessor extends UIBase {
 			lay.add(title);
 			lay.add(getImage(step, file));
 		});	
-		
+		 
 		lay.setSizeFull();
 		
 		return lay;
