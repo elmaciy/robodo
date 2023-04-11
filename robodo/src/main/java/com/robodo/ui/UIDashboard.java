@@ -10,7 +10,7 @@ import com.vaadin.flow.router.Route;
 
 import jakarta.annotation.security.RolesAllowed;
 
-@Route(value = "/parameters")
+@Route(value = "/dashboard")
 @RolesAllowed(UserRole.ROLE_USER)
 public class UIDashboard extends UIBase  {
 
