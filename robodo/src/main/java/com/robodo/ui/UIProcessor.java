@@ -73,7 +73,8 @@ public class UIProcessor extends UIBase {
 		super(processService, securityService);
 		this.processService = processService;
 		
-		setTitle("Process");
+		setTitle("Processes");
+		
 		
 		gridProcessDefinition = new Grid<>(ProcessDefinition.class, false);
 		gridProcessDefinition.addColumn(p -> p.getId()).setHeader("#").setWidth("3em");
@@ -248,19 +249,6 @@ public class UIProcessor extends UIBase {
 		gridProcessDefinition.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 		gridProcessInstance.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
-		/*
-		VerticalLayout verticalLay=new VerticalLayout(headerOfInstancesLayout(),gridProcessInstance);
-		verticalLay.setWidthFull();
-		
-		VerticalLayout layGridTop=new VerticalLayout(gridProcessDefinition);
-		layGridTop.setWidthFull();
-		layGridTop.setHeight(30, Unit.PERCENTAGE);
-
-		SplitLayout  splitter = new SplitLayout(layGridTop, verticalLay);
-		splitter.setOrientation(Orientation.VERTICAL);
-		splitter.setSplitterPosition(.30);
-		add(splitter);
-		*/
 		
 		add(gridProcessDefinition);
 		add(headerOfInstancesLayout());
@@ -371,31 +359,7 @@ public class UIProcessor extends UIBase {
 		});
 		
 		layoutForProcessInstanceTop.add(chWaitingApproval);
-		
-		
-		Button btnShowThreads = new Button("Show Threads", new Icon(VaadinIcon.COG));
-		btnShowThreads.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-		btnShowThreads.setDisableOnClick(true);
-		btnShowThreads.addClickListener(e -> {
-			showThreads();
-			btnShowThreads.setEnabled(true);
-		});
-		layoutForProcessInstanceTop.add(btnShowThreads);
-		
-		/*
-		IntegerField inDays = new IntegerField();
-		chApproval.setId("inDays");
-		inDays.setValue(1);
-		inDays.setStepButtonsVisible(true);
-		inDays.setMin(1);
-		inDays.setMax(100);
-		inDays.setLabel("days or before");
-		inDays.addValueChangeListener(e->{
-			fillProcessInstanceGrid();
-		});
-		
-		layoutForProcessInstanceTop.add(inDays);
-		*/
+	
 		
 		return layoutForProcessInstanceTop;
 	}
@@ -780,77 +744,7 @@ public class UIProcessor extends UIBase {
 		
 	}
 
-	private void showThreads() {
-		Dialog dialog = new Dialog();
-		String title="Threads";
-		dialog.setHeaderTitle(title);
-		
-		VerticalLayout dialogLayout = new VerticalLayout();
-		dialogLayout.setSizeFull();
-		
-		
-
-		//--------------------------------------------------------------------
-		Grid<KeyValue> gridRunningProcessKeys = new Grid<>(KeyValue.class, false);
-		gridRunningProcessKeys.addColumn(p -> p.getKey()).setHeader("Process Key").setAutoWidth(true);
-		gridRunningProcessKeys.addColumn(p -> p.getValue()).setHeader("Start Time").setAutoWidth(true);
-
-		gridRunningProcessKeys.setWidthFull();
-		gridRunningProcessKeys.getColumns().forEach(col->{col.setResizable(true);});
-		gridRunningProcessKeys.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
-
-		gridRunningProcessKeys.setItems(RunnerSingleton.getInstance().getProcesses());
-		
 	
-		//--------------------------------------------------------------------
-		Grid<KeyValue> gridRunningThreadGroup = new Grid<>(KeyValue.class, false);
-		gridRunningThreadGroup.addColumn(p -> p.getKey()).setHeader("Thread group").setAutoWidth(true);
-		gridRunningThreadGroup.addColumn(p -> p.getValue()).setHeader("Active Thread Count").setAutoWidth(true);
-
-		gridRunningThreadGroup.setWidthFull();
-		gridRunningThreadGroup.getColumns().forEach(col->{col.setResizable(true);});
-		gridRunningThreadGroup.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
-
-		gridRunningThreadGroup.setItems(ThreadGroupSingleton.getInstance().getThreadGroupsAsKeyValue());
-
-		//--------------------------------------------------------------------
-		Grid<KeyValue> gridQueue = new Grid<>(KeyValue.class, false);
-		gridQueue.addColumn(p -> p.getKey()).setHeader("Queue Instance Code").setAutoWidth(true);
-		gridQueue.addColumn(p -> p.getValue()).setHeader("Status").setAutoWidth(true);
-
-		gridQueue.setWidthFull();
-		gridQueue.getColumns().forEach(col->{col.setResizable(true);});
-		gridQueue.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
-
-		gridQueue.setItems(QueueSingleton.getInstance().getAllAsKeyValue());
-
-		//-----------------------------------------------------------
-		Button btRefresh = new Button("Refresh all", new Icon(VaadinIcon.REFRESH));
-		btRefresh.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-		btRefresh.addClickListener(e -> {
-			gridRunningProcessKeys.setItems(RunnerSingleton.getInstance().getProcesses());
-			gridRunningThreadGroup.setItems(ThreadGroupSingleton.getInstance().getThreadGroupsAsKeyValue());
-			gridQueue.setItems(QueueSingleton.getInstance().getAllAsKeyValue());
-		});
-
-		dialogLayout.add(btRefresh);
-		HorizontalLayout horizontalLayout = new HorizontalLayout(gridRunningProcessKeys,gridRunningThreadGroup,gridQueue);
-		horizontalLayout.setSizeFull();
-		
-		dialogLayout.add(horizontalLayout);
-		
-		
-		dialog.add(dialogLayout);
-		Button cancelButton = new Button("Close", e -> dialog.close());
-		dialog.getFooter().add(cancelButton);
-		dialog.setWidth("90%");
-		dialog.setHeight("60%");
-		dialog.setResizable(true);
-		dialog.setCloseOnEsc(true);
-		dialog.setCloseOnOutsideClick(true);
-		dialog.open();
-		
-	}
 
 	private void setVariableGridItems(Grid<KeyValue> gridVars, HashMap<String, String> hmVars) {
 		List<KeyValue> items=new ArrayList<KeyValue>();

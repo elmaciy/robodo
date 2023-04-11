@@ -140,7 +140,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			decline(processInstance);
 		});
 		
-		HorizontalLayout buttonsLayout=new HorizontalLayout(makeBackButton(), btApprove, btDecline);
+		HorizontalLayout buttonsLayout=new HorizontalLayout(btApprove, btDecline);
 		buttonsLayout.setWidthFull();
 		buttonsLayout.setAlignItems(Alignment.CENTER);
 		
@@ -176,16 +176,6 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			}
 		}
 		
-	}
-
-	private Button makeBackButton() {
-		Button btBack = new Button("<< Back <<", new Icon(VaadinIcon.BACKWARDS));
-		btBack.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-		btBack.addClickListener(e -> {
-			UI.getCurrent().navigate("/process");
-		});
-		btBack.setVisible(super.isAuthenticated());
-		return btBack;
 	}
 
 	private boolean isApproveable(ProcessInstance processInstance) {
@@ -262,7 +252,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		stepForApproval.setStatus(ProcessInstanceStep.STATUS_COMPLETED);
 		stepForApproval.setApproved(approved);
 		stepForApproval.setApprovalDate(LocalDateTime.now());
-		stepForApproval.setApprovedBy("TBD");
+		stepForApproval.setApprovedBy(getApprovingUser());
 		stepForApproval.setFinished(LocalDateTime.now());
 		
 		if (!approved) {
@@ -277,15 +267,18 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		if (approved && !QueueSingleton.getInstance().inQueue(processInstance)) {
 			QueueSingleton.getInstance().add(processInstance);
 		}
-		
-		/*
-		informAndRun("Completed", "%s successfully.".formatted(approved ? "Approved" : "Declined"), ()->{
-			UI.getCurrent().navigate("/approve/%s/%s/SCREEN".formatted(HelperUtil.encrypt(instanceId),action));
-		});
-		*/
+
 		this.action="VIEW";
 		drawScreen();
 
+	}
+
+	private String getApprovingUser() {
+		if (!isAuthenticated()) {
+			return "EMAIL";
+		}
+		
+		return getAuthenticatedUser();
 	}
 
 }

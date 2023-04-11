@@ -24,9 +24,10 @@
 55. screenshotta exception oldugunda browser acik kaldi. teardown calismadi. neden? 
 
 56. onaylayan kisiyi TBD yerine düzgün setle. mail üzerinden onay oldugunda onaylayan kisiyi nasıl anlayacağız? 
-57. içeriden onaya gidince token e gerek olmamalı. direk sahip oldugu rol yeterli olabilir. ya da sadece login olmuş olması yeterli olmalıdır. 
 58. mailden gelince soldaki menü görünmesin. 
 60. login success sayfasını "/home" ya da process e falan ayarlayalım
+
+61. decline edildikten sonra retry ediyor. etmemeli. atetmpt count olmasa da etmemeli. 
 
 -------------------
 TAMAMLANANLAR 

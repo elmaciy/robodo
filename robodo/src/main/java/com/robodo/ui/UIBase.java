@@ -4,11 +4,16 @@ import java.io.ByteArrayInputStream;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
+import com.robodo.singleton.QueueSingleton;
+import com.robodo.singleton.RunnerSingleton;
+import com.robodo.singleton.ThreadGroupSingleton;
 import com.robodo.utils.HelperUtil;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
@@ -17,26 +22,29 @@ import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.tabs.Tabs.SelectedChangeEvent;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
 
 @SpringComponent
+@Route(value = "/")
+@AnonymousAllowed
 @UIScope
 @PageTitle("Robo.do")
 public class UIBase extends AppLayout {
@@ -48,6 +56,7 @@ public class UIBase extends AppLayout {
 	VerticalLayout root = new VerticalLayout();
 	
 	H1 titleH1 = new H1("Robo.do");
+	String title="";
 	
 	public UIBase(ProcessService processService, SecurityService securityService) {
 		this.processService=processService;
@@ -57,6 +66,7 @@ public class UIBase extends AppLayout {
 		root.setWidth("100%");
 		root.setHeight("100%");
 		root.setSpacing(false);
+		root.setMargin(false);
 		setContent(root);
 		
 		getElement().getStyle().set("height", "100%");
@@ -72,6 +82,7 @@ public class UIBase extends AppLayout {
 		}
         
         this.setPrimarySection(Section.NAVBAR);
+        
 	}
 
 
@@ -80,9 +91,20 @@ public class UIBase extends AppLayout {
 		 return authenticatedUser!=null;
 	}
 
+	public String getAuthenticatedUser() {
+		 UserDetails authenticatedUser = securityService.getAuthenticatedUser();
+		 if (authenticatedUser==null) {
+			 return null;
+		 }
+		 
+		return authenticatedUser.getUsername();
+		 
+	}
+	
 
 	public void setTitle(String title) {
-		titleH1.setText("Robo.do %s".formatted(title));
+		this.title=title;
+		titleH1.setText("Robo.do %s".formatted(this.title));
 	}
 	
 	private VerticalLayout  getRoterLinks() {
@@ -90,108 +112,37 @@ public class UIBase extends AppLayout {
 		VerticalLayout lay=new VerticalLayout();
 
 
-		Button linkProcess = new Button("Processes", new Icon(VaadinIcon.COG));
-		linkProcess.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
-		linkProcess.addClickListener(e -> {
-			UI.getCurrent().navigate(UIProcessor.class);
-		});
+		Button linkProcess =  makeMenuOption("Processes",VaadinIcon.COG.create(),(p)->UI.getCurrent().navigate(UIProcessor.class));
+		Button lnkShowThreads =  makeMenuOption("Thread Info",VaadinIcon.INFO.create(),(p)->showThreads());
+		Button lnkEmailTemplates =  makeMenuOption("Email Templates",VaadinIcon.INBOX.create(),(p)->UI.getCurrent().navigate(UIEmailTemplates.class));
+		Button linkParameters =  makeMenuOption("Parameters",VaadinIcon.PACKAGE.create(),(p)->UI.getCurrent().navigate(UIParameters.class));
+		Button linkUsers =  makeMenuOption("Users",VaadinIcon.USER.create(),(p)->UI.getCurrent().navigate(UIUsers.class));
+		Button linkDashboard =  makeMenuOption("Dashboard",VaadinIcon.DASHBOARD.create(),(p)->UI.getCurrent().navigate(UIDashboard.class));
+		Button btLogout =  makeMenuOption("Logout",VaadinIcon.EXIT.create(),(p)->confirmAndRun("Logout", "Sure to logout", ()->securityService.logout()));
 		
-		Button linkParameters = new Button("Parameters", new Icon(VaadinIcon.PACKAGE));
-		linkParameters.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
-		linkParameters.addClickListener(e -> {
-			UI.getCurrent().navigate(UIParameters.class);
-		});
-		
-		
-		
-		Button linkUsers = new Button("Users", new Icon(VaadinIcon.USER));
-		linkUsers.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
-		linkUsers.addClickListener(e -> {
-			UI.getCurrent().navigate(UIUsers.class);
-		});
-		
-		
-		Button linkDashboard = new Button("Dashboard", new Icon(VaadinIcon.DASHBOARD));
-		linkDashboard.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
-		linkDashboard.addClickListener(e -> {
-			UI.getCurrent().navigate(UIDashboard.class);
-		});
-		
-		
-
-		
-		Button btLogout = new Button("Logout", new Icon(VaadinIcon.EXIT));
-		btLogout.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-		btLogout.addClickListener(e -> {
-			confirmAndRun("Logout", "Sure to logout", ()->securityService.logout());
-		});
 		
 		lay.add(linkProcess);
+		lay.add(lnkShowThreads);
+		lay.add(lnkEmailTemplates);
 		lay.add(linkParameters);
 		lay.add(linkUsers);
 		lay.add(linkDashboard);
 		lay.add(btLogout);
 		
+		lay.setSpacing(false);
+		
 		return lay;
-		
-		/*
-		Tabs tabs = new Tabs();
-		
-		Tab tabProcess=createTab(VaadinIcon.COG, "Proces");
-		Tab tabParameter=createTab(VaadinIcon.COG, "Parameter");
-		Tab tabUsers=createTab(VaadinIcon.COG, "User Management");
-		Tab tabDashboard=createTab(VaadinIcon.COG, "Dashboard");
-		Tab tabLogout=createTab(VaadinIcon.COG, "Logout");
-		
-        tabs.add(tabProcess);
-        tabs.add(tabParameter);
-        tabs.add(tabUsers);
-        tabs.add(tabDashboard);
-        tabs.add(tabLogout);
-        
-        ComponentEventListener<SelectedChangeEvent> selectionChangeListener=(e)->{
-        	Tab selectedTab = e.getSelectedTab();
-        	
-        	if(selectedTab.equals(tabProcess)) {
-        		UI.getCurrent().navigate(UIProcessor.class);
-        	}
-        	else if (selectedTab.equals(tabParameter)) {
-        		UI.getCurrent().navigate(UIParameters.class);
-        	} 
-        	else if (selectedTab.equals(tabUsers)) {
-        		UI.getCurrent().navigate(UIUsers.class);
-        	} 
-        	else if (selectedTab.equals(tabDashboard)) {
-        		UI.getCurrent().navigate(UIDashboard.class);
-        	} else if(selectedTab.equals(tabLogout)) {
-        		confirmAndRun("Logout", "Sure to logout", ()->securityService.logout());
-        	}
-        };
-		tabs.addSelectedChangeListener(selectionChangeListener);
-
-        
-        tabs.setOrientation(Tabs.Orientation.VERTICAL);
-        return tabs;
-        */
 	}
 	
-	private Tab createTab(VaadinIcon viewIcon, String viewName) {
-        Icon icon = viewIcon.create();
-        icon.getStyle().set("box-sizing", "border-box")
-                .set("margin-inline-end", "var(--lumo-space-m)")
-                .set("padding", "var(--lumo-space-xs)");
+	private Button makeMenuOption(String title, Icon icon, ComponentEventListener<ClickEvent<Button>> clickListener) {
+		
+		Button btOption = new Button(title, icon);
+		btOption.setWidthFull();
+		btOption.addThemeVariants(ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_SMALL);
 
-        RouterLink link = new RouterLink();
-        link.add(icon, new Span(viewName));
-        // Demo has no routes
-        // link.setRoute(viewClass.java);
-        link.setTabIndex(-1);
-
-        return new Tab(link);
-    }
-
-	
-
+		btOption.addClickListener(clickListener);
+		return btOption;
+	}
 
 	public void removeAll() {
 		root.removeAll();
@@ -273,6 +224,79 @@ public class UIBase extends AppLayout {
 		integerField.setValue(current);
 		integerField.setStepButtonsVisible(true);
 		return integerField;
+	}
+	
+	
+	public void showThreads() {
+		Dialog dialog = new Dialog();
+		String title="Threads";
+		dialog.setHeaderTitle(title);
+		
+		VerticalLayout dialogLayout = new VerticalLayout();
+		dialogLayout.setSizeFull();
+		
+		
+
+		//--------------------------------------------------------------------
+		Grid<KeyValue> gridRunningProcessKeys = new Grid<>(KeyValue.class, false);
+		gridRunningProcessKeys.addColumn(p -> p.getKey()).setHeader("Process Key").setAutoWidth(true);
+		gridRunningProcessKeys.addColumn(p -> p.getValue()).setHeader("Start Time").setAutoWidth(true);
+
+		gridRunningProcessKeys.setWidthFull();
+		gridRunningProcessKeys.getColumns().forEach(col->{col.setResizable(true);});
+		gridRunningProcessKeys.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
+
+		gridRunningProcessKeys.setItems(RunnerSingleton.getInstance().getProcesses());
+		
+	
+		//--------------------------------------------------------------------
+		Grid<KeyValue> gridRunningThreadGroup = new Grid<>(KeyValue.class, false);
+		gridRunningThreadGroup.addColumn(p -> p.getKey()).setHeader("Thread group").setAutoWidth(true);
+		gridRunningThreadGroup.addColumn(p -> p.getValue()).setHeader("Active Thread Count").setAutoWidth(true);
+
+		gridRunningThreadGroup.setWidthFull();
+		gridRunningThreadGroup.getColumns().forEach(col->{col.setResizable(true);});
+		gridRunningThreadGroup.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
+
+		gridRunningThreadGroup.setItems(ThreadGroupSingleton.getInstance().getThreadGroupsAsKeyValue());
+
+		//--------------------------------------------------------------------
+		Grid<KeyValue> gridQueue = new Grid<>(KeyValue.class, false);
+		gridQueue.addColumn(p -> p.getKey()).setHeader("Queue Instance Code").setAutoWidth(true);
+		gridQueue.addColumn(p -> p.getValue()).setHeader("Status").setAutoWidth(true);
+
+		gridQueue.setWidthFull();
+		gridQueue.getColumns().forEach(col->{col.setResizable(true);});
+		gridQueue.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
+
+		gridQueue.setItems(QueueSingleton.getInstance().getAllAsKeyValue());
+
+		//-----------------------------------------------------------
+		Button btRefresh = new Button("Refresh all", new Icon(VaadinIcon.REFRESH));
+		btRefresh.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+		btRefresh.addClickListener(e -> {
+			gridRunningProcessKeys.setItems(RunnerSingleton.getInstance().getProcesses());
+			gridRunningThreadGroup.setItems(ThreadGroupSingleton.getInstance().getThreadGroupsAsKeyValue());
+			gridQueue.setItems(QueueSingleton.getInstance().getAllAsKeyValue());
+		});
+
+		dialogLayout.add(btRefresh);
+		HorizontalLayout horizontalLayout = new HorizontalLayout(gridQueue, gridRunningProcessKeys,gridRunningThreadGroup);
+		horizontalLayout.setSizeFull();
+		
+		dialogLayout.add(horizontalLayout);
+		
+		
+		dialog.add(dialogLayout);
+		Button cancelButton = new Button("Close", e -> dialog.close());
+		dialog.getFooter().add(cancelButton);
+		dialog.setWidth("60%");
+		dialog.setHeight("60%");
+		dialog.setResizable(true);
+		dialog.setCloseOnEsc(true);
+		dialog.setCloseOnOutsideClick(true);
+		dialog.open();
+		
 	}
 	
 	
