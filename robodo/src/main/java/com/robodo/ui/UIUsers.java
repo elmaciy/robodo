@@ -13,8 +13,6 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import jakarta.annotation.security.RolesAllowed;
 
 @Route(value = "/users")
-@SpringComponent
-@UIScope
 @RolesAllowed(UserRole.ROLE_ADMIN)
 public class UIUsers extends UIBase  {
 

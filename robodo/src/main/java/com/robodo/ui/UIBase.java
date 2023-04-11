@@ -14,6 +14,8 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
@@ -66,7 +68,7 @@ public class UIBase extends AppLayout {
 
 		if (isAuthenticated()) {
 	        addToNavbar(toggle, titleH1);
-	        addToDrawer(getTabs());
+	        addToDrawer(getRoterLinks());
 		}
         
         this.setPrimarySection(Section.NAVBAR);
@@ -83,7 +85,56 @@ public class UIBase extends AppLayout {
 		titleH1.setText("Robo.do %s".formatted(title));
 	}
 	
-	private Tabs  getTabs() {
+	private VerticalLayout  getRoterLinks() {
+		
+		VerticalLayout lay=new VerticalLayout();
+
+
+		Button linkProcess = new Button("Processes", new Icon(VaadinIcon.COG));
+		linkProcess.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
+		linkProcess.addClickListener(e -> {
+			UI.getCurrent().navigate(UIProcessor.class);
+		});
+		
+		Button linkParameters = new Button("Parameters", new Icon(VaadinIcon.PACKAGE));
+		linkParameters.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
+		linkParameters.addClickListener(e -> {
+			UI.getCurrent().navigate(UIParameters.class);
+		});
+		
+		
+		
+		Button linkUsers = new Button("Users", new Icon(VaadinIcon.USER));
+		linkUsers.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
+		linkUsers.addClickListener(e -> {
+			UI.getCurrent().navigate(UIUsers.class);
+		});
+		
+		
+		Button linkDashboard = new Button("Dashboard", new Icon(VaadinIcon.DASHBOARD));
+		linkDashboard.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
+		linkDashboard.addClickListener(e -> {
+			UI.getCurrent().navigate(UIDashboard.class);
+		});
+		
+		
+
+		
+		Button btLogout = new Button("Logout", new Icon(VaadinIcon.EXIT));
+		btLogout.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+		btLogout.addClickListener(e -> {
+			confirmAndRun("Logout", "Sure to logout", ()->securityService.logout());
+		});
+		
+		lay.add(linkProcess);
+		lay.add(linkParameters);
+		lay.add(linkUsers);
+		lay.add(linkDashboard);
+		lay.add(btLogout);
+		
+		return lay;
+		
+		/*
 		Tabs tabs = new Tabs();
 		
 		Tab tabProcess=createTab(VaadinIcon.COG, "Proces");
@@ -121,6 +172,7 @@ public class UIBase extends AppLayout {
         
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
         return tabs;
+        */
 	}
 	
 	private Tab createTab(VaadinIcon viewIcon, String viewName) {
