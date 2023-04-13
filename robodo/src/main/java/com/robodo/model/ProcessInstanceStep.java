@@ -27,6 +27,7 @@ public class ProcessInstanceStep {
 	public static final String STATUS_RUNNING="RUNNING";
 	public static final String STATUS_FAILED="FAILED";
 	public static final String STATUS_COMPLETED="COMPLETED";
+	public static final String STEP_NONE = "NONE";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

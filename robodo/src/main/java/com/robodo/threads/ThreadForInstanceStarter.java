@@ -36,15 +36,18 @@ public class ThreadForInstanceStarter implements Runnable {
 		while(true) {
 
 			ProcessInstance processInstance=QueueSingleton.getInstance().get();
+			
 			if (processInstance==null) {
 				break;
 			}
+
+			ProcessDefinition processDefinition=processService.getProcessDefinitionById(processInstance.getProcessDefinitionId());
 			
-			String threadGroupName=processInstance.getProcessDefinition().getCode();
+			String threadGroupName=processDefinition.getCode();
 			ThreadGroup thGroup=ThreadGroupSingleton.getInstance().getThreadGroupByName(threadGroupName);
 			int activeInstancesCount=ThreadGroupSingleton.getInstance().filteredActiveThreadCount(thGroup);
 			
-			int remaining=processInstance.getProcessDefinition().getMaxThreadCount()-activeInstancesCount;
+			int remaining=processDefinition.getMaxThreadCount()-activeInstancesCount;
 			
 			if (remaining<=0) {
 				break;

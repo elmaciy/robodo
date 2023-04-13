@@ -1,13 +1,11 @@
 package com.robodo.threads;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
-import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 
@@ -36,7 +34,9 @@ public class ThreadForRetryFailed implements Runnable {
 		for (ProcessDefinition processDefinition : processDefinitionsActive) {
 			List<ProcessInstance> instances = processService.getProcessFailedAndToBeRetriedInstances(processDefinition, processDefinition.getMaxThreadCount());
 			instances.forEach(instance->{
-				retryInstance(instance);
+				//retryInstance(instance);
+				retryInstanceStep(instance);
+				processService.deleteAllFiles(instance);
 				processService.saveProcessInstance(instance);
 			});
 		}
@@ -46,7 +46,6 @@ public class ThreadForRetryFailed implements Runnable {
 	}
 
 	private void retryInstance(ProcessInstance instance) {
-		instance.setCurrentStepCode(null);
 		instance.setError(null);
 		instance.setFailed(false);
 		instance.setStarted(null);
@@ -65,6 +64,33 @@ public class ThreadForRetryFailed implements Runnable {
 			step.setStatus(ProcessInstanceStep.STATUS_NEW);
 			
 		}
+		
+	}
+	
+	
+	private void retryInstanceStep(ProcessInstance instance) {
+		
+		
+		ProcessInstanceStep latestProcessedStep = instance.getLatestProcessedStep();
+		if (latestProcessedStep==null) {
+			return;
+		}
+		
+		instance.setError(null);
+		instance.setFailed(false);
+		instance.setFinished(null);
+		instance.setStatus(ProcessInstance.STATUS_RUNNING);
+
+		latestProcessedStep.setApprovalDate(null);
+		latestProcessedStep.setApprovedBy(null);
+		latestProcessedStep.setApproved(false);
+		latestProcessedStep.setError(null);
+		latestProcessedStep.setLogs(null);
+		latestProcessedStep.setStarted(null);
+		latestProcessedStep.setFinished(null);
+		latestProcessedStep.setNotificationSent(false);
+		latestProcessedStep.setStatus(ProcessInstanceStep.STATUS_NEW);
+		
 		
 	}
 

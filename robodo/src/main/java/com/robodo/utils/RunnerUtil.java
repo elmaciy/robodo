@@ -58,7 +58,7 @@ public class RunnerUtil {
 			}
 			processService.saveProcessInstance(result.getProcessInstance());
 
-			ProcessDefinition processDefinition = processInstance.getProcessDefinition();
+			ProcessDefinition processDefinition=processService.getProcessDefinitionById(processInstance.getProcessDefinitionId());
 			ProcessDefinitionStep stepDef = processDefinition.getSteps().stream().filter(p->p.getOrderNo().equals(step.getOrderNo())).findAny().get();
 			String stepRunningKey="$STEP_%s".formatted(stepDef.getCode());
 			try {
@@ -77,7 +77,6 @@ public class RunnerUtil {
 				
 
 				result.getProcessInstance().setStatus(ProcessInstance.STATUS_RUNNING);
-				result.getProcessInstance().setCurrentStepCode(step.getStepCode());
 				
 				RunnerSingleton.getInstance().start(stepRunningKey);
 				
@@ -107,6 +106,7 @@ public class RunnerUtil {
 				step.setStatus(ProcessInstanceStep.STATUS_FAILED);
 				step.setError(e.getMessage());
 				step.setFinished(LocalDateTime.now());
+				//processInstance.setFailed(true);
 				
 				result.setMessage(e.getMessage());
 				result.setStatus(ExecutionResultsForInstance.STATUS_FAILED);
@@ -119,6 +119,7 @@ public class RunnerUtil {
 			RunnerSingleton.getInstance().stop(stepRunningKey);
 			
 			step.setLogs(logs.toString());
+			
 			result.getProcessInstance().setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
 			processService.saveProcessInstance(result.getProcessInstance());
 
@@ -133,12 +134,18 @@ public class RunnerUtil {
 							|| 
 							p.getStatus().equals(ProcessInstanceStep.STATUS_FAILED)
 						);
+		
+		
 
 		result.getProcessInstance().setStatus(allStepsCompleted ? ProcessInstance.STATUS_COMPLETED : ProcessInstance.STATUS_RUNNING);
 		
 		if (allStepsCompleted) {
 			result.getProcessInstance().setFinished(LocalDateTime.now());
 			result.getProcessInstance().setAttemptNo(processInstance.getAttemptNo()+1);
+			
+			boolean anyStepFailed = result.getProcessInstance().getLatestProcessedStep()!=null 
+					&& result.getProcessInstance().getLatestProcessedStep().getStatus().equals(ProcessInstanceStep.STATUS_FAILED);
+			result.getProcessInstance().setFailed(anyStepFailed);
 		} 
 		
 		result.getProcessInstance().setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
@@ -178,6 +185,7 @@ public class RunnerUtil {
 			if (!step.isNotificationSent()) {
 				sendEmailNotificationForApproval(step, arg1);
 				step.setNotificationSent(true);
+				
 			}
 			boolean isApproved = step.isApproved();
 			if (isApproved) {
@@ -189,7 +197,7 @@ public class RunnerUtil {
 			
 		}
 
-		return result;
+		return result.succeeded();
 	}
 
 	private void sendEmailNotificationForApproval(ProcessInstanceStep step, String emailTemplateCode) {
@@ -198,10 +206,7 @@ public class RunnerUtil {
 			throw new RuntimeException("email template %s not found");
 		}
 		
-		boolean isMailSend = HelperUtil.sendEmailByTemplate(emailTemplate, step, this);
-		if (!isMailSend) {
-			throw new RuntimeException("email not sent");
-		}
+		HelperUtil.sendEmailByTemplate(emailTemplate, step, this);
 	}
 
 	private ProcessInstanceStep runStep(ProcessInstance processInstance, ProcessInstanceStep step) {

@@ -30,14 +30,4 @@ public class YillikPatentUcretiTahakkukOlustur extends BaseEpatsSteps {
 		//selenium.stopDriver();
 	}
 
-
-	
-
-
-	
-
-
-
-	
-
 }

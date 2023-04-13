@@ -39,28 +39,4 @@ public class ThreadForExpiredTokenRemoval implements Runnable {
 
 	}
 
-
-	private void retryInstance(ProcessInstance instance) {
-		instance.setCurrentStepCode(null);
-		instance.setError(null);
-		instance.setFailed(false);
-		instance.setStarted(null);
-		instance.setFinished(null);
-		instance.setStatus(ProcessInstance.STATUS_RETRY);
-		
-		for (var step : instance.getSteps()) {
-			step.setApprovalDate(null);
-			step.setApprovedBy(null);
-			step.setApproved(false);
-			step.setError(null);
-			step.setLogs(null);
-			step.setStarted(null);
-			step.setFinished(null);
-			step.setNotificationSent(false);
-			step.setStatus(ProcessInstanceStep.STATUS_NEW);
-			
-		}
-		
-	}
-
 }

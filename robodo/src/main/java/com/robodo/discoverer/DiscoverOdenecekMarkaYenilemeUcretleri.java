@@ -32,8 +32,7 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseDiscoverer {
 			instance.setFinished(null);
 			instance.setAttemptNo(0);
 			instance.setStatus(ProcessInstance.STATUS_NEW);
-			instance.setCurrentStepCode(null);
-			instance.setProcessDefinition(processDefinition);
+			instance.setProcessDefinitionId(processDefinition.getId());
 			instance.setSteps(new ArrayList<ProcessInstanceStep>());
 			
 			HashMap<String, String> hmVars=new HashMap<String, String>();

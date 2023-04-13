@@ -99,7 +99,7 @@ public class HelperUtil {
 		}
 	}
 
-	public static boolean sendEmailByTemplate(EmailTemplate emailTemplate, ProcessInstanceStep step, RunnerUtil runnerUtil) {
+	public static void sendEmailByTemplate(EmailTemplate emailTemplate, ProcessInstanceStep step, RunnerUtil runnerUtil) {
 		String instanceVariables = step.getProcessInstance().getInstanceVariables();
 		HashMap<String, String> hmVars=String2HashMap(instanceVariables);
 		long tokenDuration=Long.valueOf(runnerUtil.processService.getEnv().getProperty("token.duration"));
@@ -107,7 +107,7 @@ public class HelperUtil {
 		hmVars.put("token", token.getToken());
 		emailTemplate.setSubject(replaceVariables(emailTemplate.getSubject(),hmVars));
 		emailTemplate.setBody(replaceVariables(emailTemplate.getBody(), hmVars));
-		return sendEmail(step.getProcessInstance(), emailTemplate, runnerUtil);
+		sendEmail(step.getProcessInstance(), emailTemplate, runnerUtil);
 	}
 
 	
@@ -141,24 +141,25 @@ public class HelperUtil {
 		return List.of("instanceId","processInstance.code").stream().anyMatch(p->p.equals(key));
 	}
 
-	private static boolean sendEmail(ProcessInstance processInstance, EmailTemplate emailTemplate, RunnerUtil runnerUtil) {
-		String from = "yildirayelmaci@gmail.com";
+	private static void sendEmail(ProcessInstance processInstance, EmailTemplate emailTemplate, RunnerUtil runnerUtil) {
+		
+		
+		String from = runnerUtil.getEnvironmentParameter("mail.from");
 		Properties properties = System.getProperties();
 		
-		properties.put("mail.smtp.host", "smtp.gmail.com");
-		properties.put("mail.smtp.port", "465");
-		properties.put("mail.smtp.ssl.enable", "true");
-		properties.put("mail.smtp.auth", "true");
+		properties.put("mail.smtp.host", runnerUtil.getEnvironmentParameter("mail.smtp.host"));
+		properties.put("mail.smtp.port", runnerUtil.getEnvironmentParameter("mail.smtp.port"));
+		properties.put("mail.smtp.ssl.enable", runnerUtil.getEnvironmentParameter("mail.smtp.ssl.enable"));
+		properties.put("mail.smtp.auth", runnerUtil.getEnvironmentParameter("mail.smtp.auth"));
+		
+		String googleAuthKey=runnerUtil.getEnvironmentParameter("mail.google.authentication.key");
 
 		Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(from, "zffxuvhipdjvlfkn");
+                return new PasswordAuthentication(from, googleAuthKey);
             }
         });
-		
-		//test amacli. silinecek sonra
-		//session.setDebug(true);
-		
+
 		try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
@@ -212,27 +213,23 @@ public class HelperUtil {
         	                multipart.addBodyPart(messageImagePart);
         				} catch (MessagingException e) {
         					e.printStackTrace();
-        					runnerUtil.logger("error attaching file [%s] : %s".formatted(file.getDescription(), e.getMessage()));
+        					String err="error attaching file [%s] : %s".formatted(file.getDescription(), e.getMessage());
+        					throw new RuntimeException(err);
         				}
             		}
             	});
     			
             });
-			 
-            
-            
-            
-            
+			
             message.setContent(multipart);
             
             runnerUtil.logger("Sending email [%s] to %s".formatted(emailTemplate.getSubject(), emailTemplate.getToAddress()));
             // Send message
             Transport.send(message);
             runnerUtil.logger("Sent message successfully....");
-            return true;
         } catch (Exception mex) {
-            mex.printStackTrace();
-            return false;
+			String err="error transmitting mail: %s".formatted(mex.getMessage());
+			throw new RuntimeException(err);
         }
 		
 		

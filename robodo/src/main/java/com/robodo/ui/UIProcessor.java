@@ -21,7 +21,6 @@ import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.model.UserRole;
 import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
-import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.singleton.ThreadGroupSingleton;
 import com.robodo.threads.ThreadForInstanceRunner;
@@ -170,7 +169,7 @@ public class UIProcessor extends UIBase {
 			progress.setValue(Double.valueOf(step));
 			return progress;
 		}).setHeader("Progress").setWidth("3em");
-		gridProcessInstance.addColumn(p -> p.getCurrentStepCode()).setHeader("Latest Step").setAutoWidth(true);
+		gridProcessInstance.addColumn(p -> p.getLatestProcessedStep()==null ? ProcessInstanceStep.STEP_NONE : p.getLatestProcessedStep().getStepCode()).setHeader("Latest Step").setAutoWidth(true);
 		gridProcessInstance.addColumn(p -> p.getAttemptNo()).setHeader("Attempt#").setWidth("2em").setTextAlign(ColumnTextAlign.END);
 		gridProcessInstance.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setWidth("3em").setTextAlign(ColumnTextAlign.END);
 		gridProcessInstance.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setWidth("3em").setTextAlign(ColumnTextAlign.END);
@@ -449,7 +448,12 @@ public class UIProcessor extends UIBase {
 		grid.addComponentColumn(p->{
 			Button btnIcon = new Button();
 			btnIcon.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL);
-			if (p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED) && p.isHumanInteractionStep()) {
+			
+			if (!p.isHumanInteractionStep()) {
+				return btnIcon;
+			}
+			
+			if (p.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)) {
 				if (p.isApproved()) {
 					btnIcon.setIcon(VaadinIcon.CHECK.create());
 					btnIcon.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
@@ -459,7 +463,11 @@ public class UIProcessor extends UIBase {
 					btnIcon.addThemeVariants(ButtonVariant.LUMO_ERROR);
 					
 				}
-			} 
+			} else if (p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)) {
+				btnIcon.setIcon(VaadinIcon.CLOCK.create());
+				btnIcon.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+				
+			}
 			
 			return btnIcon;
 		}).setHeader("Approved").setAutoWidth(true);
@@ -601,7 +609,6 @@ public class UIProcessor extends UIBase {
 		
 		processInstance.setStatus(countOfNonNew==0 ? (processInstance.getAttemptNo()==0 ? ProcessInstance.STATUS_NEW : ProcessInstance.STATUS_RETRY) : ProcessInstance.STATUS_RUNNING);
 		processInstance.setFinished(null);
-		processInstance.setCurrentStepCode(countOfNonNew==0 ? null : "BACKWARDED");
 		processInstance.setAttemptNo(Integer.max(processInstance.getAttemptNo()-1, 0));
 
 		processService.saveProcessInstance(processInstance);

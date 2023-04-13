@@ -24,8 +24,6 @@
 
 60. login success sayfasını "/home" ya da process e falan ayarlayalım
 
-61. decline edildikten sonra retry ediyor. etmemeli. atetmpt count==0 olsa da etmemeli.
-
 62. hata aldığında durumun inceleneceği bir ekran yapılmalıdır. diyelim hiç işlem olmadı. o zaman her durumda izleme için link paylaşılmalı. 
 63. gün içinde onay gelmezse, yani belli bir aşamada onay gelmezse ne olacağı ile ilgili kararlar olsun. 
 	işlemi baştan al 
@@ -38,7 +36,8 @@
 67. reddedildiğinde tekrar başlamayacak di mi? arşivlensin, kullanıcı gerekirse statüsünü tekrar taslak a getirsin ve tekrar başlasın. 
 	arşivleme : task arşivlendi koymak.belki tarihle falan. arşiv no gibi. listede direk görünmesin. ama bu şekilde dosya direk alınabilsin. 
 	
-
+70. stepler geri alındıkça variable lar da alınsın. Bunun için stepin başlamadan önceki variableleri saklanır. 
+	en son step alındığında, yani new ya da retry olduğunda başlangıç parametreleri instance dan kopyalansın
 
 //-------------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 

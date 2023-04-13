@@ -95,7 +95,7 @@ public class ProcessService {
 
 		if (!processDefinition.isActive()) return instances;
 		
-		List<ProcessInstance> newInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThan(processDefinition, ProcessInstance.STATUS_NEW, processDefinition.getMaxAttemptCount());
+		List<ProcessInstance> newInstances = processInstanceRepo.findByProcessDefinitionIdAndStatusAndAttemptNoLessThan(processDefinition.getId(), ProcessInstance.STATUS_NEW, processDefinition.getMaxAttemptCount());
 		for (ProcessInstance instance : newInstances) {
 			if (instances.size()>=maxInstance) break;
 			instances.add(instance);
@@ -103,7 +103,7 @@ public class ProcessService {
 		
 		if (instances.size()>=maxInstance) return instances;
 		
-		List<ProcessInstance> retryInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThan(processDefinition, ProcessInstance.STATUS_RETRY, processDefinition.getMaxAttemptCount());
+		List<ProcessInstance> retryInstances = processInstanceRepo.findByProcessDefinitionIdAndStatusAndAttemptNoLessThan(processDefinition.getId(), ProcessInstance.STATUS_RETRY, processDefinition.getMaxAttemptCount());
 		for (ProcessInstance instance : retryInstances) {
 			if (instances.size()>=maxInstance) break;
 			instances.add(instance);
@@ -111,7 +111,7 @@ public class ProcessService {
 		
 		if (instances.size()>=maxInstance) return instances;
 
-		List<ProcessInstance> runningInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThan(processDefinition, ProcessInstance.STATUS_RUNNING, processDefinition.getMaxAttemptCount());
+		List<ProcessInstance> runningInstances = processInstanceRepo.findByProcessDefinitionIdAndStatusAndAttemptNoLessThan(processDefinition.getId(), ProcessInstance.STATUS_RUNNING, processDefinition.getMaxAttemptCount());
 		
 		for (ProcessInstance instance : runningInstances) {
 			if (instances.size()>=maxInstance) break;
@@ -127,22 +127,21 @@ public class ProcessService {
 
 		if (!processDefinition.isActive()) return instances;
 		
-		List<ProcessInstance> newInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThanAndFailed(processDefinition, ProcessInstance.STATUS_COMPLETED, processDefinition.getMaxAttemptCount(),true);
+		List<ProcessInstance> newInstances = processInstanceRepo.findByProcessDefinitionIdAndStatusAndAttemptNoLessThanAndFailed(processDefinition.getId(), ProcessInstance.STATUS_COMPLETED, processDefinition.getMaxAttemptCount(),true);
 		for (ProcessInstance instance : newInstances) {
+
+			ProcessInstanceStep currentStep=instance.getCurrentStep();
+						
+			if (currentStep!=null &&  currentStep.isHumanInteractionStep() && currentStep.isNotificationSent() && !currentStep.isApproved()) {
+				continue;
+			}
+			
 			if (instances.size()>=maxInstance) break;
 			instances.add(instance);
 		}
 		
 		if (instances.size()>=maxInstance) return instances;
-		
-		List<ProcessInstance> runningInstances = processInstanceRepo.findByProcessDefinitionAndStatusAndAttemptNoLessThanAndFailed(processDefinition, ProcessInstance.STATUS_COMPLETED, processDefinition.getMaxAttemptCount(), true);
-		
-		for (ProcessInstance instance : runningInstances) {
-			if (instances.size()>=maxInstance) break;
-			instances.add(instance);
-		}
-		
-	
+
 		return instances;
 	}
 
@@ -151,11 +150,11 @@ public class ProcessService {
 	}
 
 	public List<ProcessInstance> getProcessInstancesByProcessDefinition(ProcessDefinition processDefinition) {
-		return processInstanceRepo.findByProcessDefinition(processDefinition);
+		return processInstanceRepo.findByProcessDefinitionId(processDefinition.getId());
 	}
 	
 	public List<ProcessInstance> getProcessInstancesByProcessDefinitionAndStatus(ProcessDefinition processDefinition, String status) {
-		return processInstanceRepo.findByProcessDefinitionAndStatus(processDefinition, status);
+		return processInstanceRepo.findByProcessDefinitionIdAndStatus(processDefinition.getId(), status);
 	}
 	
 	public EmailTemplate getEmailTemplateByCode(String code) {
@@ -184,6 +183,12 @@ public class ProcessService {
 		
 	}
 
+	public void deleteAllFiles(ProcessInstance instance) {
+		instance.getSteps().forEach(step->{
+			processInstanceStepFileRepo.deleteByProcessInstanceStepId(step.getId());	
+		});
+	}
+	
 	public void deleteAllStepFiles(ProcessInstanceStep step) {
 		processInstanceStepFileRepo.deleteByProcessInstanceStepId(step.getId());
 		
@@ -233,6 +238,10 @@ public class ProcessService {
 
 	public List<User> getActiveUsers() {
 		return userRepo.findByValid(true);		
+	}
+
+	public ProcessDefinition getProcessDefinitionById(Long processDefinitionId) {
+		return getProcessDefinitions().stream().filter(p->p.getId().equals(processDefinitionId)).findFirst().get();
 	}
 
 	

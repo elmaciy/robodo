@@ -14,7 +14,6 @@ import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.QueueSingleton;
 import com.robodo.utils.HelperUtil;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H1;
@@ -259,6 +258,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			processInstance.setStatus(ProcessInstance.STATUS_COMPLETED);
 			processInstance.setError(approved ? null : "declined by user");
 			processInstance.setFailed(true);
+			processInstance.setAttemptNo(processInstance.getAttemptNo()+1);
 		} 
 		
 		

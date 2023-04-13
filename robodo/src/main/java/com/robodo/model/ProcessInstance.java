@@ -43,17 +43,12 @@ public class ProcessInstance {
 	LocalDateTime finished;
 	LocalDateTime queued;
 	String status;
-	@Column(length = 255)
-	String currentStepCode;
 	@Column(columnDefinition = "mediumtext")
 	String error;
 	boolean failed=false;
 	@Column(columnDefinition = "mediumtext")
-	String instanceVariables;
-	
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "process_definition_id", nullable = false)
-	ProcessDefinition processDefinition;
+	String instanceVariables;	
+	Long processDefinitionId;
 	
 	@OneToMany(mappedBy = "processInstance", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	List<ProcessInstanceStep> steps;
@@ -131,22 +126,12 @@ public class ProcessInstance {
 		this.status = status;
 	}
 
-
-
-	public String getCurrentStepCode() {
-		return currentStepCode;
+	public Long getProcessDefinitionId() {
+		return processDefinitionId;
 	}
 
-	public void setCurrentStepCode(String currentStepCode) {
-		this.currentStepCode = currentStepCode;
-	}
-
-	public ProcessDefinition getProcessDefinition() {
-		return processDefinition;
-	}
-
-	public void setProcessDefinition(ProcessDefinition processDefinition) {
-		this.processDefinition = processDefinition;
+	public void setProcessDefinitionId(Long processDefinitionId) {
+		this.processDefinitionId = processDefinitionId;
 	}
 
 	public List<ProcessInstanceStep> getSteps() {
@@ -197,7 +182,7 @@ public class ProcessInstance {
 		}
 		
 		if (this.getStatus().equals(STATUS_COMPLETED)) {
-			return this.steps.get(this.steps.size()-1);
+			return this.getLatestProcessedStep();
 		}
 		
 		List<ProcessInstanceStep> runningSteps = this.steps.stream()
@@ -211,6 +196,19 @@ public class ProcessInstance {
 		return runningSteps.get(runningSteps.size()-1);
  	}
 	
+	public ProcessInstanceStep getLatestProcessedStep() {
+		ProcessInstanceStep latestProcessedStep=null;
+		for (ProcessInstanceStep step : this.getSteps()) {
+			if (step.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
+				break;
+			} 
+
+			latestProcessedStep=step;
+		}
+		
+		return latestProcessedStep;
+	}
+
 	public List<ProcessInstanceStep> getPreviousSteps(ProcessInstanceStep refStep) {
 		return this.steps.stream().filter(p->p.getOrderNo().compareTo(refStep.getOrderNo())<0)
 				.collect(Collectors.toList());

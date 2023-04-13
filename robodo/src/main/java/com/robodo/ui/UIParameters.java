@@ -7,8 +7,6 @@ import com.robodo.model.UserRole;
 import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 
 import jakarta.annotation.security.RolesAllowed;
 

@@ -31,11 +31,6 @@ public class ProcessDefinition {
 	Integer maxAttemptCount;
 	Integer maxThreadCount;
 	boolean isActive;
-
-	
-	@OneToMany(mappedBy = "processDefinition", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	List<ProcessInstance> instances;
-	
 	LocalDateTime created;
 	LocalDateTime updated;
 	
@@ -77,12 +72,7 @@ public class ProcessDefinition {
 	public void setMaxAttemptCount(Integer maxAttemptCount) {
 		this.maxAttemptCount = maxAttemptCount;
 	}
-	public List<ProcessInstance> getInstances() {
-		return instances;
-	}
-	public void setInstances(List<ProcessInstance> instances) {
-		this.instances = instances;
-	}
+	
 	public Integer getMaxThreadCount() {
 		return maxThreadCount;
 	}
