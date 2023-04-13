@@ -4,10 +4,8 @@
 20. eski işi bitenleri belli bir gün geçince arşivleyip silelim. 
 56. isin sonunda notifikasyon gonderilmesi gerekir mi? 
 
-31. human notificationda email gitmezse tekrar deneyecek mi? 
-34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı?
+
 16. kurulan yerde chrome güncellenmemeli
-35. Ödeme aşamalarında bir şekilde o işlemin arada manual ödenip ödenmediğini kontrol edebilir miyiz? 
 37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
 38. gizli bilgileirn, mail parametrelerini, kredi kartı gibi kuruma özel bilgileri properties yerine parametre dosyasından aldır. Bussinessvariables olsun bunlar
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
@@ -16,18 +14,39 @@
 47. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 48. instance gridine sıralama koy. kolonlarına da filtre koy. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
-15. login ekranı konulacak
+
 56. email template ekranı yaz 
-57. file tablosunda step_id+description unique key koy ya da dosya adi olustururken sira noyu da kullan. 
-58. hepsini birden koşunca $STEP_MARKA_ONAY_BEKLE lar kalıyor thread ekranında. 
 
 55. screenshotta exception oldugunda browser acik kaldi. teardown calismadi. neden? 
 
-56. onaylayan kisiyi TBD yerine düzgün setle. mail üzerinden onay oldugunda onaylayan kisiyi nasıl anlayacağız? 
-58. mailden gelince soldaki menü görünmesin. 
+31. human notificationda email gitmezse tekrar deneyecek mi? 
+34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
+
 60. login success sayfasını "/home" ya da process e falan ayarlayalım
 
-61. decline edildikten sonra retry ediyor. etmemeli. atetmpt count olmasa da etmemeli. 
+61. decline edildikten sonra retry ediyor. etmemeli. atetmpt count==0 olsa da etmemeli.
+
+62. hata aldığında durumun inceleneceği bir ekran yapılmalıdır. diyelim hiç işlem olmadı. o zaman her durumda izleme için link paylaşılmalı. 
+63. gün içinde onay gelmezse, yani belli bir aşamada onay gelmezse ne olacağı ile ilgili kararlar olsun. 
+	işlemi baştan al 
+	şu adıma geri al
+	şu işlemi adımı çalıştır. 
+	işlemi komple arşivle/sil (ki tekrar alabilsin). 
+	
+64. işlemlerin çalışmayacağı zaman aralıkları olmalı. Mesela bazı işlemler öğlene kadar yapılabilir gibi... hatta bazı günler olmalı falan...
+
+67. reddedildiğinde tekrar başlamayacak di mi? arşivlensin, kullanıcı gerekirse statüsünü tekrar taslak a getirsin ve tekrar başlasın. 
+	arşivleme : task arşivlendi koymak.belki tarihle falan. arşiv no gibi. listede direk görünmesin. ama bu şekilde dosya direk alınabilsin. 
+	
+
+
+//-------------------------------------------
+1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
+2. RPA işlemi aldıktan sonra statüyü "RPA işlemde" olarak güncelleyecek. bu aşamada kontrol linki direk paylaşılacak ki ekrandan durum görülebilsin. 
+3. Tahakkuk oluşturulduktan sonra statü "RPA Tahakkuk" olarak güncellencek ve yanısıra a) tahakkukno, b) onay/red/kontrol linkleri sağlanacak
+4. Onay alınıp işlem devam bittikten sonra statü "RPA ödeme"  olarak güncellenecek ve yanısıra a) dekont no sağlanacak. 
+5. Admin ekranı tamamlanınca, işlem tipine göre kredi kartı bilgilerini sağlayan servis geliştirilecek. Bu servisteki kredi kartı ödeme aşamasında çekilip kullanılacak. 
+Not : her işlem tipi için farklı kredi kartı kullanılacak. 
 
 -------------------
 TAMAMLANANLAR 
@@ -57,4 +76,7 @@ TAMAMLANANLAR
 51. Onaydan sonra ekran refresh olmuyor. 
 50. ss leri koydugumuz dizin process name e gore olusturuldugundan, sikinti olabilir. Burada baska bir yontem bulunsun. 
 53. tablolara update date ve create date alanları koyalım 
-
+58. hepsini birden koşunca $STEP_MARKA_ONAY_BEKLE lar kalıyor thread ekranında. 
+58. mailden gelince soldaki menü görünmesin. 
+56. onaylayan kisiyi TBD yerine düzgün setle. mail üzerinden onay oldugunda onaylayan kisiyi nasıl anlayacağız? 
+15. login ekranı konulacak
