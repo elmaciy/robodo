@@ -163,7 +163,7 @@ public class SeleniumUtil {
 	}
 
 	public byte[] screenShotAsByteArray(ProcessInstance processInstance) {
-		waitPageLoaded();
+		//waitPageLoaded();
 		TakesScreenshot scrShot =((TakesScreenshot) webDriver);
 		return scrShot.getScreenshotAs(OutputType.BYTES);
 	}
@@ -244,11 +244,19 @@ public class SeleniumUtil {
 	}
 
 	public void waitPageLoaded() {
+		long timeout = webDriver.manage().timeouts().getImplicitWaitTimeout().toMillis();
+		long startTs=System.currentTimeMillis();
 		while(true) {
 			 JavascriptExecutor executor = (JavascriptExecutor) webDriver;
 			boolean readyStateComplete = ((String) executor.executeScript("return document.readyState")).equals("complete"); 
-			if (readyStateComplete) break;
+			if (readyStateComplete) {
+				break;
+			}
+			if ((System.currentTimeMillis()-startTs) > timeout) {
+				break;
+			}
 			sleep(1L);
+			
 		}
 		
 	}

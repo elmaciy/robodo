@@ -59,7 +59,6 @@ public class UIProcessor extends UIBase {
 
 	private static final long serialVersionUID = 1L;
 
-	static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
 	ProcessService processService;
 
@@ -148,13 +147,16 @@ public class UIProcessor extends UIBase {
 
 		// --------------------------------------------------------------------
 		gridProcessInstance = new Grid<>(ProcessInstance.class, false);
-		gridProcessInstance.addColumn(p -> p.getId()).setHeader(makeInstaceGridRefresherButton()).setAutoWidth(true)
-				.setFrozen(true).setTextAlign(ColumnTextAlign.END);
-		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true).setFrozen(true);
+		gridProcessInstance.addColumn(p -> p.getId()).setHeader("#").setAutoWidth(true)
+				.setFrozen(true).setTextAlign(ColumnTextAlign.END).setSortable(true);
+		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true).setFrozen(true).setSortable(true);
 		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true)
-				.setFrozen(true).setVisible(false);
-		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("3em").setFrozen(true);
-		gridProcessInstance.addColumn(p -> p.getError()).setHeader("Error").setWidth("10em");
+				.setFrozen(true).setSortable(true).setVisible(false);
+		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("3em").setFrozen(true).setSortable(true);
+		gridProcessInstance.addComponentColumn(p -> makeTrueFalseIcon(!p.isFailed(),VaadinIcon.CHECK.create(), VaadinIcon.CLOSE.create()))
+			.setHeader("Res.").setWidth("3em").setSortable(true).setTextAlign(ColumnTextAlign.CENTER);
+		gridProcessInstance.addColumn(p -> p.getError()).setHeader("Error").setWidth("10em").setSortable(true)
+			.setTooltipGenerator(p->HelperUtil.limitString(p.getError(), 1000));
 		gridProcessInstance.addComponentColumn(p -> {
 			ProgressBar progress = new ProgressBar();
 			progress.setMax(Double.valueOf(p.getSteps().size()));
@@ -162,11 +164,11 @@ public class UIProcessor extends UIBase {
 					&& !s.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)).count();
 			progress.setValue(Double.valueOf(step));
 			return progress;
-		}).setHeader("Progress").setWidth("3em");
+		}).setHeader("Progress").setWidth("3em").setSortable(true);
 		gridProcessInstance.addColumn(p -> p.getLatestProcessedStep() == null ? ProcessInstanceStep.STEP_NONE
-				: p.getLatestProcessedStep().getStepCode()).setHeader("Latest Step").setAutoWidth(true);
+				: p.getLatestProcessedStep().getStepCode()).setHeader("Latest Step").setAutoWidth(true).setSortable(true);
 		gridProcessInstance.addColumn(p -> p.getAttemptNo()).setHeader("Attempt#").setWidth("2em")
-				.setTextAlign(ColumnTextAlign.END);
+				.setTextAlign(ColumnTextAlign.END).setSortable(true);
 		gridProcessInstance.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setWidth("3em")
 				.setTextAlign(ColumnTextAlign.END).setVisible(false);
 		gridProcessInstance.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setWidth("3em")
@@ -286,22 +288,6 @@ public class UIProcessor extends UIBase {
 		notifyInfo(" instance %s is removed".formatted(processInstance.getCode()));
 	}
 
-	private Component makeInstaceGridRefresherButton() {
-		Button btnRefresh = new Button("", new Icon(VaadinIcon.REFRESH));
-		btnRefresh.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-		btnRefresh.setDisableOnClick(true);
-		btnRefresh.addClickListener(e -> {
-			Set<ProcessDefinition> selectedProcessDefiniton = gridProcessDefinition.getSelectedItems();
-			if (selectedProcessDefiniton.isEmpty()) {
-				gridProcessInstance.setItems(Collections.emptyList());
-			} else {
-				fillProcessInstanceGrid(selectedProcessDefiniton.iterator().next());
-			}
-			btnRefresh.setEnabled(true);
-		});
-
-		return btnRefresh;
-	}
 
 	boolean instanceFilterNew = true;
 	boolean instanceFilterCompleted = false;
@@ -318,6 +304,19 @@ public class UIProcessor extends UIBase {
 
 		layoutForProcessInstanceTop.setSizeUndefined();
 		layoutForProcessInstanceTop.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+
+		Button btnRefresh = new Button("", new Icon(VaadinIcon.REFRESH));
+		btnRefresh.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+		btnRefresh.setDisableOnClick(true);
+		btnRefresh.addClickListener(e -> {
+			Set<ProcessDefinition> selectedProcessDefiniton = gridProcessDefinition.getSelectedItems();
+			if (selectedProcessDefiniton.isEmpty()) {
+				gridProcessInstance.setItems(Collections.emptyList());
+			} else {
+				fillProcessInstanceGrid(selectedProcessDefiniton.iterator().next());
+			}
+			btnRefresh.setEnabled(true);
+		});
 		
 		chAnyMatch = new Checkbox();
 		chAnyMatch.setValue(false);
@@ -335,11 +334,14 @@ public class UIProcessor extends UIBase {
 		searchField.setValueChangeMode(ValueChangeMode.LAZY);
 		searchField.setValueChangeTimeout(1000);
 		searchField.setWidth("20em");
+		searchField.setPlaceholder("Search for");
 		
 		searchField.addValueChangeListener(e->{
 			fillProcessInstanceGrid();
 		});
 		
+		layoutForProcessInstanceTop.add(btnRefresh);
+
 		
 		layoutForProcessInstanceTop.add(searchField);
 		
@@ -458,11 +460,6 @@ public class UIProcessor extends UIBase {
 
 	}
 
-	private String dateFormat(LocalDateTime local) {
-		if (local == null)
-			return null;
-		return local.format(formatter);
-	}
 
 	private void approveProcessInstance(ProcessInstance instance) {
 		Optional<ProcessInstanceStep> stepOpt = instance.getSteps().stream()

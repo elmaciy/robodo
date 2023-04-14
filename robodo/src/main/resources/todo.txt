@@ -48,6 +48,13 @@
 
 81. silme yerine arşive taşıma yapalım. 
 	Aramaya arşivde ara seçeneği eklenirse arşivde de arama yapar. 
+	
+82. şurada işlem yarım kaldı. sistem error vermedi. 
+	işi başlat. login olurken browseri direk kapat. 
+	
+83. thread windowundaki kuyruk ve thread lar sıfırlanabilmelidir. 
+
+84. Kullanıcı last login ve last password change bir de update falan alanları koy. 
 
 //-------------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 

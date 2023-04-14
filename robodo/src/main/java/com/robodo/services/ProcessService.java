@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
@@ -29,6 +30,7 @@ import com.robodo.repo.ProcessInstanceStepFileRepo;
 import com.robodo.repo.TokenizationRepo;
 import com.robodo.repo.UserRepo;
 import com.robodo.utils.HelperUtil;
+import com.vaadin.flow.data.provider.DataProvider;
 
 @Service
 @Transactional
@@ -272,6 +274,10 @@ public class ProcessService {
 
 	public void deleteProcessInstance(ProcessInstance processInstance) {
 		processInstanceRepo.delete(processInstance);
+	}
+
+	public List<User> getUsersAll() {
+		return Lists.newArrayList(userRepo.findAll());
 	}
 
 	

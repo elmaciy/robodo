@@ -1,6 +1,8 @@
 package com.robodo.ui;
 
 import java.io.ByteArrayInputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -301,6 +303,30 @@ public class UIBase extends AppLayout {
 		
 	}
 	
+	static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+
+	public String dateFormat(LocalDateTime local) {
+		if (local == null)
+			return null;
+		return local.format(formatter);
+	}
+	
+	
+	public Button makeTrueFalseIcon(boolean isSuccess,Icon iconForSuccess, Icon iconForFail) {
+		
+		Button btn = new Button("");
+		btn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL);
+		if (isSuccess) {
+			btn.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+			btn.setIcon(iconForSuccess);
+		}  else {
+			btn.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+			btn.setIcon(iconForFail);
+		}
+		
+		return btn;
+	}
 	
 
 }

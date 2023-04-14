@@ -48,11 +48,18 @@ public abstract class BaseSteps {
 		 if (actionBefore!=null) {
 			 actionBefore.run();
 		 }
-		 
-		 byte[] screenShotAsByteArray = selenium.screenShotAsByteArray(processInstanceStep.getProcessInstance());
-		 ProcessInstanceStepFile file=new ProcessInstanceStepFile();
-		 file.setFileOrder(fileOrder++);
-		 file.setMimeType(ProcessInstanceStepFile.MIME_TYPE_SCREENSHOT);
+		 byte[] screenShotAsByteArray = null;
+		 ProcessInstanceStepFile file = null;
+		 try {
+			 screenShotAsByteArray = selenium.screenShotAsByteArray(processInstanceStep.getProcessInstance());
+			 file=new ProcessInstanceStepFile();
+			 file.setFileOrder(fileOrder++);
+			 file.setMimeType(ProcessInstanceStepFile.MIME_TYPE_SCREENSHOT);
+		 } catch(Exception e) {
+			 e.printStackTrace();
+			 throw new RuntimeException("Exception takeStepScreenShot in converting screenshot content : %s".formatted(e.getMessage()));
+		 }
+		
 		 Blob blobContent=null;
 		 try {
 			 blobContent= new SerialBlob(screenShotAsByteArray);

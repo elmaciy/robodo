@@ -68,4 +68,11 @@ public class UserRole {
 	protected void onCreate() {
 		this.created = LocalDateTime.now();
 	}
+
+	@Override
+	public String toString() {
+		return role;
+	}
+	
+	
 }
