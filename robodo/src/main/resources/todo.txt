@@ -1,43 +1,53 @@
-17. alarm oluştur ve threshold belirle, bu aşılınca mail gitsin biryerlere, bu sayede bir problem olup olmadığını anlarız. 
-	a. uzun süredir hiçbir süreç discover edilmiyor
-	b. kuyruk azalmiyor
-20. eski işi bitenleri belli bir gün geçince arşivleyip silelim. 
-56. isin sonunda notifikasyon gonderilmesi gerekir mi? 
+17. dashboardda iş bazında bekleyenler, tamamlananlar vs görünsün. 
 
+56. isin sonunda notifikasyon gonderilmesi gerekir mi? 
+	Bunu bir step olarak ekleyelim. 
+	human interaction a benzesin ve istenirse eklensin. 
 
 16. kurulan yerde chrome güncellenmemeli
-37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? context vs koyarak halledilebilir belki de. 
-38. gizli bilgileirn, mail parametrelerini, kredi kartı gibi kuruma özel bilgileri properties yerine parametre dosyasından aldır. Bussinessvariables olsun bunlar
+
+37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? 
+	context vs koyarak halledilebilir belki de. 
+
+38. gizli bilgileirn, mail parametrelerini, kredi kartı gibi kuruma özel bilgileri properties yerine parametre dosyasından aldır. 
+	Bussinessvariables olsun bunlar ve env parametrelerini ezsin aynı parametre burada da tanımlı ise
+	Aynı ekrana ayrıca tüm env parametrelerinin listelenmesini sağla. orada env parametresini de görsün. 
+	
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
-40. ödeme stepinin singleAtATime özelliği programatik olarak direk true yap. yani ne olursa olsun o stepten başka olmasın. tanım yanlış da olsa kodda bu ezilsin. 
+	 
+40. ödeme stepinin singleAtATime özelliği programatik olarak direk true yap.
+	yani ne olursa olsun o stepten başka olmasın. tanım yanlış da olsa kodda bu ezilsin. 
+
+
+56. email template ekranı yaz 
+
+57. User management ekranı yaz. Userlerin ldap dan da doğrulanabilmesi mümkün olsun sonrasında. 
+	3 rol olmalı => ADMIN, SUPERVISOR, USER
+	Admin ile SUPERVISOR arasında fark var. ADMIN sistemin sahibi, SUPERVISOR şirketin. 
+
+55. screenshotta exception oldugunda browser acik kaldi. teardown calismadi. neden? 
+
+34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
+
+60. login success sayfasını "/home" ya da process e falan ayarlayalım
+	
+64. işlemlerin çalışmayacağı zaman aralıkları olmalı. 
+	Mesela bazı işlemler öğlene kadar yapılabilir gibi... 
+	hatta bazı günlerde hiç çalışma olmamalı falan...
+	
+71. process definitions a bunu görebileceklerin listesini mi eklesek? sadece o kişiler ya da o roldekiler bu işlemi  görebilecek böylece. 
+
+72. backward yapınca  variable leri de eski haline nasıl getirebiliriz? 
+	Bunun için stepin başlamadan önceki variableleri saklanır. 
+	en son step alındığında, yani new ya da retry olduğunda başlangıç parametreleri instance dan kopyalansın
+
 47. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 48. instance gridine sıralama koy. kolonlarına da filtre koy. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
 
-56. email template ekranı yaz 
-
-55. screenshotta exception oldugunda browser acik kaldi. teardown calismadi. neden? 
-
-31. human notificationda email gitmezse tekrar deneyecek mi? 
-34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
-
-60. login success sayfasını "/home" ya da process e falan ayarlayalım
-
-62. hata aldığında durumun inceleneceği bir ekran yapılmalıdır. diyelim hiç işlem olmadı. o zaman her durumda izleme için link paylaşılmalı. 
-63. gün içinde onay gelmezse, yani belli bir aşamada onay gelmezse ne olacağı ile ilgili kararlar olsun. 
-	işlemi baştan al 
-	şu adıma geri al
-	şu işlemi adımı çalıştır. 
-	işlemi komple arşivle/sil (ki tekrar alabilsin). 
-	
-64. işlemlerin çalışmayacağı zaman aralıkları olmalı. Mesela bazı işlemler öğlene kadar yapılabilir gibi... hatta bazı günler olmalı falan...
-
-67. reddedildiğinde tekrar başlamayacak di mi? arşivlensin, kullanıcı gerekirse statüsünü tekrar taslak a getirsin ve tekrar başlasın. 
-	arşivleme : task arşivlendi koymak.belki tarihle falan. arşiv no gibi. listede direk görünmesin. ama bu şekilde dosya direk alınabilsin. 
-	
-70. stepler geri alındıkça variable lar da alınsın. Bunun için stepin başlamadan önceki variableleri saklanır. 
-	en son step alındığında, yani new ya da retry olduğunda başlangıç parametreleri instance dan kopyalansın
+81. silme yerine arşive taşıma yapalım. 
+	Aramaya arşivde ara seçeneği eklenirse arşivde de arama yapar. 
 
 //-------------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -79,3 +89,5 @@ TAMAMLANANLAR
 58. mailden gelince soldaki menü görünmesin. 
 56. onaylayan kisiyi TBD yerine düzgün setle. mail üzerinden onay oldugunda onaylayan kisiyi nasıl anlayacağız? 
 15. login ekranı konulacak
+50. arama kutuucğu koy. bununla instance id içinde ve variables içinde like ile arayabilsin. 
+80. instance silme olsun. Confirmation.

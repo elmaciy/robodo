@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Splitter;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
@@ -153,10 +155,34 @@ public class ProcessService {
 		return processInstanceRepo.findByProcessDefinitionId(processDefinition.getId());
 	}
 	
-	public List<ProcessInstance> getProcessInstancesByProcessDefinitionAndStatus(ProcessDefinition processDefinition, String status) {
-		return processInstanceRepo.findByProcessDefinitionIdAndStatus(processDefinition.getId(), status);
+	public List<ProcessInstance> getProcessInstancesByProcessDefinitionAndStatusAndSearchString(
+			ProcessDefinition processDefinition, String status, 
+			String searchString, boolean anyMatches) {
+		var results= processInstanceRepo.findByProcessDefinitionIdAndStatus(processDefinition.getId(), status);
+		return results.stream()
+				.filter(p-> {
+					String str="%s %s %s".formatted(p.getCode(),p.getDescription(),p.getInstanceVariables());
+					return containsString(str,searchString,anyMatches);
+				})
+				.collect(Collectors.toList());
 	}
 	
+	private boolean containsString(String string, String searchString, boolean anyMatches) {
+		String clearedSearchString=searchString.replaceAll(" |\t", " ").strip();
+		if (clearedSearchString.isBlank()) {
+			return true;
+		}
+		
+		List<String> keywords = Splitter.on(" ").omitEmptyStrings().splitToList(clearedSearchString);
+
+		if (anyMatches) {
+			return keywords.stream().anyMatch(kw->StringUtils.containsIgnoreCase(string,kw));
+		}
+		
+		return keywords.stream().allMatch(kw->StringUtils.containsIgnoreCase(string,kw));
+
+	}
+
 	public EmailTemplate getEmailTemplateByCode(String code) {
 		List<EmailTemplate> list = emailTemplateRepo.findByCode(code);
 		if (list.size()==0) {
@@ -242,6 +268,10 @@ public class ProcessService {
 
 	public ProcessDefinition getProcessDefinitionById(Long processDefinitionId) {
 		return getProcessDefinitions().stream().filter(p->p.getId().equals(processDefinitionId)).findFirst().get();
+	}
+
+	public void deleteProcessInstance(ProcessInstance processInstance) {
+		processInstanceRepo.delete(processInstance);
 	}
 
 	

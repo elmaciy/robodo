@@ -31,6 +31,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.nimbusds.jose.shaded.json.JSONArray;
@@ -362,6 +364,19 @@ public class HelperUtil {
 	    	e.printStackTrace();
 	    	return created;
 	    } 
+	}
+
+
+	public static String limitString(String value, int maxLen) {
+		if (value==null) {
+			return null;
+		}
+		
+		if (value.length()<=maxLen) {
+			return value;
+		}
+		
+		return "%s...".formatted(StringUtils.left(value, maxLen));
 	}
 	
 }

@@ -223,6 +223,8 @@ public class UIBase extends AppLayout {
 		integerField.setWidthFull();
 		integerField.setValue(current);
 		integerField.setStepButtonsVisible(true);
+		integerField.setAutofocus(false);
+		integerField.setAutoselect(false);
 		return integerField;
 	}
 	

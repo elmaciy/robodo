@@ -303,7 +303,7 @@ public class RunnerUtil {
 
 	public void logger(String logStr) {
 		String str = "%s - %s".formatted(new Date().toString(), logStr);
-		System.err.println(str);
+		System.out.println(str);
 		logs.append(str + "\n");
 
 	}

@@ -235,5 +235,13 @@ public class ProcessInstance {
 				!currentStep.isApproved();
 	}
 
+	public boolean isTheLatestStep(ProcessInstanceStep step) {
+		ProcessInstanceStep latestProcessedStep = this.getLatestProcessedStep();
+		if (latestProcessedStep==null) {
+			return false;
+		}
+		return latestProcessedStep.getStepCode().equals(step.getStepCode());
+	}
+
 
 }
