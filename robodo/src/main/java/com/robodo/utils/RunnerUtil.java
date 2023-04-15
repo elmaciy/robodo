@@ -61,7 +61,7 @@ public class RunnerUtil {
 					boolean hasRunningInstance=RunnerSingleton.getInstance().hasRunningInstance(stepRunningKey);
 
 					if (hasRunningInstance) {
-						RunnerSingleton.getInstance().stop(processInstance.getCode());
+						RunnerSingleton.getInstance().stop(processInstance.getCode(), processDefinition.getCode());
 						return;
 					}
 					

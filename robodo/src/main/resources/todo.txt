@@ -45,11 +45,9 @@
 
 86. parametre tablosunun env den öncelikli olarak kulanılmasını sağla
 
-87. google search de işlemler yarım kaldı. 
+87. google search de işlemler askıda kalıyor. 
 
-88. instance e toplu silme koy. 
-
-//-------------------------------------------
+//--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
 2. RPA işlemi aldıktan sonra statüyü "RPA işlemde" olarak güncelleyecek. bu aşamada kontrol linki direk paylaşılacak ki ekrandan durum görülebilsin. 
 3. Tahakkuk oluşturulduktan sonra statü "RPA Tahakkuk" olarak güncellencek ve yanısıra a) tahakkukno, b) onay/red/kontrol linkleri sağlanacak
