@@ -2,7 +2,6 @@ package com.robodo.services;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -18,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.robodo.model.EmailTemplate;
+import com.robodo.model.Parameter;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
@@ -26,6 +26,7 @@ import com.robodo.model.Tokenization;
 import com.robodo.model.User;
 import com.robodo.model.UserRole;
 import com.robodo.repo.EmailTemplateRepo;
+import com.robodo.repo.ParameterRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
 import com.robodo.repo.ProcessInstanceRepo;
 import com.robodo.repo.ProcessInstanceStepFileRepo;
@@ -33,7 +34,6 @@ import com.robodo.repo.TokenizationRepo;
 import com.robodo.repo.UserRepo;
 import com.robodo.repo.UserRoleRepo;
 import com.robodo.utils.HelperUtil;
-import com.vaadin.flow.data.provider.DataProvider;
 
 @Service
 @Transactional
@@ -65,6 +65,9 @@ public class ProcessService {
 	
 	@Autowired
 	EmailTemplateRepo emailTemplateRepo;
+	
+	@Autowired
+	ParameterRepo parameterRepo;
 	
 	public List<ProcessDefinition> getProcessDefinitions() {
 		return StreamSupport.stream(processDefinitionRepo.findAll().spliterator(), false).collect(Collectors.toList());
@@ -315,6 +318,32 @@ public class ProcessService {
 	public void saveUserRole(UserRole userRole) {
 		userRoleRepo.save(userRole);
 		
+	}
+
+	public EmailTemplate saveEmailTemplate(EmailTemplate emailTemplate) {
+		return emailTemplateRepo.save(emailTemplate);
+	}
+
+	public List<EmailTemplate> getEmailTemplateAll() {
+		return StreamSupport.stream(emailTemplateRepo.findAll().spliterator(), false).collect(Collectors.toList());
+	}
+
+	public void removeEmailTemplate(EmailTemplate emailTemplate) {
+		emailTemplateRepo.delete(emailTemplate);
+		
+	}
+
+	public void removeParameter(Parameter parameter) {
+		parameterRepo.save(parameter);
+	}
+
+	public Parameter saveParameter(Parameter parameter) {
+		return parameterRepo.save(parameter);
+		
+	}
+
+	public List<Parameter> getParametersAll() {
+		return StreamSupport.stream(parameterRepo.findAll().spliterator(), false).collect(Collectors.toList());
 	}
 
 	

@@ -1,6 +1,6 @@
 package com.robodo.ui;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +22,6 @@ import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -91,7 +90,7 @@ public class UIUsers extends UIBase {
 
 	private void makeGrid() {
 		grid.addColumn(p -> p.getUsername()).setKey("username").setHeader("Username").setSortable(true)
-				.setAutoWidth(true);
+				.setAutoWidth(true).setFrozen(true);
 		grid.addColumn(p -> p.getEmail()).setKey("email").setHeader("Email").setSortable(true).setAutoWidth(true);
 		grid.addColumn(p -> p.getFullname()).setKey("fullName").setHeader("Full Name").setSortable(true)
 				.setAutoWidth(true);
@@ -102,9 +101,7 @@ public class UIUsers extends UIBase {
 		grid.addComponentColumn(p -> makePasswordEditor(p)).setKey("password").setHeader("Password").setWidth("10em");
 		grid.addColumn(p -> dateFormat(p.getLastLogin())).setHeader("Last Login").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getLastPasswordChange())).setHeader("Last Password Change").setAutoWidth(true);
-		grid.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setAutoWidth(true);
-		grid.addColumn(p -> dateFormat(p.getUpdated())).setHeader("Updated").setAutoWidth(true);
-
+	
 		grid.addComponentColumn(p -> {
 			Button btnRemove = new Button("", new Icon(VaadinIcon.TRASH));
 			btnRemove.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
@@ -115,7 +112,7 @@ public class UIUsers extends UIBase {
 			});
 			return btnRemove;
 
-		}).setHeader("Remove").setAutoWidth(true);
+		}).setHeader("Remove").setWidth("3em").setFrozenToEnd(true);
 
 		grid.setWidthFull();
 
@@ -137,7 +134,7 @@ public class UIUsers extends UIBase {
 				grid.getEditor().editItem(user);
 			});
 			return editButton;
-		}).setWidth("150px").setFlexGrow(0);
+		}).setWidth("150px").setFrozenToEnd(true);
 
 		Binder<User> binder = new Binder<>(User.class);
 		editor.setBinder(binder);
@@ -166,13 +163,13 @@ public class UIUsers extends UIBase {
 
 		editor.addSaveListener(e -> {
 
-			if (!isValidUsername(e.getItem().getUsername())) {
+			if (!HelperUtil.isValidCode(e.getItem().getUsername())) {
 				e.getSource().cancel();
 				runAndInform("Error", "Username entered is invalid", () -> fillGrid(e.getItem()));
 				return;
 			}
 
-			if (!isValidEmailAddress(e.getItem().getEmail())) {
+			if (!HelperUtil.isValidEmailAddress(e.getItem().getEmail())) {
 				e.getSource().cancel();
 				runAndInform("Error", "Email entered is invalid", () -> fillGrid(e.getItem()));
 				return;
@@ -335,6 +332,7 @@ public class UIUsers extends UIBase {
 			}
 			
 			user.setPassword(HelperUtil.encrypt(pass1.getValue()));
+			user.setLastPasswordChange(LocalDateTime.now());
 			processService.saveUser(user);
 			
 			fillGrid(user);
@@ -397,14 +395,6 @@ public class UIUsers extends UIBase {
 		return true;
 	}
 
-	private boolean isValidUsername(String username) {
-		return HelperUtil.patternMatches(username, "^[A-Za-z]\\w{5,29}$");
-	}
-
-	private boolean isValidEmailAddress(String email) {
-		return HelperUtil.patternMatches(email, "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
-				+ "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$");
-	}
 
 	private void fillGrid(User user) {
 		List<User> usersAll = processService.getUsersAll();

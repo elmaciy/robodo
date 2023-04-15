@@ -1,8 +1,6 @@
 17. dashboardda iş bazında bekleyenler, tamamlananlar vs görünsün. 
 
-56. isin sonunda notifikasyon gonderilmesi gerekir mi? 
-	Bunu bir step olarak ekleyelim. 
-	human interaction a benzesin ve istenirse eklensin. 
+18. kullanıcı yönetimi ekranına arama koy
 
 16. kurulan yerde chrome güncellenmemeli
 
@@ -15,12 +13,6 @@
 	
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
-	 
-56. email template ekranı yaz 
-
-57. User management ekranı yaz. Userlerin ldap dan da doğrulanabilmesi mümkün olsun sonrasında. 
-	3 rol olmalı => ADMIN, SUPERVISOR, USER
-	Admin ile SUPERVISOR arasında fark var. ADMIN sistemin sahibi, SUPERVISOR şirketin. 
 
 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
@@ -45,12 +37,17 @@
 	
 83. thread windowundaki kuyruk ve thread lar sıfırlanabilmelidir. ???
 
-84. Kullanıcı last login ve last password change bir de update falan alanları koy. 
+84. Kullanıcı last login alanını loginlerde güncelle ya da o alanı sil çok önemli değilse. 
 
 85. Human interactionda iki türlü olsun. 1nci mail göndersin. 2ncsi ise bir stepAction calistirsin. 
 	ikincisinde steple ilgili olarak human onayi almadan once bir dis sistemi tetikleyecegiz. 
 	ikinci tipte de hata durumlarini dusun
 
+86. parametre tablosunun env den öncelikli olarak kulanılmasını sağla
+
+87. google search de işlemler yarım kaldı. 
+
+88. instance e toplu silme koy. 
 
 //-------------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -96,4 +93,9 @@ TAMAMLANANLAR
 80. instance silme olsun. Confirmation.
 48. instance gridine sıralama koy. kolonlarına da filtre koy. 
 55. screenshotta exception oldugunda browser acik kaldi. teardown calismadi. neden? 
+
+57. User management ekranı yaz. Userlerin ldap dan da doğrulanabilmesi mümkün olsun sonrasında. 
+	3 rol olmalı => ADMIN, SUPERVISOR, USER
+	Admin ile SUPERVISOR arasında fark var. ADMIN sistemin sahibi, SUPERVISOR şirketin. 
+77. email template ekranı yaz 
 

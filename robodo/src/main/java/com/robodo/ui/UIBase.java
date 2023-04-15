@@ -307,7 +307,13 @@ public class UIBase extends AppLayout {
 		gridQueue.setMaxWidth("30%");
 		gridRunningProcessKeys.setMaxWidth("40%");
 		gridRunningThreadGroup.setMaxWidth("30%");
+		
+		gridQueue.setHeightFull();
+		gridRunningProcessKeys.setHeightFull();
+		gridRunningThreadGroup.setHeightFull();
+		
 
+		
 		dialogLayout.add(btRefresh);
 		HorizontalLayout horizontalLayout = new HorizontalLayout(gridQueue, gridRunningProcessKeys,gridRunningThreadGroup);
 		horizontalLayout.setSizeFull();
@@ -319,7 +325,7 @@ public class UIBase extends AppLayout {
 		Button cancelButton = new Button("Close", e -> dialog.close());
 		dialog.getFooter().add(cancelButton);
 		dialog.setWidth("90%");
-		dialog.setHeight("60%");
+		dialog.setHeight("80%");
 		dialog.setResizable(true);
 		dialog.setCloseOnEsc(true);
 		dialog.setCloseOnOutsideClick(true);

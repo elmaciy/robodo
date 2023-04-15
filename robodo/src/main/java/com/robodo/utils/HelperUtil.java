@@ -238,7 +238,7 @@ public class HelperUtil {
 		
 	}
 
-	private static boolean isValidEmailAddress(String email) {
+	public static boolean isValidEmailAddress(String email) {
 		 boolean valid = true;
 		   try {
 		      InternetAddress emailAddr = new InternetAddress(email);
@@ -391,4 +391,10 @@ public class HelperUtil {
 	    	return false;
 	    }
 	}
+	
+	public static boolean isValidCode(String username) {
+		return HelperUtil.patternMatches(username, "^[A-Za-z]\\w{5,29}$");
+	}
+
+
 }

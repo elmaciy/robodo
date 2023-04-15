@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -31,6 +32,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -269,6 +271,8 @@ public class UIProcessor extends UIBase {
 		gridProcessInstance.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,
 				GridVariant.LUMO_ROW_STRIPES);
 
+		gridProcessInstance.setSelectionMode(SelectionMode.MULTI);
+		
 		add(gridProcessDefinition);
 		add(headerOfInstancesLayout());
 		add(gridProcessInstance);
@@ -397,7 +401,30 @@ public class UIProcessor extends UIBase {
 
 		layoutForProcessInstanceTop.add(chWaitingApproval);
 
+		Button btnRemoveSelected= new Button("Remove Selected", new Icon(VaadinIcon.TRASH));
+		btnRemoveSelected.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+		btnRemoveSelected.addClickListener(e -> {
+			if (gridProcessInstance.getSelectedItems().size()>0) {
+				confirmAndRun("Delete", "Sure to remove all selected instances?", ()->removeSelectedInstances());	
+			}
+			btnRemoveSelected.setEnabled(true);
+		});
+		
+		layoutForProcessInstanceTop.add(btnRemoveSelected);
+
+
+		
 		return layoutForProcessInstanceTop;
+	}
+
+	private void removeSelectedInstances() {
+		Iterator<ProcessInstance> iterator = gridProcessInstance.getSelectedItems().iterator();
+		while(iterator.hasNext()) {
+			ProcessInstance instance = iterator.next();
+			processService.deleteProcessInstance(instance);
+		}
+		
+		fillProcessInstanceGrid();
 	}
 
 	private void fillProcessInstanceGrid() {
