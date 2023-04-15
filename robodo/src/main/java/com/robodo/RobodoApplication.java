@@ -17,6 +17,7 @@ import com.robodo.model.UserRole;
 import com.robodo.repo.EmailTemplateRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
 import com.robodo.repo.UserRepo;
+import com.robodo.repo.UserRoleRepo;
 import com.robodo.utils.HelperUtil;
 
 @SpringBootApplication
@@ -28,7 +29,7 @@ public class RobodoApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demo(ProcessDefinitionRepo processDefinitionRepo, EmailTemplateRepo emailTemplateRepo, UserRepo userRepo) {
+	public CommandLineRunner demo(ProcessDefinitionRepo processDefinitionRepo, EmailTemplateRepo emailTemplateRepo, UserRepo userRepo, UserRoleRepo userRoleRepo) {
 		return (args) -> {
 			
 
@@ -39,10 +40,15 @@ public class RobodoApplication {
 			admin.setPassword(HelperUtil.encrypt("admin123"));
 			admin.setFullname("Administrator");
 			admin.setValid(true);
-			admin.setRoles(List.of(new UserRole(admin,UserRole.ROLE_USER), new UserRole(admin,UserRole.ROLE_ADMIN)));
+			
 			
 			if (userRepo.findByUsername(admin.getUsername()).isEmpty()) {
-				userRepo.save(admin);
+				User savedUser = userRepo.save(admin);
+				UserRole roleAdmin=new UserRole(savedUser.getId(), UserRole.ROLE_ADMIN);
+				UserRole roleUser=new UserRole(savedUser.getId(), UserRole.ROLE_USER);
+				
+				userRoleRepo.save(roleAdmin);
+				userRoleRepo.save(roleUser);
 			}
 			
 			User user=new User();
@@ -51,10 +57,13 @@ public class RobodoApplication {
 			user.setPassword(HelperUtil.encrypt("123"));
 			user.setFullname("Yıldıray Elmacı");
 			user.setValid(true);
-			user.setRoles(List.of(new UserRole(user,UserRole.ROLE_USER)));
+
 			
 			if (userRepo.findByUsername(user.getUsername()).isEmpty()) {
-				userRepo.save(user);
+				User savedUser = userRepo.save(user);
+				UserRole roleUser=new UserRole(savedUser.getId(), UserRole.ROLE_USER);
+				
+				userRoleRepo.save(roleUser);
 			}
 			
 			

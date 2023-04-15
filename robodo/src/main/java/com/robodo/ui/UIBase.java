@@ -167,19 +167,19 @@ public class UIBase extends AppLayout {
 	public void notifySuccess(String content) {
 		Notification notification = Notification.show(content);
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-        notification.setPosition(Notification.Position.TOP_END);
+        notification.setPosition(Notification.Position.BOTTOM_END);
 	}
 	
 	public void notifyError(String content) {
 		Notification notification = Notification.show(content);
         notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        notification.setPosition(Notification.Position.TOP_END);		
+        notification.setPosition(Notification.Position.BOTTOM_END);		
 	}
 	
 	public void notifyInfo(String content) {
 		Notification notification = Notification.show(content);
         notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
-        notification.setPosition(Notification.Position.TOP_END);		
+        notification.setPosition(Notification.Position.BOTTOM_END);		
 	}
 	
 	public void confirmAndRun(String header, String message, Runnable actionWhenYes) {

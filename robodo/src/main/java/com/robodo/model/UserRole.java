@@ -23,9 +23,7 @@ public class UserRole {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	Long id;
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "user_id", nullable = false)
-	User user;
+	Long userId;
 	String role;
 	
 	
@@ -35,8 +33,10 @@ public class UserRole {
 	public UserRole() {
 	}
 	
-	public UserRole(User user, String role) {
-		this.user=user;
+	
+	
+	public UserRole(Long userId, String role) {
+		this.userId=userId;
 		this.role=role;
 	}
 	public Long getId() {
@@ -45,12 +45,15 @@ public class UserRole {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public User getUser() {
-		return user;
+	
+	public Long getUserId() {
+		return userId;
 	}
-	public void setUser(User user) {
-		this.user = user;
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
+
 	public LocalDateTime getCreated() {
 		return created;
 	}

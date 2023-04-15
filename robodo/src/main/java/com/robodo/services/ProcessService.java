@@ -31,6 +31,7 @@ import com.robodo.repo.ProcessInstanceRepo;
 import com.robodo.repo.ProcessInstanceStepFileRepo;
 import com.robodo.repo.TokenizationRepo;
 import com.robodo.repo.UserRepo;
+import com.robodo.repo.UserRoleRepo;
 import com.robodo.utils.HelperUtil;
 import com.vaadin.flow.data.provider.DataProvider;
 
@@ -57,6 +58,10 @@ public class ProcessService {
 	
 	@Autowired
 	UserRepo userRepo;
+	
+
+	@Autowired
+	UserRoleRepo userRoleRepo;
 	
 	@Autowired
 	EmailTemplateRepo emailTemplateRepo;
@@ -282,8 +287,8 @@ public class ProcessService {
 		return Lists.newArrayList(userRepo.findAll());
 	}
 
-	public void saveUser(User user) {
-		userRepo.save(user);
+	public User saveUser(User user) {
+		return userRepo.save(user);
 		
 	}
 
@@ -294,6 +299,22 @@ public class ProcessService {
 
 	public List<String> getRoles() {
 		return List.of("ADMIN","USER","SUPERVISOR");
+	}
+
+	public List<UserRole> getUserRoles(User user) {
+		return userRoleRepo.findByUserId(user.getId());
+	}
+
+	public void removeRolesByUser(User user) {
+		getUserRoles(user).stream().forEach(userRole->{
+			userRoleRepo.delete(userRole);
+		});
+		
+	}
+
+	public void saveUserRole(UserRole userRole) {
+		userRoleRepo.save(userRole);
+		
 	}
 
 	
