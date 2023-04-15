@@ -1,7 +1,5 @@
 package com.robodo.ui;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,11 +20,9 @@ import com.robodo.model.UserRole;
 import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
-import com.robodo.singleton.ThreadGroupSingleton;
 import com.robodo.threads.ThreadForInstanceRunner;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
@@ -36,7 +32,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -486,9 +481,9 @@ public class UIProcessor extends UIBase {
 		
 		grid.addColumn(p -> p.getId()).setHeader(btnRefresh).setWidth("2em");
 		grid.addColumn(p -> p.getStepCode()).setHeader("Code").setAutoWidth(true);
-		grid.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("3em");
+		grid.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("3em").setVisible(false);
 		grid.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("5em");
-		grid.addColumn(p -> p.getError()).setHeader("Error").setWidth("10em");
+		grid.addColumn(p -> p.getError()).setHeader("Error").setWidth("5em");
 		grid.addColumn(p -> p.getCommands()).setHeader("Command Executed").setAutoWidth(true);
 		grid.addComponentColumn(p -> {
 			Button btnIcon = new Button();
@@ -515,10 +510,10 @@ public class UIProcessor extends UIBase {
 			}
 
 			return btnIcon;
-		}).setHeader("Approved").setAutoWidth(true);
+		}).setHeader("Approved").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
 		grid.addColumn(p -> p.getApprovedBy()).setHeader("App. By").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getApprovalDate())).setHeader("App. Date");
-		grid.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setAutoWidth(true);
+		grid.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setAutoWidth(true).setVisible(false);
 		grid.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setAutoWidth(true);
 		grid.addComponentColumn(p -> {
@@ -529,7 +524,7 @@ public class UIProcessor extends UIBase {
 				confirmAndRun("Backward", "Sure to backward the step : %s?".formatted(p.getStepCode()), ()->setBackward(grid, p));
 			});
 			return btnBackward;
-		}).setHeader("Rollback").setAutoWidth(true);
+		}).setHeader("Rollback").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
 
 		grid.getColumns().forEach(col -> {
 			col.setResizable(true);
@@ -660,7 +655,9 @@ public class UIProcessor extends UIBase {
 				: ProcessInstance.STATUS_RUNNING);
 		processInstance.setFinished(null);
 		processInstance.setAttemptNo(Integer.max(processInstance.getAttemptNo() - 1, 0));
-
+		processInstance.setError(null);
+		processInstance.setFailed(false);
+		
 		processService.saveProcessInstance(processInstance);
 
 		grid.setItems(processInstance.getSteps());
@@ -900,7 +897,8 @@ public class UIProcessor extends UIBase {
 	private void runProcessInstance(ProcessInstance processInstance) {
 
 		int maxThreadCount = Integer.valueOf(processService.getEnv().getProperty("max.thread"));
-		int currentThreadCount = ThreadGroupSingleton.getInstance().getActiveThreadCount();
+		
+		int currentThreadCount = RunnerSingleton.getInstance().getRunningProcessCount();
 		if (currentThreadCount >= maxThreadCount) {
 			notifyError("no thread to run this instance");
 			return;

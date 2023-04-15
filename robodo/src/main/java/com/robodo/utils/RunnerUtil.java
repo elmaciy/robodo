@@ -12,7 +12,6 @@ import org.openqa.selenium.WebElement;
 import com.robodo.discoverer.BaseDiscoverer;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ExecutionResultsForCommand;
-import com.robodo.model.ExecutionResultsForInstance;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
@@ -33,21 +32,18 @@ public class RunnerUtil {
 		this.processService = processService;
 	}
 
-	public ExecutionResultsForInstance runProcessInstance(ProcessInstance processInstance) {
-		
-		ExecutionResultsForInstance result=new ExecutionResultsForInstance(processInstance);
+	public void runProcessInstance(ProcessInstance processInstance) {
+		ProcessDefinition processDefinition=processService.getProcessDefinitionById(processInstance.getProcessDefinitionId());
 
-		RunnerSingleton.getInstance().start(processInstance.getCode());
+		RunnerSingleton.getInstance().start(processInstance.getCode(), processDefinition.getCode());
 				
-		hmExtractedValues = HelperUtil.String2HashMap(result.getProcessInstance().getInstanceVariables());
-		
+		hmExtractedValues = HelperUtil.String2HashMap(processInstance.getInstanceVariables());
 
-		List<ProcessInstanceStep> steps = result.getProcessInstance().getSteps();
-
+		List<ProcessInstanceStep> steps = processInstance.getSteps();
 		
 		for (ProcessInstanceStep step : steps) {
 			if (step.getStatus().equals(ProcessInstanceStep.STATUS_COMPLETED)) {
-				logger("skipping already completed step %s".formatted(step.getStepCode()));
+				//logger("skipping already completed step %s".formatted(step.getStepCode()));
 				continue;
 			}
 			logs.setLength(0);
@@ -56,9 +52,7 @@ public class RunnerUtil {
 			if (step.getLogs() != null) {
 				logs.append(step.getLogs());
 			}
-			processService.saveProcessInstance(result.getProcessInstance());
 
-			ProcessDefinition processDefinition=processService.getProcessDefinitionById(processInstance.getProcessDefinitionId());
 			ProcessDefinitionStep stepDef = processDefinition.getSteps().stream().filter(p->p.getOrderNo().equals(step.getOrderNo())).findAny().get();
 			String stepRunningKey="$STEP_%s".formatted(stepDef.getCode());
 			try {
@@ -67,20 +61,20 @@ public class RunnerUtil {
 					boolean hasRunningInstance=RunnerSingleton.getInstance().hasRunningInstance(stepRunningKey);
 
 					if (hasRunningInstance) {
-						result.setMessage("");
-						result.setStatus(ExecutionResultsForInstance.STATUS_STALLED);
 						RunnerSingleton.getInstance().stop(processInstance.getCode());
-						return result;
+						return;
 					}
 					
 				}
 				
 
-				result.getProcessInstance().setStatus(ProcessInstance.STATUS_RUNNING);
-				
 				RunnerSingleton.getInstance().start(stepRunningKey);
+				processInstance.setStatus(ProcessInstance.STATUS_RUNNING);
+				processService.saveProcessInstance(processInstance);
 				
-				runStep(result.getProcessInstance(), step);
+				//----------------------------------
+				runStep(processInstance, step);
+				//---------------------------------
 				
 				if (step.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)) {
 					logger("stopped at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
@@ -96,20 +90,15 @@ public class RunnerUtil {
 					RunnerSingleton.getInstance().stop(stepRunningKey);
 					break;
 				}
-				
-				result.setStatus(ExecutionResultsForInstance.STATUS_SUCCESS);
 			} catch (Exception e) {
 				String message = e.getMessage();
 				logger("exception at step [%s] at command [%s] : %s".formatted(step.getStepCode(), step.getCommands(),
 						message));
+
 				step.setLogs(logs.toString());
 				step.setStatus(ProcessInstanceStep.STATUS_FAILED);
 				step.setError(e.getMessage());
 				step.setFinished(LocalDateTime.now());
-				//processInstance.setFailed(true);
-				
-				result.setMessage(e.getMessage());
-				result.setStatus(ExecutionResultsForInstance.STATUS_FAILED);
 				
 				RunnerSingleton.getInstance().stop(stepRunningKey);
 				
@@ -120,12 +109,12 @@ public class RunnerUtil {
 			
 			step.setLogs(logs.toString());
 			
-			result.getProcessInstance().setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
-			processService.saveProcessInstance(result.getProcessInstance());
+			processInstance.setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
+			processService.saveProcessInstance(processInstance);
 
 		} //for
 		
-		boolean allStepsCompleted = result.getProcessInstance().getSteps().stream()
+		boolean allStepsCompleted = processInstance.getSteps().stream()
 				.allMatch(
 						p -> 
 							p.getStatus().equals(ProcessInstanceStep.STATUS_NEW) 
@@ -137,24 +126,22 @@ public class RunnerUtil {
 		
 		
 
-		result.getProcessInstance().setStatus(allStepsCompleted ? ProcessInstance.STATUS_COMPLETED : ProcessInstance.STATUS_RUNNING);
+		processInstance.setStatus(allStepsCompleted ? ProcessInstance.STATUS_COMPLETED : ProcessInstance.STATUS_RUNNING);
 		
 		if (allStepsCompleted) {
-			result.getProcessInstance().setFinished(LocalDateTime.now());
-			result.getProcessInstance().setAttemptNo(processInstance.getAttemptNo()+1);
+			processInstance.setFinished(LocalDateTime.now());
+			processInstance.setAttemptNo(processInstance.getAttemptNo()+1);
 			
-			boolean anyStepFailed = result.getProcessInstance().getLatestProcessedStep()!=null 
-					&& result.getProcessInstance().getLatestProcessedStep().getStatus().equals(ProcessInstanceStep.STATUS_FAILED);
-			result.getProcessInstance().setFailed(anyStepFailed);
+			ProcessInstanceStep latestProcessedStep = processInstance.getLatestProcessedStep();
+			
+			boolean isLastStepFailed = latestProcessedStep!=null && latestProcessedStep.getStatus().equals(ProcessInstanceStep.STATUS_FAILED);
+			processInstance.setFailed(isLastStepFailed);
+			processInstance.setError(isLastStepFailed ? latestProcessedStep.getError() : null);
 		} 
 		
-		result.getProcessInstance().setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
-
-		processService.saveProcessInstance(result.getProcessInstance());
-		
-		RunnerSingleton.getInstance().stop(result.getProcessInstance().getCode());
-		
-		return result;
+		processInstance.setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
+		processService.saveProcessInstance(processInstance);
+		RunnerSingleton.getInstance().stop(processInstance.getCode(), processDefinition.getCode());
 
 	}
 
@@ -209,7 +196,7 @@ public class RunnerUtil {
 		HelperUtil.sendEmailByTemplate(emailTemplate, step, this);
 	}
 
-	private ProcessInstanceStep runStep(ProcessInstance processInstance, ProcessInstanceStep step) {
+	private void runStep(ProcessInstance processInstance, ProcessInstanceStep step) {
 		if (step.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
 			step.setStatus(ProcessInstanceStep.STATUS_RUNNING);
 			step.setStarted(LocalDateTime.now());
@@ -226,20 +213,14 @@ public class RunnerUtil {
 		if (result.getStatus().equals(ExecutionResultsForCommand.STATUS_FAILED)) {
 			logger("Command [%s] execution is failed for step [%s] => %s".formatted(step.getCommands(),step.getStepCode(), result.getMessage()));
 			step.setError(result.getMessage());
-			processInstance.setError(result.getMessage());
-			processInstance.setFailed(true);
 			step.setStatus(ProcessInstanceStep.STATUS_FAILED);
 		} else {
 			boolean isOk = result.getStatus().equals(ExecutionResultsForCommand.STATUS_SUCCESS);
 			step.setStatus(isOk ? ProcessInstanceStep.STATUS_COMPLETED : ProcessInstanceStep.STATUS_RUNNING);
-			step.setError("");
-			processInstance.setError("");
+			step.setError(null);
 			step.setFinished(isOk ? LocalDateTime.now() : null);
 		}
 		
-		
-		return step;
-
 	}
 	
 	

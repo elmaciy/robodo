@@ -1,7 +1,9 @@
 package com.robodo.ui;
 
 import java.io.ByteArrayInputStream;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,11 +11,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
+import com.robodo.model.RunningProcess;
 import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
-import com.robodo.singleton.ThreadGroupSingleton;
 import com.robodo.utils.HelperUtil;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
@@ -239,12 +241,11 @@ public class UIBase extends AppLayout {
 		VerticalLayout dialogLayout = new VerticalLayout();
 		dialogLayout.setSizeFull();
 		
-		
-
 		//--------------------------------------------------------------------
-		Grid<KeyValue> gridRunningProcessKeys = new Grid<>(KeyValue.class, false);
-		gridRunningProcessKeys.addColumn(p -> p.getKey()).setHeader("Process Key").setAutoWidth(true);
-		gridRunningProcessKeys.addColumn(p -> p.getValue()).setHeader("Start Time").setAutoWidth(true);
+		Grid<RunningProcess> gridRunningProcessKeys = new Grid<>(RunningProcess.class, false);
+		gridRunningProcessKeys.addColumn(p -> p.getName()).setHeader("Name").setAutoWidth(true);
+		gridRunningProcessKeys.addColumn(p -> p.getGroup()).setHeader("Group").setAutoWidth(true);
+		gridRunningProcessKeys.addColumn(p -> dateFormat(LocalDateTime.ofInstant(Instant.ofEpochMilli(p.getStartTs()), ZoneId.systemDefault()))).setHeader("Started").setAutoWidth(true);
 
 		gridRunningProcessKeys.setWidthFull();
 		gridRunningProcessKeys.getColumns().forEach(col->{col.setResizable(true);});
@@ -262,7 +263,7 @@ public class UIBase extends AppLayout {
 		gridRunningThreadGroup.getColumns().forEach(col->{col.setResizable(true);});
 		gridRunningThreadGroup.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
-		gridRunningThreadGroup.setItems(ThreadGroupSingleton.getInstance().getThreadGroupsAsKeyValue());
+		gridRunningThreadGroup.setItems(RunnerSingleton.getInstance().getThreadGroupsAsKeyValue());
 
 		//--------------------------------------------------------------------
 		Grid<KeyValue> gridQueue = new Grid<>(KeyValue.class, false);
@@ -280,9 +281,13 @@ public class UIBase extends AppLayout {
 		btRefresh.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
 		btRefresh.addClickListener(e -> {
 			gridRunningProcessKeys.setItems(RunnerSingleton.getInstance().getProcesses());
-			gridRunningThreadGroup.setItems(ThreadGroupSingleton.getInstance().getThreadGroupsAsKeyValue());
+			gridRunningThreadGroup.setItems(RunnerSingleton.getInstance().getThreadGroupsAsKeyValue());
 			gridQueue.setItems(QueueSingleton.getInstance().getAllAsKeyValue());
 		});
+		
+		gridQueue.setMaxWidth("30%");
+		gridRunningProcessKeys.setMaxWidth("40%");
+		gridRunningThreadGroup.setMaxWidth("30%");
 
 		dialogLayout.add(btRefresh);
 		HorizontalLayout horizontalLayout = new HorizontalLayout(gridQueue, gridRunningProcessKeys,gridRunningThreadGroup);
@@ -294,7 +299,7 @@ public class UIBase extends AppLayout {
 		dialog.add(dialogLayout);
 		Button cancelButton = new Button("Close", e -> dialog.close());
 		dialog.getFooter().add(cancelButton);
-		dialog.setWidth("60%");
+		dialog.setWidth("90%");
 		dialog.setHeight("60%");
 		dialog.setResizable(true);
 		dialog.setCloseOnEsc(true);
@@ -314,14 +319,13 @@ public class UIBase extends AppLayout {
 	
 	
 	public Button makeTrueFalseIcon(boolean isSuccess,Icon iconForSuccess, Icon iconForFail) {
-		
 		Button btn = new Button("");
 		btn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL);
 		if (isSuccess) {
 			btn.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
 			btn.setIcon(iconForSuccess);
 		}  else {
-			btn.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+			btn.addThemeVariants(ButtonVariant.LUMO_ERROR);
 			btn.setIcon(iconForFail);
 		}
 		

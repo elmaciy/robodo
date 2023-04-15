@@ -5,12 +5,9 @@ import java.util.stream.Collectors;
 
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
-import com.robodo.model.ProcessInstanceStep;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
-import com.robodo.singleton.ThreadGroupSingleton;
-import com.robodo.utils.HelperUtil;
 
 public class ThreadForQueueManager implements Runnable {
 	
@@ -48,7 +45,7 @@ public class ThreadForQueueManager implements Runnable {
 			List<ProcessInstance> notCompletedInstances = processService.getNotCompletedInstances(processDefinition,remaining);
 				
 			for (ProcessInstance processInstance : notCompletedInstances) {
-				boolean isAlreadyRunning = RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode());
+				boolean isAlreadyRunning = RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode(), processDefinition.getCode());
 				
 				
 				if (isAlreadyRunning) {
@@ -75,10 +72,7 @@ public class ThreadForQueueManager implements Runnable {
 			}
 		}
 		
-		
-		
-		
-			RunnerSingleton.getInstance().stop(threadName);
+		RunnerSingleton.getInstance().stop(threadName);
 
 	}
 

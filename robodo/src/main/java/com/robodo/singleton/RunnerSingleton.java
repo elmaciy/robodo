@@ -1,16 +1,18 @@
 package com.robodo.singleton;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.robodo.model.KeyValue;
+import com.robodo.model.RunningProcess;
 
 public class RunnerSingleton {
 	
 	private static RunnerSingleton instance;
 	
-	private Hashtable<String,Long> hmRunningInstances=new Hashtable<String,Long>();
+	private ConcurrentHashMap<RunningProcess,Long> hmRunningInstances=new ConcurrentHashMap<RunningProcess,Long>();
 	public static final long TIMEOUT=5*60*1000;
 	
 	private RunnerSingleton() {
@@ -26,15 +28,16 @@ public class RunnerSingleton {
 	}
 	
 	
-	private synchronized  boolean syncaction(String runId, String action, Long param) {
+	private synchronized  boolean syncaction(String name, String group, String action, Long startTs) {
+		var rp = new RunningProcess(name, group, startTs);
 		if (action.equals("PUT")) {
-			hmRunningInstances.put(runId, param);
+			hmRunningInstances.put(rp, startTs);
 			return true;
 		} else if (action.equals("GET")) {
-			return hmRunningInstances.containsKey(runId);
+			return hmRunningInstances.containsKey(rp);
 		} else if (action.equals("REMOVE")) {
-			if (hmRunningInstances.containsKey(runId)) {
-				hmRunningInstances.remove(runId);
+			if (hmRunningInstances.containsKey(rp)) {
+				hmRunningInstances.remove(rp);
 			}
 			return true;
 		}
@@ -43,15 +46,15 @@ public class RunnerSingleton {
 		
 	}
 	
-	public boolean hasRunningInstance(String runId) {
-		boolean isExists =  syncaction(runId, "GET", null);
+	public boolean hasRunningInstance(String name, String group) {		
+		boolean isExists =  syncaction(name, group, "GET", 0L);
 		if (!isExists) {
 			return false;
 		}
-		
-		long startTime=hmRunningInstances.get(runId);
+	
+		Long startTime = hmRunningInstances.get(new RunningProcess(name, group, 0));
 		if (System.currentTimeMillis()-startTime> TIMEOUT) {
-			stop(runId);
+			stop(name, group);
 			return false;
 		}
 		
@@ -59,19 +62,54 @@ public class RunnerSingleton {
 		return true;
 	}
 	
-	public void start(String runId) {
-		syncaction(runId, "PUT", System.currentTimeMillis());
+	public boolean hasRunningInstance(String name) {
+		return hasRunningInstance(name, name);
 	}
 	
-	public void stop(String runId) {
-		syncaction(runId, "REMOVE", null);
+	public void start(String name, String group) {
+		syncaction(name, group, "PUT", System.currentTimeMillis());
+	}
+	
+	public void stop(String name, String group) {
+		syncaction(name, group, "REMOVE", 0L);
+	}
+	
+	public void start(String name) {
+		start(name,name);
+	}
+	
+	public void stop(String name) {
+		stop(name,name);
 	}
 
-	public List<KeyValue> getProcesses() {
-		return hmRunningInstances.entrySet().stream().map(e->{
+	public List<RunningProcess> getProcesses() {
+		return hmRunningInstances.keySet().stream().collect(Collectors.toList());
+	}
+
+	public List<KeyValue> getThreadGroupsAsKeyValue() {
+		HashMap<String,Integer> map=new HashMap<String,Integer>();
+		List<RunningProcess> processes = getProcesses();
+		processes.forEach(p->{
+			if (!map.containsKey(p.getGroup())) {
+				map.put(p.getGroup(), Integer.valueOf(0));
+			}
+			
+			Integer currentCount = map.get(p.getGroup());
+			map.put(p.getGroup(), currentCount+1);
+		});
+		
+		return map.entrySet().stream().map(e->{
 			return new KeyValue(e.getKey(), String.valueOf(e.getValue()));
 		}).collect(Collectors.toList());
-		
+	}
+
+	public int getRunningProcessCount() {
+		return (int) getProcesses().stream().filter(p-> !p.getName().equals(p.getGroup())).count();
+	}
+
+	
+	public int getThreadCountByGroup(String group) {
+		return (int) getProcesses().stream().filter(p->p.getGroup().equals(group)).count();
 	}
 
 

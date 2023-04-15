@@ -1,14 +1,10 @@
 package com.robodo.threads;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
-import com.robodo.singleton.ThreadGroupSingleton;
 import com.robodo.utils.HelperUtil;
 
 public class ThreadForInstanceStarter implements Runnable {
@@ -31,7 +27,7 @@ public class ThreadForInstanceStarter implements Runnable {
 		RunnerSingleton.getInstance().start(threadName);
 		
 		
-		int maxThreadCount=Integer.valueOf(processService.getEnv().getProperty("max.thread"));
+		int maxProcessCount=Integer.valueOf(processService.getEnv().getProperty("max.thread"));
 						
 		while(true) {
 
@@ -43,9 +39,8 @@ public class ThreadForInstanceStarter implements Runnable {
 
 			ProcessDefinition processDefinition=processService.getProcessDefinitionById(processInstance.getProcessDefinitionId());
 			
-			String threadGroupName=processDefinition.getCode();
-			ThreadGroup thGroup=ThreadGroupSingleton.getInstance().getThreadGroupByName(threadGroupName);
-			int activeInstancesCount=ThreadGroupSingleton.getInstance().filteredActiveThreadCount(thGroup);
+			
+			int activeInstancesCount=RunnerSingleton.getInstance().getThreadCountByGroup(processDefinition.getCode());
 			
 			int remaining=processDefinition.getMaxThreadCount()-activeInstancesCount;
 			
@@ -54,23 +49,23 @@ public class ThreadForInstanceStarter implements Runnable {
 			}
 			
 
-			boolean isAlreadyRunning = RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode());
+			boolean isAlreadyRunning = RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode(), processDefinition.getCode());
 			
 			if (isAlreadyRunning) {
 				continue;
 			}
 			
 			
-			Thread th=new Thread(thGroup, new ThreadForInstanceRunner(processService, processInstance));
+			Thread th=new Thread(new ThreadForInstanceRunner(processService, processInstance));
 			th.start();
 			HelperUtil.sleep(300L);
 
 			QueueSingleton.getInstance().remove(processInstance);
 			
 			
-			int activeThreadCount=ThreadGroupSingleton.getInstance().getActiveThreadCount();
+			int runningProcessCount=RunnerSingleton.getInstance().getRunningProcessCount();
 
-			if (activeThreadCount>=maxThreadCount) {
+			if (runningProcessCount>=maxProcessCount) {
 				break;
 			}
 		}
