@@ -22,7 +22,6 @@
 	3 rol olmalı => ADMIN, SUPERVISOR, USER
 	Admin ile SUPERVISOR arasında fark var. ADMIN sistemin sahibi, SUPERVISOR şirketin. 
 
-55. screenshotta exception oldugunda browser acik kaldi. teardown calismadi. neden? 
 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
 
@@ -39,20 +38,19 @@
 	en son step alındığında, yani new ya da retry olduğunda başlangıç parametreleri instance dan kopyalansın
 
 47. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
-48. instance gridine sıralama koy. kolonlarına da filtre koy. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
 
 81. silme yerine arşive taşıma yapalım. 
 	Aramaya arşivde ara seçeneği eklenirse arşivde de arama yapar. 
 	
-82. şurada işlem yarım kaldı. sistem error vermedi. 
-	işi başlat. login olurken browseri direk kapat. 
-	
-83. thread windowundaki kuyruk ve thread lar sıfırlanabilmelidir. 
+83. thread windowundaki kuyruk ve thread lar sıfırlanabilmelidir. ???
 
 84. Kullanıcı last login ve last password change bir de update falan alanları koy. 
 
-85. Thread group yerine kendi mekanizmanı kurmam lazım. 
+85. Human interactionda iki türlü olsun. 1nci mail göndersin. 2ncsi ise bir stepAction calistirsin. 
+	ikincisinde steple ilgili olarak human onayi almadan once bir dis sistemi tetikleyecegiz. 
+	ikinci tipte de hata durumlarini dusun
+
 
 //-------------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -96,3 +94,6 @@ TAMAMLANANLAR
 15. login ekranı konulacak
 50. arama kutuucğu koy. bununla instance id içinde ve variables içinde like ile arayabilsin. 
 80. instance silme olsun. Confirmation.
+48. instance gridine sıralama koy. kolonlarına da filtre koy. 
+55. screenshotta exception oldugunda browser acik kaldi. teardown calismadi. neden? 
+

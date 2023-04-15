@@ -12,6 +12,7 @@ import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.model.RunningProcess;
+import com.robodo.model.User;
 import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.QueueSingleton;
@@ -38,6 +39,11 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.Binder.Binding;
+import com.vaadin.flow.data.binder.Setter;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
@@ -210,6 +216,19 @@ public class UIBase extends AppLayout {
 		dialog.open();
 	}	
 	
+	public void runAndInform(String header, String message, Runnable actionAfterInform) {
+		actionAfterInform.run();
+		
+		ConfirmDialog dialog = new ConfirmDialog();
+		dialog.setHeader(header);
+		dialog.setText(message);
+		dialog.setCancelable(false);
+		
+		dialog.setRejectable(false);
+		dialog.setConfirmText("OK");
+		dialog.open();
+	}	
+	
 	public Image getImage(ProcessInstanceStep step, ProcessInstanceStepFile file) {
 		byte[] imageBytes=HelperUtil.byteArr2Blob(file.getBinarycontent());
 		StreamResource resource = new StreamResource("%s.png".formatted(String.valueOf(file.getId())), () -> new ByteArrayInputStream(imageBytes));
@@ -331,6 +350,9 @@ public class UIBase extends AppLayout {
 		
 		return btn;
 	}
+	
+	
+
 	
 
 }

@@ -192,12 +192,12 @@ public class UIProcessor extends UIBase {
 		}).setHeader("Steps").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
 
 		gridProcessInstance.addComponentColumn(p -> {
-			Button btnShowSteps = new Button("", new Icon(VaadinIcon.TRASH));
-			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
-			btnShowSteps.addClickListener(e -> {
+			Button btnRemove = new Button("", new Icon(VaadinIcon.TRASH));
+			btnRemove.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+			btnRemove.addClickListener(e -> {
 				confirmAndRun("Remove", "Sure to remove this instance : %s".formatted(p.getCode()), ()-> removeProcessInstance(p));
 			});
-			return btnShowSteps;
+			return btnRemove;
 		}).setHeader("Remove").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
 
 		gridProcessInstance.addComponentColumn(p -> {

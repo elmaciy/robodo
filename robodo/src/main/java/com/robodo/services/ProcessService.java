@@ -2,6 +2,7 @@ package com.robodo.services;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +24,7 @@ import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.model.Tokenization;
 import com.robodo.model.User;
+import com.robodo.model.UserRole;
 import com.robodo.repo.EmailTemplateRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
 import com.robodo.repo.ProcessInstanceRepo;
@@ -278,6 +280,20 @@ public class ProcessService {
 
 	public List<User> getUsersAll() {
 		return Lists.newArrayList(userRepo.findAll());
+	}
+
+	public void saveUser(User user) {
+		userRepo.save(user);
+		
+	}
+
+	public void removeUser(User user) {
+		userRepo.delete(user);
+		
+	}
+
+	public List<String> getRoles() {
+		return List.of("ADMIN","USER","SUPERVISOR");
 	}
 
 	

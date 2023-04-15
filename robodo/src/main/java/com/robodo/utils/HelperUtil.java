@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
@@ -379,4 +380,15 @@ public class HelperUtil {
 		return "%s...".formatted(StringUtils.left(value, maxLen));
 	}
 	
+	
+	public static boolean patternMatches(String txt, String regexPattern) {
+	    try {
+			return Pattern.compile(regexPattern)
+		      .matcher(txt)
+		      .matches();	
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    	return false;
+	    }
+	}
 }
