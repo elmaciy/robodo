@@ -70,16 +70,18 @@ public class RunnerUtil {
 
 				RunnerSingleton.getInstance().start(stepRunningKey);
 				processInstance.setStatus(ProcessInstance.STATUS_RUNNING);
-				step.setInstanceVariables(null);
 				processService.saveProcessInstance(processInstance);
+				
 				
 				//----------------------------------
 				runStep(processInstance, step);
 				//---------------------------------
 				
+				
 				if (step.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)) {
 					logger("stopped at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
 					step.setLogs(logs.toString());
+					step.setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
 					RunnerSingleton.getInstance().stop(stepRunningKey);
 					break;
 				}
@@ -88,9 +90,13 @@ public class RunnerUtil {
 					logger("failed at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
 					step.setLogs(logs.toString());
 					step.setFinished(LocalDateTime.now());
+					step.setInstanceVariables(null);
 					RunnerSingleton.getInstance().stop(stepRunningKey);
 					break;
 				}
+				
+				step.setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
+				
 			} catch (Exception e) {
 				String message = e.getMessage();
 				logger("exception at step [%s] at command [%s] : %s".formatted(step.getStepCode(), step.getCommands(),
@@ -100,18 +106,16 @@ public class RunnerUtil {
 				step.setStatus(ProcessInstanceStep.STATUS_FAILED);
 				step.setError(e.getMessage());
 				step.setFinished(LocalDateTime.now());
-				
+				step.setInstanceVariables(null);
 				RunnerSingleton.getInstance().stop(stepRunningKey);
 				
 				break;
 			} 
 
 			RunnerSingleton.getInstance().stop(stepRunningKey);
-			
 			step.setLogs(logs.toString());
 			
 			processInstance.setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
-			step.setInstanceVariables(processInstance.getInstanceVariables());
 			processService.saveProcessInstance(processInstance);
 
 		} //for

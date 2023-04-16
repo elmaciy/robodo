@@ -193,16 +193,6 @@ public class UIProcessor extends UIBase {
 			});
 			return btnShowSteps;
 		}).setHeader("Steps").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
-
-		gridProcessInstance.addComponentColumn(p -> {
-			Button btnRemove = new Button("", new Icon(VaadinIcon.TRASH));
-			btnRemove.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
-			btnRemove.addClickListener(e -> {
-				confirmAndRun("Remove", "Sure to remove this instance : %s".formatted(p.getCode()), ()-> removeProcessInstance(p));
-			});
-			return btnRemove;
-		}).setHeader("Remove").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
-
 		gridProcessInstance.addComponentColumn(p -> {
 			Button btnApprove = new Button("", new Icon(VaadinIcon.CHECK));
 			btnApprove.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
@@ -659,10 +649,15 @@ public class UIProcessor extends UIBase {
 		List<ProcessInstanceStep> steps = processInstance.getSteps();
 
 		int stepCount = 0;
+		int previousStepIndex=-1;
+		
 		for (int i = steps.size() - 1; i >= 0; i--) {
 			ProcessInstanceStep step = steps.get(i);
-			if (step.getStepCode().equals(stepToBackward.getStepCode()))
+			if (step.getStepCode().equals(stepToBackward.getStepCode())) {
+				previousStepIndex = i -1;
 				break;
+			}
+				
 
 			if (!step.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
 				stepCount++;
@@ -681,6 +676,7 @@ public class UIProcessor extends UIBase {
 		stepToBackward.setNotificationSent(false);
 		stepToBackward.setError(null);
 		stepToBackward.setLogs(null);
+		stepToBackward.setInstanceVariables(null);
 
 		long countOfNonNew = steps.stream().filter(p -> !p.getStatus().equals(ProcessInstanceStep.STATUS_NEW)).count();
 
@@ -693,15 +689,15 @@ public class UIProcessor extends UIBase {
 		processInstance.setFailed(false);
 
 		//reset initial variables
-		if (!processInstance.getStatus().equals(ProcessInstance.STATUS_RUNNING)) {
-			processInstance.setInstanceVariables(processInstance.getInitialInstanceVariables());
-		}
+		processInstance.setInstanceVariables(previousStepIndex==-1 ? processInstance.getInitialInstanceVariables() : steps.get(previousStepIndex).getInstanceVariables());
+		ProcessInstance saveProcessInstance = processService.saveProcessInstance(processInstance);
 		
-		processService.saveProcessInstance(processInstance);
+		
 
-		grid.setItems(processInstance.getSteps());
-		var theStepToSelect = processInstance.getSteps().stream().filter(p->p.getStepCode().equals(stepToBackward.getStepCode())).findFirst().get();
-		grid.select(theStepToSelect);
+
+		grid.setItems(saveProcessInstance.getSteps());
+		var theStepToSelect = saveProcessInstance.getSteps().stream().filter(p->p.getStepCode().equals(stepToBackward.getStepCode())).findFirst().get();
+		fillStepsGrid(grid, theStepToSelect.getStepCode());
 		notifySuccess("backwarded");
 	}
 
@@ -757,7 +753,7 @@ public class UIProcessor extends UIBase {
 		gridVars.addComponentColumn(p -> {
 			TextField textField = new TextField();
 			textField.setWidthFull();
-			textField.setValue(p.getValue());
+			textField.setValue(p.getValue() == null ? "" : p.getValue());
 			textField.addValueChangeListener(e -> {
 				p.setValue(e.getValue());
 			});

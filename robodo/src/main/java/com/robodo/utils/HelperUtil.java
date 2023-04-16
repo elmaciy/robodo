@@ -89,6 +89,10 @@ public class HelperUtil {
 	
 	public static HashMap<String,String>  String2HashMap(String data) {
 		HashMap<String,String> hm= new HashMap<String,String>();
+		if (data==null) {
+			return hm;
+		}
+		
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			KeyValue[] values = mapper.readValue(data, KeyValue[].class);
@@ -166,7 +170,7 @@ public class HelperUtil {
 		runnerUtil.setVariable("mail.smtp.port", smtpPort);
 		runnerUtil.setVariable("mail.smtp.ssl.enable", smtpSSLEnabled);
 		runnerUtil.setVariable("mail.smtp.auth", smtpAuth);
-		runnerUtil.setVariable("mail.google.authentication.key", googleAuthKey);
+		//runnerUtil.setVariable("mail.google.authentication.key", googleAuthKey);
 
 		
 		

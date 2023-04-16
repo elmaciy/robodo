@@ -89,8 +89,8 @@ public class ProcessService {
 		}
 	}
 
-	public void saveProcessInstance(ProcessInstance processInstance) {		
-		processInstanceRepo.save(processInstance);
+	public ProcessInstance saveProcessInstance(ProcessInstance processInstance) {		
+		return processInstanceRepo.save(processInstance);
 	}
 	
 	public void updateQueueDate(ProcessInstance processInstance) {

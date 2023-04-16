@@ -49,6 +49,9 @@
 
 88. instance ekranında process definition sadece filtre olarak falan görünsün. Ekran ayrılsın. admin yetkisi gerekir çünkü. 
 
+89. backward yapılınca önceki adıma geçmiyor, doğru refresh etmiyor. 
+90. human aşamasında maille ilgii setlediği variableleri ve önceki aşamanın variablelerini yüklemiyor
+
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
 2. RPA işlemi aldıktan sonra statüyü "RPA işlemde" olarak güncelleyecek. bu aşamada kontrol linki direk paylaşılacak ki ekrandan durum görülebilsin. 
