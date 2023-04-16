@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,11 +29,13 @@ import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -51,99 +52,45 @@ import com.vaadin.flow.router.Route;
 
 import jakarta.annotation.security.RolesAllowed;
 
-@Route("/process")
+@Route("/instance")
 @RolesAllowed(UserRole.ROLE_USER)
-public class UIProcessor extends UIBase {
+public class UIInstance extends UIBase {
 
 	private static final long serialVersionUID = 1L;
 
-
 	ProcessService processService;
 
-	Grid<ProcessDefinition> gridProcessDefinition;
+	ComboBox<ProcessDefinition> comboForProcessDefinition;
 	Grid<ProcessInstance> gridProcessInstance;
 
 	@Autowired
-	public UIProcessor(ProcessService processService, SecurityService securityService) {
+	public UIInstance(ProcessService processService, SecurityService securityService) {
 		super(processService, securityService);
 		this.processService = processService;
 
-		setTitle("Processes", VaadinIcon.COG.create());
+		setTitle("Instances", VaadinIcon.FLASH.create());
 
-		gridProcessDefinition = new Grid<>(ProcessDefinition.class, false);
-		gridProcessDefinition.addColumn(p -> p.getId()).setHeader("#").setWidth("3em");
-		gridProcessDefinition.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
-		gridProcessDefinition.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
-		gridProcessDefinition.addComponentColumn(p -> {
-			Checkbox chActive = new Checkbox(p.isActive());
-			chActive.addValueChangeListener(e -> {
-				boolean newVal = e.getValue();
-				p.setActive(newVal);
-				boolean isOk = processService.saveProcessDefinition(p);
-				if (!isOk) {
-					notifyError("Error saving");
-				} else {
-					notifySuccess("process is %s".formatted(newVal ? "active" : "pasive"));
-				}
-			});
-			return chActive;
-		}).setHeader("Active").setWidth("2em");
-		gridProcessDefinition.addComponentColumn(p -> {
-			var fld = makeIntegerMinMaxField(p.getMaxAttemptCount(), 1, 100);
-			fld.addValueChangeListener(e -> {
-				Integer value = e.getValue();
-				p.setMaxAttemptCount(value);
-				processService.saveProcessDefinition(p);
-				notifyInfo("maximum attempt count changed");
-			});
-			return fld;
-		}).setHeader("Attempt").setWidth("2em");
-		gridProcessDefinition.addComponentColumn(p -> {
-			var fld = makeIntegerMinMaxField(p.getMaxThreadCount(), 1, 10);
-			fld.addValueChangeListener(e -> {
-				Integer value = e.getValue();
-				p.setMaxThreadCount(value);
-				processService.saveProcessDefinition(p);
-				notifyInfo("maximum thread count changed");
-			});
-			return fld;
-		}).setHeader("Thread").setWidth("2em");
-		gridProcessDefinition.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer");
-
-		gridProcessDefinition.addComponentColumn(p -> {
-			Button btnRun = new Button("", new Icon(VaadinIcon.SEARCH));
-			btnRun.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-			btnRun.setDisableOnClick(true);
-			btnRun.addClickListener(e -> {
-				runProcessDiscoverer(p);
-				gridProcessDefinition.select(p);
-				fillProcessInstanceGrid(p);
-				btnRun.setEnabled(true);
-			});
-			return btnRun;
-		}).setHeader("Discover").setWidth("3em");
-		gridProcessDefinition.addComponentColumn(p -> {
-			Button btnShowSteps = new Button("", new Icon(VaadinIcon.LINES_LIST));
-			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-			btnShowSteps.setDisableOnClick(true);
-			btnShowSteps.addClickListener(e -> {
-				showProcessDefinitionSteps(p);
-				btnShowSteps.setEnabled(true);
-			});
-			return btnShowSteps;
-		}).setHeader("Steps").setWidth("3em");
-		;
-
-		gridProcessDefinition.addSelectionListener(e -> {
-			Optional<ProcessDefinition> selection = e.getFirstSelectedItem();
-			if (selection.isEmpty()) {
-				gridProcessInstance.setItems(Collections.emptyList());
-			} else {
-				fillProcessInstanceGrid(selection.get());
-			}
+		
+		//--------------------------------------------------------------------------
+		Label lblProcessDef = new Label("Process definition");
+		
+		
+		comboForProcessDefinition=new ComboBox<ProcessDefinition>();
+		comboForProcessDefinition.setItemLabelGenerator(p->p.getDescription());
+		comboForProcessDefinition.setWidth("30em");
+		var activeProcessDefinitions = processService.getProcessDefinitions().stream().filter(p->p.isActive()).toList();
+		comboForProcessDefinition.setItems(activeProcessDefinitions);
+		comboForProcessDefinition.addValueChangeListener(e->{
+			ProcessDefinition processDefinition = e.getValue();
+			fillProcessInstanceGrid(processDefinition);
 		});
 
-		// --------------------------------------------------------------------
+		
+		HorizontalLayout layForProcessDefinitionFilter=new HorizontalLayout(lblProcessDef, comboForProcessDefinition);
+		layForProcessDefinitionFilter.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+
+		//--------------------------------------------------------------------------
+
 		gridProcessInstance = new Grid<>(ProcessInstance.class, false);
 		gridProcessInstance.addColumn(p -> p.getId()).setHeader("#").setAutoWidth(true)
 				.setFrozen(true).setTextAlign(ColumnTextAlign.END).setSortable(true);
@@ -240,44 +187,23 @@ public class UIProcessor extends UIBase {
 		
 		
 		//------------------------------------------------------------
-		
-		gridProcessDefinition.setWidthFull();
-		gridProcessInstance.setWidthFull();
-
-		gridProcessDefinition.setColumnReorderingAllowed(true);
+		gridProcessInstance.setSizeFull();
 		gridProcessInstance.setColumnReorderingAllowed(true);
-
-		gridProcessDefinition.setMaxHeight("30%");
-		
-		
-		gridProcessDefinition.getColumns().forEach(col -> {
-			col.setResizable(true);
-		});
 		gridProcessInstance.getColumns().forEach(col -> {
 			col.setResizable(true);
 		});
 
-		gridProcessDefinition.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,
-				GridVariant.LUMO_ROW_STRIPES);
 		gridProcessInstance.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,
 				GridVariant.LUMO_ROW_STRIPES);
 
 		gridProcessInstance.setSelectionMode(SelectionMode.MULTI);
 		
-		add(gridProcessDefinition);
-		add(headerOfInstancesLayout());
+		add(layForProcessDefinitionFilter);
+		add(makeHeaderForInstances());
 		add(gridProcessInstance);
 
 		fillGrid();
 	}
-
-	private void removeProcessInstance(ProcessInstance processInstance) {
-		processService.deleteProcessInstance(processInstance);
-		processService.deleteAllFiles(processInstance);
-		fillProcessInstanceGrid();
-		notifyInfo(" instance %s is removed".formatted(processInstance.getCode()));
-	}
-
 
 	boolean instanceFilterNew = true;
 	boolean instanceFilterCompleted = false;
@@ -289,9 +215,8 @@ public class UIProcessor extends UIBase {
 	TextField searchField;
 	Checkbox chAnyMatch;
 
-	private HorizontalLayout headerOfInstancesLayout() {
+	private HorizontalLayout makeHeaderForInstances() {
 		HorizontalLayout layoutForProcessInstanceTop = new HorizontalLayout();
-
 		layoutForProcessInstanceTop.setSizeUndefined();
 		layoutForProcessInstanceTop.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
@@ -299,15 +224,28 @@ public class UIProcessor extends UIBase {
 		btnRefresh.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 		btnRefresh.setDisableOnClick(true);
 		btnRefresh.addClickListener(e -> {
-			Set<ProcessDefinition> selectedProcessDefiniton = gridProcessDefinition.getSelectedItems();
-			if (selectedProcessDefiniton.isEmpty()) {
+			ProcessDefinition selectedProcessDefiniton = comboForProcessDefinition.getValue();
+			if (selectedProcessDefiniton==null) {
 				gridProcessInstance.setItems(Collections.emptyList());
 			} else {
-				fillProcessInstanceGrid(selectedProcessDefiniton.iterator().next());
+				fillProcessInstanceGrid(selectedProcessDefiniton);
 			}
 			btnRefresh.setEnabled(true);
 		});
 		
+		layoutForProcessInstanceTop.add(btnRefresh);
+
+		Button btnRemoveSelected= new Button("", new Icon(VaadinIcon.TRASH));
+		btnRemoveSelected.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+		btnRemoveSelected.addClickListener(e -> {
+			if (gridProcessInstance.getSelectedItems().size()>0) {
+				confirmAndRun("Delete", "Sure to remove all selected instances?", ()->removeSelectedInstances());	
+			}
+			btnRemoveSelected.setEnabled(true);
+		});
+		
+		layoutForProcessInstanceTop.add(btnRemoveSelected);
+
 		chAnyMatch = new Checkbox();
 		chAnyMatch.setValue(false);
 		chAnyMatch.setLabel("Any");
@@ -330,7 +268,6 @@ public class UIProcessor extends UIBase {
 			fillProcessInstanceGrid();
 		});
 		
-		layoutForProcessInstanceTop.add(btnRefresh);
 
 		
 		layoutForProcessInstanceTop.add(searchField);
@@ -392,16 +329,6 @@ public class UIProcessor extends UIBase {
 
 		layoutForProcessInstanceTop.add(chWaitingApproval);
 
-		Button btnRemoveSelected= new Button("Remove Selected", new Icon(VaadinIcon.TRASH));
-		btnRemoveSelected.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
-		btnRemoveSelected.addClickListener(e -> {
-			if (gridProcessInstance.getSelectedItems().size()>0) {
-				confirmAndRun("Delete", "Sure to remove all selected instances?", ()->removeSelectedInstances());	
-			}
-			btnRemoveSelected.setEnabled(true);
-		});
-		
-		layoutForProcessInstanceTop.add(btnRemoveSelected);
 
 
 		
@@ -419,13 +346,13 @@ public class UIProcessor extends UIBase {
 	}
 
 	private void fillProcessInstanceGrid() {
-		Set<ProcessDefinition> selectedItems = gridProcessDefinition.getSelectedItems();
-		if (selectedItems.isEmpty()) {
+		ProcessDefinition selectedProcessDefinition = comboForProcessDefinition.getValue();
+		if (selectedProcessDefinition==null) {
 			gridProcessInstance.setItems(Collections.emptyList());
 			return;
 		}
 
-		fillProcessInstanceGrid(selectedItems.iterator().next());
+		fillProcessInstanceGrid(selectedProcessDefinition);
 
 	}
 
@@ -488,7 +415,6 @@ public class UIProcessor extends UIBase {
 	private void showProcessInstanceSteps(String title, ProcessInstance processInstance) {
 		Dialog dialog = new Dialog();
 		dialog.setHeaderTitle(title);
-		
 
 		Grid<ProcessInstanceStep> grid = new Grid<>(ProcessInstanceStep.class, false);
 		
@@ -496,7 +422,6 @@ public class UIProcessor extends UIBase {
 		btnRefresh.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 		btnRefresh.addClickListener(e->fillStepsGrid(grid, processInstance.getCode()));
 
-		
 		grid.addColumn(p -> p.getId()).setHeader(btnRefresh).setWidth("2em");
 		grid.addColumn(p -> p.getStepCode()).setHeader("Code").setAutoWidth(true);
 		grid.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("3em").setVisible(false);
@@ -587,34 +512,23 @@ public class UIProcessor extends UIBase {
 			}
 		});
 
-
-
-
 		grid.addSelectionListener(p -> {
 			tabContent.removeAll();
 
 			Optional<ProcessInstanceStep> selection = p.getFirstSelectedItem();
-			if (selection.isEmpty()) {
-				if (tabs.getSelectedTab().equals(tabLogs)) {
-					logMemo.setValue("");
-					tabContent.add(logMemo);
-				} else {
-					tabContent.add(generateTabForFiles(null));
-				}
-
-			} else {
-
+			if (!selection.isEmpty()) {
 				if (tabs.getSelectedTab().equals(tabLogs)) {
 					var logs = selection.get().getLogs();
 					logMemo.setValue(logs == null ? "" : logs);
 					tabContent.add(logMemo);
-				} else {
+				} else if (tabs.getSelectedTab().equals(tabFiles)) {
 					tabContent.add(generateTabForFiles(selection.get()));
-				}
+				} else if (tabs.getSelectedTab().equals(tabVariables)) {
+					tabContent.add(makeVariableGrid(processInstance, selection.get()));
+				} 
 
 			}
 		});
-
 
 		dialog.add(grid);
 		dialog.add(tabs);
@@ -818,48 +732,6 @@ public class UIProcessor extends UIBase {
 		return gridVars;
 	}
 
-	private void showProcessDefinitionSteps(ProcessDefinition processDefinition) {
-		Dialog dialog = new Dialog();
-		String title = "steps for %s (%s)".formatted(processDefinition.getCode(), processDefinition.getDescription());
-		dialog.setHeaderTitle(title);
-
-		VerticalLayout dialogLayout = new VerticalLayout();
-		dialogLayout.setSizeFull();
-
-		// --------------------------------------------------------------------
-		Grid<ProcessDefinitionStep> gridProcessDefinitionSteps = new Grid<>(ProcessDefinitionStep.class, false);
-		gridProcessDefinitionSteps.addColumn(p -> p.getId()).setHeader("#").setWidth("2em");
-		gridProcessDefinitionSteps.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("2em");
-		gridProcessDefinitionSteps.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
-		gridProcessDefinitionSteps.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
-		gridProcessDefinitionSteps.addColumn(p -> p.getCommands()).setHeader("Command to run").setAutoWidth(true);
-		gridProcessDefinitionSteps.addColumn(p -> p.isSingleAtATime()).setHeader("Single").setAutoWidth(true);
-
-		gridProcessDefinitionSteps.setWidthFull();
-		gridProcessDefinitionSteps.setHeightFull();
-		gridProcessDefinitionSteps.setMaxHeight(200, Unit.EM);
-		gridProcessDefinitionSteps.getColumns().forEach(col -> {
-			col.setResizable(true);
-		});
-		gridProcessDefinitionSteps.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,
-				GridVariant.LUMO_ROW_STRIPES);
-
-		gridProcessDefinitionSteps.setItems(processDefinition.getSteps());
-
-		dialogLayout.add(gridProcessDefinitionSteps);
-
-		dialog.add(dialogLayout);
-		Button cancelButton = new Button("Close", e -> dialog.close());
-		dialog.getFooter().add(cancelButton);
-		dialog.setWidth("80%");
-		dialog.setHeight("60%");
-		dialog.setResizable(true);
-		dialog.setCloseOnEsc(true);
-		dialog.setCloseOnOutsideClick(true);
-		dialog.open();
-
-	}
-
 	private void setVariableGridItems(Grid<KeyValue> gridVars, HashMap<String, String> hmVars) {
 		List<KeyValue> items = new ArrayList<KeyValue>();
 		hmVars.keySet().stream().forEach(key -> {
@@ -879,73 +751,21 @@ public class UIProcessor extends UIBase {
 
 	}
 
-	public boolean refreshProcessDefinitionGrid() {
 
-		if (!isAttached()) {
-			return false;
-		}
-		if (!isVisible()) {
-			return false;
-		}
-
-		var selection = gridProcessDefinition.getSelectedItems();
-		if (selection.isEmpty()) {
-			return true;
-		}
-
-		setData(selection.iterator().next());
-
-		return true;
-	}
 
 	private void fillGrid() {
-		List<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();
-		gridProcessDefinition.setItems(processDefinitions);
+		ProcessDefinition processDefinition=comboForProcessDefinition.getValue();
 
-		if (!processDefinitions.isEmpty()) {
-			setData(processDefinitions.get(0));
+		if (processDefinition!=null) {
+			setData(processDefinition);
 		}
 
 	}
 
 	private void setData(ProcessDefinition processDefinition) {
-		gridProcessDefinition.select(processDefinition);
 		fillProcessInstanceGrid(processDefinition);
 	}
 
-	private void runProcessDiscoverer(ProcessDefinition processDefinition) {
-
-		String processId = "DISCOVERY.%s".formatted(processDefinition.getCode());
-		boolean isRunning = RunnerSingleton.getInstance().hasRunningInstance(processId);
-		if (isRunning) {
-			notifyError("Discovery is already running");
-			return;
-		}
-
-		RunnerUtil runner = new RunnerUtil(processService);
-
-		RunnerSingleton.getInstance().start(processId);
-		List<ProcessInstance> discoveredInstances = runner.runProcessDiscovery(processDefinition);
-		int discovered = 0;
-		for (ProcessInstance discoveredInstance : discoveredInstances) {
-			runner.logger("discovered : new instance [%s] of process [%s]".formatted(processDefinition.getCode(),
-					discoveredInstance.getCode()));
-			boolean isExists = processService.isProcessInstanceAlreadyExists(discoveredInstance);
-			if (isExists) {
-				runner.logger("skip process [%s]/%s".formatted(processDefinition.getCode(),
-						discoveredInstance.getCode(), processDefinition.getCode()));
-				continue;
-			}
-
-			processService.saveProcessInstance(discoveredInstance);
-			discovered++;
-		}
-
-		RunnerSingleton.getInstance().stop(processId);
-		notifyInfo(discovered == 0 ? "no new instance is discovered "
-				: "%d new instance discovered".formatted(discovered));
-
-	}
 
 	private void runProcessInstance(ProcessInstance processInstance) {
 

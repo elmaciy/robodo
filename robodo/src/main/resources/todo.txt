@@ -47,10 +47,12 @@
 
 87. tanım ekranlarındaki boxlara maxlength falan koy  - db yi aşmasın 
 
-88. instance ekranında process definition sadece filtre olarak falan görünsün. Ekran ayrılsın. admin yetkisi gerekir çünkü. 
 
 89. backward yapılınca önceki adıma geçmiyor, doğru refresh etmiyor. 
 90. human aşamasında maille ilgili variableleri instance a yüklemiyor. onay verdikten sonra yükleniyor. 
+
+91. process definition ekranında editlenmeyen alanlara editleme koy
+	ayrıca stepleri alta al ayrı pencerede olmasın. 
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -107,3 +109,5 @@ TAMAMLANANLAR
 38. gizli bilgileirn, mail parametrelerini, kredi kartı gibi kuruma özel bilgileri properties yerine parametre dosyasından aldır. 
 	Bussinessvariables olsun bunlar ve env parametrelerini ezsin aynı parametre burada da tanımlı ise
 	Aynı ekrana ayrıca tüm env parametrelerinin listelenmesini sağla. orada env parametresini de görsün.
+88. instance ekranında process definition sadece filtre olarak falan görünsün. Ekran ayrılsın. admin yetkisi gerekir çünkü. 
+	

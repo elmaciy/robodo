@@ -30,7 +30,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -121,24 +120,26 @@ public class UIBase extends AppLayout {
 	private VerticalLayout  getRoterLinks() {
 		
 		VerticalLayout lay=new VerticalLayout();
+		
 
-
-		Button linkProcess =  makeMenuOption("Processes",VaadinIcon.COG.create(),(p)->UI.getCurrent().navigate(UIProcessor.class));
-		Button lnkShowThreads =  makeMenuOption("Thread Info",VaadinIcon.INFO.create(),(p)->showThreads());
-		Button lnkEmailTemplates =  makeMenuOption("Email Templates",VaadinIcon.INBOX.create(),(p)->UI.getCurrent().navigate(UIEmailTemplates.class));
-		Button linkParameters =  makeMenuOption("Parameters",VaadinIcon.PACKAGE.create(),(p)->UI.getCurrent().navigate(UIParameters.class));
-		Button linkUsers =  makeMenuOption("Users",VaadinIcon.USER.create(),(p)->UI.getCurrent().navigate(UIUsers.class));
+		Button linkInstance=  makeMenuOption("Instances",VaadinIcon.FLASH.create(),(p)->UI.getCurrent().navigate(UIInstance.class));
+		Button lnkShowThread =  makeMenuOption("Thread Info",VaadinIcon.INFO.create(),(p)->showThreads());
+		Button linkProcess =  makeMenuOption("Processes",VaadinIcon.COG.create(),(p)->UI.getCurrent().navigate(UIProcess.class));
+		Button lnkEmailTemplate =  makeMenuOption("Email Templates",VaadinIcon.INBOX.create(),(p)->UI.getCurrent().navigate(UIEmailTemplates.class));
+		Button linkParameter =  makeMenuOption("Parameters",VaadinIcon.PACKAGE.create(),(p)->UI.getCurrent().navigate(UIParameters.class));
+		Button linkUser =  makeMenuOption("Users",VaadinIcon.USER.create(),(p)->UI.getCurrent().navigate(UIUsers.class));
 		Button linkDashboard =  makeMenuOption("Dashboard",VaadinIcon.DASHBOARD.create(),(p)->UI.getCurrent().navigate(UIDashboard.class));
 		
 		var authenticatedUser =  securityService.getAuthenticatedUser();
 		String accountUsername=authenticatedUser==null ? "" : authenticatedUser.getUsername();
 		Button btLogout =  makeMenuOption("Logout [%s]".formatted(accountUsername),VaadinIcon.EXIT.create(),(p)->confirmAndRun("Logout", "Sure to logout", ()->securityService.logout()));
 		
+		lay.add(linkInstance);
+		lay.add(lnkShowThread);
 		lay.add(linkProcess);
-		lay.add(lnkShowThreads);
-		lay.add(lnkEmailTemplates);
-		lay.add(linkParameters);
-		lay.add(linkUsers);
+		lay.add(lnkEmailTemplate);
+		lay.add(linkParameter);
+		lay.add(linkUser);
 		lay.add(linkDashboard);
 		lay.add(btLogout);
 		

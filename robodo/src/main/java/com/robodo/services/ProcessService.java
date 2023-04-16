@@ -10,9 +10,11 @@ import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -371,7 +373,5 @@ public class ProcessService {
 	private String getCorporateParameterByCode(String parameterName) {
 		return getCorporateParametersAll().stream().filter(p->p.getCode().equals(parameterName)).map(p->p.getValue()).findAny().orElse(null);
 	}
-
-	
 
 }
