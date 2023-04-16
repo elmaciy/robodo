@@ -17,6 +17,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.Icon;
@@ -86,7 +87,7 @@ public class UIProcess extends UIBase {
 
 		gridProcessDefinition.addComponentColumn(p -> {
 			Button btnRun = new Button("", new Icon(VaadinIcon.SEARCH));
-			btnRun.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+			btnRun.addThemeVariants(ButtonVariant.LUMO_SMALL);
 			btnRun.setDisableOnClick(true);
 			btnRun.addClickListener(e -> {
 				runProcessDiscoverer(p);
@@ -94,17 +95,19 @@ public class UIProcess extends UIBase {
 				btnRun.setEnabled(true);
 			});
 			return btnRun;
-		}).setHeader("Discover").setWidth("3em");
+		}).setHeader("Discover").setWidth("3em").setTextAlign(ColumnTextAlign.CENTER);
+		
+		
 		gridProcessDefinition.addComponentColumn(p -> {
 			Button btnShowSteps = new Button("", new Icon(VaadinIcon.LINES_LIST));
-			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_SMALL);
 			btnShowSteps.setDisableOnClick(true);
 			btnShowSteps.addClickListener(e -> {
 				showProcessDefinitionSteps(p);
 				btnShowSteps.setEnabled(true);
 			});
 			return btnShowSteps;
-		}).setHeader("Steps").setWidth("3em");
+		}).setHeader("Steps").setWidth("3em").setTextAlign(ColumnTextAlign.CENTER);
 		;
 		//------------------------------------------------------------
 		
