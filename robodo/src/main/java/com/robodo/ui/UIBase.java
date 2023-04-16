@@ -12,7 +12,6 @@ import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.model.RunningProcess;
-import com.robodo.model.User;
 import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.QueueSingleton;
@@ -30,8 +29,8 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -39,11 +38,6 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.Binder.Binding;
-import com.vaadin.flow.data.binder.Setter;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
@@ -65,8 +59,9 @@ public class UIBase extends AppLayout {
 	
 	VerticalLayout root = new VerticalLayout();
 	
-	H1 titleH1 = new H1("Robo.do");
-	String title="";
+	Span titleSpan = new Span("Robo.do");
+	Icon icon=VaadinIcon.RANDOM.create();
+	String title="Base Page";
 	
 	public UIBase(ProcessService processService, SecurityService securityService) {
 		this.processService=processService;
@@ -84,10 +79,10 @@ public class UIBase extends AppLayout {
 		
 		DrawerToggle toggle = new DrawerToggle();
 		
-		titleH1.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "var(--lumo-space-m)");
-
+		setTitle(title, icon);
+		
 		if (isAuthenticated()) {
-	        addToNavbar(toggle, titleH1);
+	        addToNavbar(toggle, titleSpan);
 	        addToDrawer(getRoterLinks());
 		}
         
@@ -96,6 +91,15 @@ public class UIBase extends AppLayout {
 	}
 
 
+	public void setTitle(String title, Icon icon) {
+		this.title=title;
+		this.icon=icon;
+		titleSpan.removeAll();
+		titleSpan.add(icon);
+		titleSpan.add(new Span("  "), new Span(" | Robo.do | %s".formatted(this.title)));
+		
+	}
+	
 	public boolean isAuthenticated() {
 		 UserDetails authenticatedUser = securityService.getAuthenticatedUser();
 		 return authenticatedUser!=null;
@@ -112,11 +116,6 @@ public class UIBase extends AppLayout {
 	}
 	
 
-	public void setTitle(String title) {
-		this.title=title;
-		titleH1.setText("Robo.do %s".formatted(this.title));
-	}
-	
 	private VerticalLayout  getRoterLinks() {
 		
 		VerticalLayout lay=new VerticalLayout();

@@ -47,7 +47,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	@Autowired
 	public UIApprover(ProcessService processService, SecurityService securityService) {
 		super(processService, securityService);
-		setTitle("Approve");
+		setTitle("Approve", VaadinIcon.SEARCH.create());
 	}
 
 	@Override

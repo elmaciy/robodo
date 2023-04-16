@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.robodo.model.Parameter;
+import com.robodo.model.CorporateParameter;
 
-public interface ParameterRepo extends CrudRepository<Parameter, Long> {
+public interface ParameterRepo extends CrudRepository<CorporateParameter, Long> {
 
-	List<Parameter> findAllByCode(String code);
+	List<CorporateParameter> findAllByCode(String code);
 	
 
 }

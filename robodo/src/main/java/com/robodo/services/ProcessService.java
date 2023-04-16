@@ -10,6 +10,9 @@ import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.robodo.model.EmailTemplate;
-import com.robodo.model.Parameter;
+import com.robodo.model.CorporateParameter;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
@@ -37,6 +40,7 @@ import com.robodo.utils.HelperUtil;
 
 @Service
 @Transactional
+@EnableCaching
 public class ProcessService {
 	
 	@Autowired
@@ -69,8 +73,20 @@ public class ProcessService {
 	@Autowired
 	ParameterRepo parameterRepo;
 	
+	@Cacheable("processDefinitions")
 	public List<ProcessDefinition> getProcessDefinitions() {
 		return StreamSupport.stream(processDefinitionRepo.findAll().spliterator(), false).collect(Collectors.toList());
+	}
+
+	@CacheEvict(value = "processDefinitions", allEntries = true)
+	public boolean saveProcessDefinition(ProcessDefinition p) {
+		try {
+			processDefinitionRepo.save(p);
+			return true;
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	public void saveProcessInstance(ProcessInstance processInstance) {		
@@ -82,15 +98,6 @@ public class ProcessService {
 		processInstanceRepo.save(processInstance);
 	}
 
-	public boolean saveProcessDefinition(ProcessDefinition p) {
-		try {
-			processDefinitionRepo.save(p);
-			return true;
-		} catch(Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
 
 	public boolean isProcessInstanceAlreadyExists(ProcessInstance discoveredInstance) {
 		List<ProcessInstance> list = processInstanceRepo.findByCode(discoveredInstance.getCode());
@@ -194,13 +201,12 @@ public class ProcessService {
 		return keywords.stream().allMatch(kw->StringUtils.containsIgnoreCase(string,kw));
 
 	}
+	
+	
 
 	public EmailTemplate getEmailTemplateByCode(String code) {
-		List<EmailTemplate> list = emailTemplateRepo.findByCode(code);
-		if (list.size()==0) {
-			return null;
-		}
-		return list.get(0);
+		List<EmailTemplate> list = getEmailTemplateAll();
+		return list.stream().filter(p->p.getCode().equals(code)).findAny().orElse(null);
 	}
 
 	public List<ProcessInstanceStepFile> getProcessInstanceStepFilesByStepId(ProcessInstanceStep step) {
@@ -263,19 +269,15 @@ public class ProcessService {
 
 	public User getUserByUsernameAndPassword(String username, String password) {
 		String passwordEncoded = HelperUtil.encrypt(password);
-		List<User> userList = userRepo.findByUsernameAndPassword(username, passwordEncoded);
-		if (userList.isEmpty()) return null;
-		return userList.get(0);
+		return getUsersAll().stream().filter(p->p.getUsername().equals(username) && p.getPassword().equals(passwordEncoded)).findAny().orElse(null);
 	}
 	
 	public User getUserByUsername(String username) {
-		List<User> userList = userRepo.findByUsername(username);
-		if (userList.isEmpty()) return null;
-		return userList.get(0);
+		return getUsersAll().stream().filter(p->p.getUsername().equals(username)).findAny().orElse(null);
 	}
 
 	public List<User> getActiveUsers() {
-		return userRepo.findByValid(true);		
+		return getUsersAll().stream().filter(p->p.isValid()).collect(Collectors.toList());
 	}
 
 	public ProcessDefinition getProcessDefinitionById(Long processDefinitionId) {
@@ -286,22 +288,25 @@ public class ProcessService {
 		processInstanceRepo.delete(processInstance);
 	}
 
+	@Cacheable("users")
 	public List<User> getUsersAll() {
 		return Lists.newArrayList(userRepo.findAll());
 	}
 
+	@CacheEvict(value = "users", allEntries = true)
 	public User saveUser(User user) {
 		return userRepo.save(user);
 		
 	}
 
+	@CacheEvict(value = "users", allEntries = true)
 	public void removeUser(User user) {
 		userRepo.delete(user);
 		
 	}
 
 	public List<String> getRoles() {
-		return List.of("ADMIN","USER","SUPERVISOR");
+		return List.of(UserRole.ROLE_ADMIN,UserRole.ROLE_USER,UserRole.SUPERVISOR);
 	}
 
 	public List<UserRole> getUserRoles(User user) {
@@ -320,30 +325,51 @@ public class ProcessService {
 		
 	}
 
-	public EmailTemplate saveEmailTemplate(EmailTemplate emailTemplate) {
-		return emailTemplateRepo.save(emailTemplate);
-	}
 
+	@Cacheable("emailTemplates")
 	public List<EmailTemplate> getEmailTemplateAll() {
 		return StreamSupport.stream(emailTemplateRepo.findAll().spliterator(), false).collect(Collectors.toList());
 	}
 
+	@CacheEvict(value = "emailTemplates", allEntries = true)
+	public EmailTemplate saveEmailTemplate(EmailTemplate emailTemplate) {
+		return emailTemplateRepo.save(emailTemplate);
+	}
+
+	@CacheEvict(value = "emailTemplates", allEntries = true)
 	public void removeEmailTemplate(EmailTemplate emailTemplate) {
 		emailTemplateRepo.delete(emailTemplate);
 		
 	}
 
-	public void removeParameter(Parameter parameter) {
-		parameterRepo.save(parameter);
+	@Cacheable("corporateParameters")
+	public List<CorporateParameter> getCorporateParametersAll() {
+		return StreamSupport.stream(parameterRepo.findAll().spliterator(), false).collect(Collectors.toList());
 	}
 
-	public Parameter saveParameter(Parameter parameter) {
+	@CacheEvict(value = "corporateParameters", allEntries = true)
+	public void removeCorporateParameter(CorporateParameter parameter) {
+		parameterRepo.delete(parameter);
+	}
+
+	@CacheEvict(value = "corporateParameters", allEntries = true)
+	public CorporateParameter saveCorporateParameter(CorporateParameter parameter) {
 		return parameterRepo.save(parameter);
 		
 	}
 
-	public List<Parameter> getParametersAll() {
-		return StreamSupport.stream(parameterRepo.findAll().spliterator(), false).collect(Collectors.toList());
+	
+	public String getEnvProperty(String parameterName) {
+		String value = getCorporateParameterByCode(parameterName);
+		if (value!=null && !value.isEmpty()) {
+			return value;
+		}
+		
+		return this.env.getProperty(parameterName);
+	}
+
+	private String getCorporateParameterByCode(String parameterName) {
+		return getCorporateParametersAll().stream().filter(p->p.getCode().equals(parameterName)).map(p->p.getValue()).findAny().orElse(null);
 	}
 
 	

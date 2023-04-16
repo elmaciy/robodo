@@ -67,7 +67,7 @@ public class UIProcessor extends UIBase {
 		super(processService, securityService);
 		this.processService = processService;
 
-		setTitle("Processes");
+		setTitle("Processes", VaadinIcon.COG.create());
 
 		gridProcessDefinition = new Grid<>(ProcessDefinition.class, false);
 		gridProcessDefinition.addColumn(p -> p.getId()).setHeader("#").setWidth("3em");
@@ -923,7 +923,7 @@ public class UIProcessor extends UIBase {
 
 	private void runProcessInstance(ProcessInstance processInstance) {
 
-		int maxThreadCount = Integer.valueOf(processService.getEnv().getProperty("max.thread"));
+		int maxThreadCount = Integer.valueOf(processService.getEnvProperty("max.thread"));
 		
 		int currentThreadCount = RunnerSingleton.getInstance().getRunningProcessCount();
 		if (currentThreadCount >= maxThreadCount) {

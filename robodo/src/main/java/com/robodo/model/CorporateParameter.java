@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "parameter")
-public class Parameter {
+public class CorporateParameter {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)

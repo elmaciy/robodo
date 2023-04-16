@@ -256,7 +256,7 @@ public class RunnerUtil {
 		ExecutionResultsForCommand result = new ExecutionResultsForCommand();
 		BaseSteps stepClassInstance=null;
 		try {
-			String packageName = processService.getEnv().getProperty("steps.package");
+			String packageName = processService.getEnvProperty("steps.package");
 			Class<?> clazz = Class.forName(packageName + "." + className);
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class, ProcessInstanceStep.class);
 		
@@ -291,7 +291,7 @@ public class RunnerUtil {
 
 	public List<ProcessInstance> runProcessDiscovery(ProcessDefinition processDefinition) {
 		try {
-			String packageName = processService.getEnv().getProperty("discovery.package");
+			String packageName = processService.getEnvProperty("discovery.package");
 			Class<?> clazz = Class.forName(packageName + "." + processDefinition.getDiscovererClass());
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class);
 			BaseDiscoverer discovererInstance = (BaseDiscoverer) constructor.newInstance(this);
@@ -304,7 +304,7 @@ public class RunnerUtil {
 	}
 
 	public String getEnvironmentParameter(String key) {
-		return this.processService.getEnv().getProperty(key);
+		return this.processService.getEnvProperty(key);
 	}
 
 	public void setVariable(String key, String value) {

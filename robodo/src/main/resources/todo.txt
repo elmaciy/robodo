@@ -45,7 +45,7 @@
 
 86. parametre tablosunun env den öncelikli olarak kulanılmasını sağla
 
-87. google search de işlemler askıda kalıyor. 
+87. tanım ekranlarındaki boxlara maxlength falan koy  - db yi aşmasın 
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 

@@ -27,7 +27,7 @@ public class ThreadForInstanceStarter implements Runnable {
 		RunnerSingleton.getInstance().start(threadName);
 		
 		
-		int maxProcessCount=Integer.valueOf(processService.getEnv().getProperty("max.thread"));
+		int maxProcessCount=Integer.valueOf(processService.getEnvProperty("max.thread"));
 						
 		while(true) {
 

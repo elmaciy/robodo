@@ -44,7 +44,7 @@ public class UIUsers extends UIBase {
 	@Autowired
 	public UIUsers(ProcessService processService, SecurityService securityService) {
 		super(processService, securityService);
-		setTitle("Users");
+		setTitle("Users", VaadinIcon.USER.create());
 
 		drawScreen();
 	}

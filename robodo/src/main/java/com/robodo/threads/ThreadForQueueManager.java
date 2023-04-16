@@ -28,7 +28,7 @@ public class ThreadForQueueManager implements Runnable {
 		
 		RunnerSingleton.getInstance().start(threadName);
 		
-		int queueSize=Integer.parseInt(processService.getEnv().getProperty("queue.size"));
+		int queueSize=Integer.parseInt(processService.getEnvProperty("queue.size"));
 		
 		
 		List<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();

@@ -41,7 +41,7 @@ public class UIEmailTemplates extends UIBase  {
 	@Autowired
 	public UIEmailTemplates(ProcessService processService, SecurityService securityService) {
 		super(processService, securityService);
-		setTitle("Email Templates");
+		setTitle("Email Templates", VaadinIcon.INBOX.create());
 		
 		 drawScreen();
 	}
@@ -150,7 +150,7 @@ public class UIEmailTemplates extends UIBase  {
 
 		editor.addSaveListener(e -> {
 
-			if (!isValidCode(e.getItem().getCode())) {
+			if (!HelperUtil.isValidCode(e.getItem().getCode())) {
 				e.getSource().cancel();
 				runAndInform("Error", "Template code entered is invalid", () -> fillGrid(e.getItem()));
 				return;
@@ -259,10 +259,6 @@ public class UIEmailTemplates extends UIBase  {
 		return lay;
 	}
 
-
-	private boolean isValidCode(String username) {
-		return HelperUtil.patternMatches(username, "^[A-Za-z]\\w{5,100}$");
-	}
 
 	private boolean isValidEmailAddresses(String emailList) {
 		List<String> emails = Splitter.on(",").omitEmptyStrings().splitToList(emailList);

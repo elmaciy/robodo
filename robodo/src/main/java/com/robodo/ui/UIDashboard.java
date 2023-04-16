@@ -6,6 +6,7 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.UserRole;
 import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.Route;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -21,7 +22,7 @@ public class UIDashboard extends UIBase  {
 	@Autowired
 	public UIDashboard(ProcessService processService, SecurityService securityService) {
 		super(processService, securityService);
-		setTitle("Dashboard");
+		setTitle("Dashboard", VaadinIcon.DASHBOARD.create());
 		
 		 drawScreen();
 	}

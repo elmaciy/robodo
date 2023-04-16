@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.robodo.model.Parameter;
+import com.robodo.model.CorporateParameter;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.UserRole;
 import com.robodo.security.SecurityService;
@@ -37,7 +37,7 @@ public class UIParameters extends UIBase  {
 	@Autowired
 	public UIParameters(ProcessService processService, SecurityService securityService) {
 		super(processService, securityService);
-		setTitle("Parameters");
+		setTitle("Parameters", VaadinIcon.PACKAGE.create());
 		
 		 drawScreen();
 	}
@@ -46,8 +46,8 @@ public class UIParameters extends UIBase  {
 
 
 
-	Grid<Parameter> grid = new Grid<>(Parameter.class, false);
-	Editor<Parameter> editor = null;
+	Grid<CorporateParameter> grid = new Grid<>(CorporateParameter.class, false);
+	Editor<CorporateParameter> editor = null;
 
 	private void drawScreen() {
 
@@ -55,8 +55,8 @@ public class UIParameters extends UIBase  {
 		Button btnAddNew = new Button("Add new parameter", new Icon(VaadinIcon.PLUS));
 		btnAddNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
 		btnAddNew.addClickListener(e -> {
-			Parameter newParameter=makeNewParameter();
-			processService.saveParameter(newParameter);
+			CorporateParameter newParameter=makeNewParameter();
+			processService.saveCorporateParameter(newParameter);
 			fillGrid(newParameter);
 			editor.editItem(grid.getSelectedItems().iterator().next());
 		});
@@ -71,8 +71,8 @@ public class UIParameters extends UIBase  {
 
 	}
 
-	private Parameter makeNewParameter() {
-		Parameter parameter=new Parameter();
+	private CorporateParameter makeNewParameter() {
+		CorporateParameter parameter=new CorporateParameter();
 		String id="%s".formatted(String.valueOf(System.currentTimeMillis()));
 		parameter.setCode("PARAM_%s".formatted(id));
 		parameter.setValue("value%s".formatted(id));
@@ -84,6 +84,7 @@ public class UIParameters extends UIBase  {
 		grid.addColumn(p -> p.getCode()).setKey("code").setHeader("Name").setSortable(true)
 				.setAutoWidth(true).setFrozen(true);
 		grid.addColumn(p -> p.getValue()).setKey("value").setHeader("Value").setSortable(true).setAutoWidth(true);
+		grid.addColumn(p -> getEnvironmentValueIfAny(p.getCode())).setKey("envval").setHeader("application.properties").setSortable(true).setAutoWidth(true);
 
 		grid.addComponentColumn(p -> {
 			Button btnRemove = new Button("", new Icon(VaadinIcon.TRASH));
@@ -94,7 +95,7 @@ public class UIParameters extends UIBase  {
 			});
 			return btnRemove;
 
-		}).setHeader("Remove").setAutoWidth(true).setFrozenToEnd(true);
+		}).setHeader("Remove").setWidth("5em").setFrozenToEnd(true);
 
 		grid.setWidthFull();
 
@@ -108,7 +109,7 @@ public class UIParameters extends UIBase  {
 
 		editor = grid.getEditor();
 
-		Grid.Column<Parameter> editColumn = grid.addComponentColumn(parameter -> {
+		Grid.Column<CorporateParameter> editColumn = grid.addComponentColumn(parameter -> {
 			Button editButton = new Button("Edit");
 			editButton.addClickListener(e -> {
 				if (editor.isOpen())
@@ -116,14 +117,14 @@ public class UIParameters extends UIBase  {
 				grid.getEditor().editItem(parameter);
 			});
 			return editButton;
-		}).setWidth("150px").setFlexGrow(0).setFrozenToEnd(true);
+		}).setWidth("5em").setFlexGrow(0).setFrozenToEnd(true);
 
-		Binder<Parameter> binder = new Binder<>(Parameter.class);
+		Binder<CorporateParameter> binder = new Binder<>(CorporateParameter.class);
 		editor.setBinder(binder);
 		editor.setBuffered(true);
 
-		addEditorTextField(grid, binder, "code", Parameter::getCode, Parameter::setCode);
-		addEditorTextField(grid, binder, "value", Parameter::getValue, Parameter::setValue);
+		addEditorTextField(grid, binder, "code", CorporateParameter::getCode, CorporateParameter::setCode);
+		addEditorTextField(grid, binder, "value", CorporateParameter::getValue, CorporateParameter::setValue);
 
 		// ---------------------------------------------------------
 		Button saveButton = new Button("Save", e -> editor.save());
@@ -137,22 +138,22 @@ public class UIParameters extends UIBase  {
 
 		editor.addSaveListener(e -> {
 
-			if (!isValidCode(e.getItem().getCode())) {
+			if (!HelperUtil.isValidCode(e.getItem().getCode())) {
 				e.getSource().cancel();
-				runAndInform("Error", "parameter name entered is invalid", () -> fillGrid(e.getItem()));
+				informAndRun("Error", "parameter name entered is invalid : %s".formatted(e.getItem().getCode()), () -> fillGrid(e.getItem()));
 				return;
 			}
 			
 			if (hasSameCode(e.getItem())) {
 				e.getSource().cancel();
-				runAndInform("Error", "parameter name already exists", () -> fillGrid(e.getItem()));
+				informAndRun("Error", "parameter name already exists", () -> fillGrid(e.getItem()));
 				return;
 				
 			}
 
-			processService.saveParameter(e.getItem());
+			CorporateParameter savedParameter = processService.saveCorporateParameter(e.getItem());
 			notifyInfo("saved");
-			fillGrid(e.getItem());
+			fillGrid(savedParameter);
 
 		});
 
@@ -162,14 +163,17 @@ public class UIParameters extends UIBase  {
 	}
 
 
-	private boolean isValidCode(String code) {
-		return HelperUtil.patternMatches(code, "^[A-Za-z]\\w{5,100}$");
+	private String getEnvironmentValueIfAny(String code) {
+		String value = processService.getEnv().getProperty(code);
+		if (value==null || value.isBlank()) {
+			return "{null}";
+		}
+		return "{%s}".formatted(value);
 	}
 
 
-
-	private void fillGrid(Parameter parameter) {
-		List<Parameter> parametersAll = processService.getParametersAll();
+	private void fillGrid(CorporateParameter parameter) {
+		List<CorporateParameter> parametersAll = processService.getCorporateParametersAll();
 		grid.setItems(parametersAll);
 		if (parameter!=null) {
 			grid.select(parametersAll.stream().filter(p->p.getCode().equals(parameter.getCode())).findAny().get());
@@ -177,20 +181,20 @@ public class UIParameters extends UIBase  {
 		} 
 	}
 
-	private boolean hasSameCode(Parameter parameter) {
-		List<Parameter> parametersAll = processService.getParametersAll();
+	private boolean hasSameCode(CorporateParameter parameter) {
+		List<CorporateParameter> parametersAll = processService.getCorporateParametersAll();
 		return parametersAll.stream().anyMatch(
 					p -> p.getCode().equalsIgnoreCase(parameter.getCode()) 
 					&& !p.getId().equals(parameter.getId())
 					);
 	}
 
-	private void removeParameter(Parameter parameter) {
-		processService.removeParameter(parameter);
+	private void removeParameter(CorporateParameter parameter) {
+		processService.removeCorporateParameter(parameter);
 		fillGrid(null);
 	}
 
-	public void addEditorTextField(Grid<Parameter> grid, Binder<Parameter> binder, String columnId, ValueProvider<Parameter, String> getter, Setter<Parameter, String> setter) {
+	public void addEditorTextField(Grid<CorporateParameter> grid, Binder<CorporateParameter> binder, String columnId, ValueProvider<CorporateParameter, String> getter, Setter<CorporateParameter, String> setter) {
 		TextField tx = new TextField();
 		tx.setWidthFull();
 		binder.forField(tx).bind(getter, setter);

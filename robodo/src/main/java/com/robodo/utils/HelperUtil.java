@@ -105,7 +105,7 @@ public class HelperUtil {
 	public static void sendEmailByTemplate(EmailTemplate emailTemplate, ProcessInstanceStep step, RunnerUtil runnerUtil) {
 		String instanceVariables = step.getProcessInstance().getInstanceVariables();
 		HashMap<String, String> hmVars=String2HashMap(instanceVariables);
-		long tokenDuration=Long.valueOf(runnerUtil.processService.getEnv().getProperty("token.duration"));
+		long tokenDuration=Long.valueOf(runnerUtil.processService.getEnvProperty("token.duration"));
 		Tokenization token = Tokenization.generateNewToken(runnerUtil.processService,"FOR_APPROVAL",step.getProcessInstance().getCode(),  tokenDuration);
 		hmVars.put("token", token.getToken());
 		emailTemplate.setSubject(replaceVariables(emailTemplate.getSubject(),hmVars));
@@ -392,8 +392,9 @@ public class HelperUtil {
 	    }
 	}
 	
-	public static boolean isValidCode(String username) {
-		return HelperUtil.patternMatches(username, "^[A-Za-z]\\w{5,29}$");
+	
+	public static boolean isValidCode(String code) {
+		return HelperUtil.patternMatches(code, "^[0-9A-Za-z\\.\\\\_\\\\$]{5,100}$");
 	}
 
 
