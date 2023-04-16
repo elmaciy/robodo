@@ -347,15 +347,15 @@ public class UIBase extends AppLayout {
 	}
 	
 	
-	public Button makeTrueFalseIcon(boolean isSuccess,Icon iconForSuccess, Icon iconForFail) {
+	public Button makeTrueFalseIcon(boolean isSuccess) {
 		Button btn = new Button("");
 		btn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL);
 		if (isSuccess) {
 			btn.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
-			btn.setIcon(iconForSuccess);
+			btn.setIcon(VaadinIcon.CHECK.create());
 		}  else {
 			btn.addThemeVariants(ButtonVariant.LUMO_ERROR);
-			btn.setIcon(iconForFail);
+			btn.setIcon(VaadinIcon.MINUS.create());
 		}
 		
 		return btn;

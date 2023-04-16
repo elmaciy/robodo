@@ -98,7 +98,7 @@ public class UIInstance extends UIBase {
 		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true)
 				.setFrozen(true).setSortable(true).setVisible(false);
 		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("3em").setFrozen(true).setSortable(true);
-		gridProcessInstance.addComponentColumn(p -> makeTrueFalseIcon(!p.isFailed(),VaadinIcon.CHECK.create(), VaadinIcon.CLOSE.create()))
+		gridProcessInstance.addComponentColumn(p -> makeTrueFalseIcon(!p.isFailed()))
 			.setHeader("Res.").setWidth("3em").setSortable(true).setTextAlign(ColumnTextAlign.CENTER);
 		gridProcessInstance.addColumn(p -> p.getError()).setHeader("Error").setWidth("10em").setSortable(true)
 			.setTooltipGenerator(p->HelperUtil.limitString(p.getError(), 1000));

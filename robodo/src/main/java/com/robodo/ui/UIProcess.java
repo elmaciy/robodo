@@ -138,8 +138,8 @@ public class UIProcess extends UIBase {
 		gridProcessDefinitionSteps.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
 		gridProcessDefinitionSteps.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
 		gridProcessDefinitionSteps.addColumn(p -> p.getCommands()).setHeader("Command to run").setAutoWidth(true);
-		gridProcessDefinitionSteps.addColumn(p -> p.isSingleAtATime()).setHeader("Single").setAutoWidth(true);
-
+		gridProcessDefinitionSteps.addComponentColumn(p -> makeTrueFalseIcon(p.isSingleAtATime())).setHeader("Single").setAutoWidth(true);
+		
 		gridProcessDefinitionSteps.setWidthFull();
 		gridProcessDefinitionSteps.setHeightFull();
 		gridProcessDefinitionSteps.setMaxHeight(200, Unit.EM);
