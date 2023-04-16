@@ -19,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.robodo.model.EmailTemplate;
 import com.robodo.model.CorporateParameter;
+import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
@@ -28,8 +28,8 @@ import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.model.Tokenization;
 import com.robodo.model.User;
 import com.robodo.model.UserRole;
+import com.robodo.repo.CorporateParameterRepo;
 import com.robodo.repo.EmailTemplateRepo;
-import com.robodo.repo.ParameterRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
 import com.robodo.repo.ProcessInstanceRepo;
 import com.robodo.repo.ProcessInstanceStepFileRepo;
@@ -71,7 +71,7 @@ public class ProcessService {
 	EmailTemplateRepo emailTemplateRepo;
 	
 	@Autowired
-	ParameterRepo parameterRepo;
+	CorporateParameterRepo corporateParameterRepo;
 	
 	@Cacheable("processDefinitions")
 	public List<ProcessDefinition> getProcessDefinitions() {
@@ -344,17 +344,17 @@ public class ProcessService {
 
 	@Cacheable("corporateParameters")
 	public List<CorporateParameter> getCorporateParametersAll() {
-		return StreamSupport.stream(parameterRepo.findAll().spliterator(), false).collect(Collectors.toList());
+		return StreamSupport.stream(corporateParameterRepo.findAll().spliterator(), false).collect(Collectors.toList());
 	}
 
 	@CacheEvict(value = "corporateParameters", allEntries = true)
 	public void removeCorporateParameter(CorporateParameter parameter) {
-		parameterRepo.delete(parameter);
+		corporateParameterRepo.delete(parameter);
 	}
 
 	@CacheEvict(value = "corporateParameters", allEntries = true)
 	public CorporateParameter saveCorporateParameter(CorporateParameter parameter) {
-		return parameterRepo.save(parameter);
+		return corporateParameterRepo.save(parameter);
 		
 	}
 

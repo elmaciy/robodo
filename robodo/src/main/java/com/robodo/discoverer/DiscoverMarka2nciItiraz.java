@@ -60,6 +60,7 @@ public class DiscoverMarka2nciItiraz extends BaseDiscoverer {
 			
 			
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
+			instance.setInitialInstanceVariables(instance.getInstanceVariables());
 			
 			for (var definitedSteps : processDefinition.getSteps()) {
 				ProcessInstanceStep instanceStep = new ProcessInstanceStep();

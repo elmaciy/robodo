@@ -44,6 +44,8 @@ public class ProcessInstanceStep {
 	String logs;
 	@Column(columnDefinition = "mediumtext")
 	String error;
+	@Column(columnDefinition = "mediumtext")
+	String instanceVariables;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "process_instance_id", nullable = false)
@@ -175,6 +177,14 @@ public class ProcessInstanceStep {
 	}
 	public boolean isHumanInteractionStep() {
 		return this.getCommands().startsWith("waitHumanInteraction");
+	}
+
+	public String getInstanceVariables() {
+		return instanceVariables;
+	}
+
+	public void setInstanceVariables(String instanceVariables) {
+		this.instanceVariables = instanceVariables;
 	}
 	
 	

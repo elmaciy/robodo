@@ -147,25 +147,45 @@ public class HelperUtil {
 	private static void sendEmail(ProcessInstance processInstance, EmailTemplate emailTemplate, RunnerUtil runnerUtil) {
 		
 		
-		String from = runnerUtil.getEnvironmentParameter("mail.from");
-		Properties properties = System.getProperties();
-		
-		properties.put("mail.smtp.host", runnerUtil.getEnvironmentParameter("mail.smtp.host"));
-		properties.put("mail.smtp.port", runnerUtil.getEnvironmentParameter("mail.smtp.port"));
-		properties.put("mail.smtp.ssl.enable", runnerUtil.getEnvironmentParameter("mail.smtp.ssl.enable"));
-		properties.put("mail.smtp.auth", runnerUtil.getEnvironmentParameter("mail.smtp.auth"));
-		
+		String smtpFrom = runnerUtil.getEnvironmentParameter("mail.from");
+		String smtpHost=runnerUtil.getEnvironmentParameter("mail.smtp.host");
+		String smtpPort=runnerUtil.getEnvironmentParameter("mail.smtp.port");
+		String smtpSSLEnabled=runnerUtil.getEnvironmentParameter("mail.smtp.ssl.enable");
+		String smtpAuth = runnerUtil.getEnvironmentParameter("mail.smtp.auth");
 		String googleAuthKey=runnerUtil.getEnvironmentParameter("mail.google.authentication.key");
+
+		runnerUtil.setVariable("mail.template.code", emailTemplate.getCode());
+		runnerUtil.setVariable("mail.template.subject", emailTemplate.getSubject());
+		runnerUtil.setVariable("mail.template.to", emailTemplate.getToAddress());
+		runnerUtil.setVariable("mail.template.cc", emailTemplate.getCc());
+		runnerUtil.setVariable("mail.template.bcc", emailTemplate.getBcc());
+		runnerUtil.setVariable("mail.template.body", emailTemplate.getBody());
+		
+		runnerUtil.setVariable("mail.from", smtpFrom);
+		runnerUtil.setVariable("mail.smtp.host", smtpHost);
+		runnerUtil.setVariable("mail.smtp.port", smtpPort);
+		runnerUtil.setVariable("mail.smtp.ssl.enable", smtpSSLEnabled);
+		runnerUtil.setVariable("mail.smtp.auth", smtpAuth);
+		runnerUtil.setVariable("mail.google.authentication.key", googleAuthKey);
+
+		
+		
+		Properties properties = System.getProperties();
+		properties.put("mail.smtp.host", smtpHost);
+		properties.put("mail.smtp.port", smtpPort);
+		properties.put("mail.smtp.ssl.enable", smtpSSLEnabled);
+		properties.put("mail.smtp.auth", smtpAuth);
+		
 
 		Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(from, googleAuthKey);
+                return new PasswordAuthentication(smtpFrom, googleAuthKey);
             }
         });
 
 		try {
             MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(from));
+            message.setFrom(new InternetAddress(smtpFrom));
             List<String> toList = Splitter.on(",").trimResults().splitToList(emailTemplate.getToAddress().replaceAll(";", ","));
             for (String email : toList) {
             	if (!isValidEmailAddress(email)) continue;

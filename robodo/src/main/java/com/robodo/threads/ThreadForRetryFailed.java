@@ -34,9 +34,9 @@ public class ThreadForRetryFailed implements Runnable {
 		for (ProcessDefinition processDefinition : processDefinitionsActive) {
 			List<ProcessInstance> instances = processService.getProcessFailedAndToBeRetriedInstances(processDefinition, processDefinition.getMaxThreadCount());
 			instances.forEach(instance->{
-				//retryInstance(instance);
-				retryInstanceStep(instance);
 				processService.deleteAllFiles(instance);
+				retryInstance(instance);
+				//retryInstanceStep(instance);
 				processService.saveProcessInstance(instance);
 			});
 		}
@@ -67,7 +67,7 @@ public class ThreadForRetryFailed implements Runnable {
 		
 	}
 	
-	
+	/*
 	private void retryInstanceStep(ProcessInstance instance) {
 		
 		
@@ -93,5 +93,6 @@ public class ThreadForRetryFailed implements Runnable {
 		
 		
 	}
+	*/
 
 }

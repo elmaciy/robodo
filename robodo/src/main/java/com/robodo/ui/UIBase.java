@@ -30,6 +30,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -62,7 +63,8 @@ public class UIBase extends AppLayout {
 	Span titleSpan = new Span("Robo.do");
 	Icon icon=VaadinIcon.RANDOM.create();
 	String title="Base Page";
-	
+
+
 	public UIBase(ProcessService processService, SecurityService securityService) {
 		this.processService=processService;
 		this.securityService=securityService;
@@ -80,7 +82,7 @@ public class UIBase extends AppLayout {
 		DrawerToggle toggle = new DrawerToggle();
 		
 		setTitle(title, icon);
-		
+
 		if (isAuthenticated()) {
 	        addToNavbar(toggle, titleSpan);
 	        addToDrawer(getRoterLinks());
@@ -127,8 +129,10 @@ public class UIBase extends AppLayout {
 		Button linkParameters =  makeMenuOption("Parameters",VaadinIcon.PACKAGE.create(),(p)->UI.getCurrent().navigate(UIParameters.class));
 		Button linkUsers =  makeMenuOption("Users",VaadinIcon.USER.create(),(p)->UI.getCurrent().navigate(UIUsers.class));
 		Button linkDashboard =  makeMenuOption("Dashboard",VaadinIcon.DASHBOARD.create(),(p)->UI.getCurrent().navigate(UIDashboard.class));
-		Button btLogout =  makeMenuOption("Logout",VaadinIcon.EXIT.create(),(p)->confirmAndRun("Logout", "Sure to logout", ()->securityService.logout()));
 		
+		var authenticatedUser =  securityService.getAuthenticatedUser();
+		String accountUsername=authenticatedUser==null ? "" : authenticatedUser.getUsername();
+		Button btLogout =  makeMenuOption("Logout [%s]".formatted(accountUsername),VaadinIcon.EXIT.create(),(p)->confirmAndRun("Logout", "Sure to logout", ()->securityService.logout()));
 		
 		lay.add(linkProcess);
 		lay.add(lnkShowThreads);

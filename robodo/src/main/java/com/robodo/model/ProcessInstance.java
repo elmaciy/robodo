@@ -47,6 +47,8 @@ public class ProcessInstance {
 	String error;
 	boolean failed=false;
 	@Column(columnDefinition = "mediumtext")
+	String initialInstanceVariables;
+	@Column(columnDefinition = "mediumtext")
 	String instanceVariables;	
 	Long processDefinitionId;
 	
@@ -151,6 +153,14 @@ public class ProcessInstance {
 		this.steps = steps;
 	}
 
+	public String getInitialInstanceVariables() {
+		return initialInstanceVariables;
+	}
+
+	public void setInitialInstanceVariables(String initialInstanceVariables) {
+		this.initialInstanceVariables = initialInstanceVariables;
+	}
+
 	public String getInstanceVariables() {
 		return instanceVariables;
 	}
@@ -158,6 +168,7 @@ public class ProcessInstance {
 	public void setInstanceVariables(String instanceVariables) {
 		this.instanceVariables = instanceVariables;
 	}
+	
 
 	public String getError() {
 		return error;

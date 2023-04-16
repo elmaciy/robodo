@@ -33,6 +33,8 @@ public class DummyGoogleSearchByKeyword extends BaseSteps {
 		selenium.setValue(findElement, keyword);
 		selenium.enter();
 		takeStepScreenShot(this.processInstanceStep, "arama sonucu", true);
+
+		setVariable("google.param", "set");
 		
 	}
 	

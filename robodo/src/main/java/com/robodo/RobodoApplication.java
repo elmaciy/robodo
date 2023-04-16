@@ -300,7 +300,7 @@ public class RobodoApplication {
 			bingSearchStep.setProcessDefinition(dummyProcess);
 			
 			dummyProcess.getSteps().add(googleSearchStep);
-			//dummyProcess.getSteps().add(googleWaitApproval);
+			dummyProcess.getSteps().add(googleWaitApproval);
 			dummyProcess.getSteps().add(bingSearchStep);
 			
 			

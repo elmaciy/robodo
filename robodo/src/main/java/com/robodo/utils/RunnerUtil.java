@@ -70,6 +70,7 @@ public class RunnerUtil {
 
 				RunnerSingleton.getInstance().start(stepRunningKey);
 				processInstance.setStatus(ProcessInstance.STATUS_RUNNING);
+				step.setInstanceVariables(null);
 				processService.saveProcessInstance(processInstance);
 				
 				//----------------------------------
@@ -110,6 +111,7 @@ public class RunnerUtil {
 			step.setLogs(logs.toString());
 			
 			processInstance.setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
+			step.setInstanceVariables(processInstance.getInstanceVariables());
 			processService.saveProcessInstance(processInstance);
 
 		} //for

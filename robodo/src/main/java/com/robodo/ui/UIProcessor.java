@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -503,7 +504,7 @@ public class UIProcessor extends UIBase {
 		
 		Button btnRefresh = new Button("", new Icon(VaadinIcon.REFRESH));
 		btnRefresh.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-		btnRefresh.addClickListener(e->fillStepsGrid(grid, processInstance));
+		btnRefresh.addClickListener(e->fillStepsGrid(grid, processInstance.getCode()));
 
 		
 		grid.addColumn(p -> p.getId()).setHeader(btnRefresh).setWidth("2em");
@@ -558,7 +559,7 @@ public class UIProcessor extends UIBase {
 		});
 		grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
-		fillStepsGrid(grid, processInstance);
+		fillStepsGrid(grid, processInstance.getCode());
 		ProcessInstanceStep firstStep = processInstance.getSteps().get(0);
 		grid.select(firstStep);
 		
@@ -570,8 +571,9 @@ public class UIProcessor extends UIBase {
 
 		Tab tabLogs = new Tab(VaadinIcon.NOTEBOOK.create(), new Span("Logs"));
 		Tab tabFiles = new Tab(VaadinIcon.PICTURE.create(), new Span("Files"));
+		Tab tabVariables = new Tab(VaadinIcon.PICTURE.create(), new Span("Variables"));
 
-		Tabs tabs = new Tabs(tabLogs, tabFiles);
+		Tabs tabs = new Tabs(tabLogs, tabFiles, tabVariables);
 		tabs.setSelectedTab(tabLogs);
 		tabs.setWidth("100%");
 
@@ -583,11 +585,15 @@ public class UIProcessor extends UIBase {
 			if (grid.getSelectedItems().isEmpty()) {
 				return;
 			}
+			
+			ProcessInstanceStep step = grid.getSelectedItems().iterator().next();
+			
 			if (event.getSelectedTab().equals(tabLogs)) {
 				tabContent.add(logMemo);
 			} else if (event.getSelectedTab().equals(tabFiles)) {
-				ProcessInstanceStep step = grid.getSelectedItems().iterator().next();
 				tabContent.add(generateTabForFiles(step));
+			} else if (event.getSelectedTab().equals(tabVariables)) {
+				tabContent.add(makeVariableGrid(processInstance, step));
 			}
 		});
 
@@ -638,8 +644,9 @@ public class UIProcessor extends UIBase {
 
 	
 
-	private void fillStepsGrid(Grid<ProcessInstanceStep> grid, ProcessInstance processInstance) {
-		grid.setItems(processInstance.getSteps());
+	private void fillStepsGrid(Grid<ProcessInstanceStep> grid, String processInstanceCode) {
+		ProcessInstance processRefreshed = processService.getProcessInstanceByCode(processInstanceCode);
+		grid.setItems(processRefreshed.getSteps());
 		
 	}
 
@@ -684,6 +691,11 @@ public class UIProcessor extends UIBase {
 		processInstance.setAttemptNo(Integer.max(processInstance.getAttemptNo() - 1, 0));
 		processInstance.setError(null);
 		processInstance.setFailed(false);
+
+		//reset initial variables
+		if (!processInstance.getStatus().equals(ProcessInstance.STATUS_RUNNING)) {
+			processInstance.setInstanceVariables(processInstance.getInitialInstanceVariables());
+		}
 		
 		processService.saveProcessInstance(processInstance);
 
@@ -722,7 +734,24 @@ public class UIProcessor extends UIBase {
 		VerticalLayout dialogLayout = new VerticalLayout();
 		dialogLayout.setSizeFull();
 
-		HashMap<String, String> hmVars = HelperUtil.String2HashMap(processInstance.getInstanceVariables());
+		dialogLayout.add(makeVariableGrid(processInstance, null));
+
+		dialog.add(dialogLayout);
+		Button cancelButton = new Button("Close", e -> dialog.close());
+		dialog.getFooter().add(cancelButton);
+		dialog.setWidth("60%");
+		dialog.setHeight("80%");
+		dialog.setResizable(true);
+		dialog.setCloseOnEsc(true);
+		dialog.setCloseOnOutsideClick(true);
+		dialog.open();
+
+	}
+
+	private Grid<KeyValue> makeVariableGrid(ProcessInstance processInstance, ProcessInstanceStep processInstanceStep) {
+		
+		String variablesStr = processInstanceStep == null ? processInstance.getInstanceVariables() : processInstanceStep.getInstanceVariables(); 
+		HashMap<String, String> hmVars = HelperUtil.String2HashMap(variablesStr);
 		Grid<KeyValue> gridVars = new Grid<>(KeyValue.class, false);
 		gridVars.addColumn(p -> p.getKey()).setHeader("Variable Name").setWidth("20em");
 		gridVars.addComponentColumn(p -> {
@@ -742,7 +771,13 @@ public class UIProcessor extends UIBase {
 			btnUpdate.addClickListener(e -> {
 				hmVars.put(p.getKey(), p.getValue());
 				String changedVariables = HelperUtil.hashMap2String(hmVars);
-				processInstance.setInstanceVariables(changedVariables);
+				if (processInstanceStep==null) {
+					processInstance.setInstanceVariables(changedVariables);
+					
+				} else {
+					processInstanceStep.setInstanceVariables(changedVariables);
+				}
+				
 				processService.saveProcessInstance(processInstance);
 				notifyInfo("variable changed");
 				btnUpdate.setEnabled(true);
@@ -753,17 +788,22 @@ public class UIProcessor extends UIBase {
 		gridVars.addComponentColumn(p -> {
 			Button btnRemove = new Button("Remove", new Icon(VaadinIcon.DOWNLOAD));
 			btnRemove.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
-			btnRemove.setDisableOnClick(true);
 			btnRemove.addClickListener(e -> {
 				
 				confirmAndRun("Remove", "Sure to remove this parameter : %s=%s?".formatted(p.getKey(),HelperUtil.limitString(p.getValue(),500)), ()->{
 					hmVars.remove(p.getKey());
 					String changedVariables = HelperUtil.hashMap2String(hmVars);
-					processInstance.setInstanceVariables(changedVariables);
+					
+					if (processInstanceStep==null) {
+						processInstance.setInstanceVariables(changedVariables);
+						
+					} else {
+						processInstanceStep.setInstanceVariables(changedVariables);
+					}
+					
 					processService.saveProcessInstance(processInstance);
 					notifyInfo("variable removed");
 					setVariableGridItems(gridVars, hmVars);
-					btnRemove.setEnabled(true);
 				});
 				
 			});
@@ -778,18 +818,8 @@ public class UIProcessor extends UIBase {
 		gridVars.setSizeFull();
 
 		setVariableGridItems(gridVars, hmVars);
-		dialogLayout.add(gridVars);
-
-		dialog.add(dialogLayout);
-		Button cancelButton = new Button("Close", e -> dialog.close());
-		dialog.getFooter().add(cancelButton);
-		dialog.setWidth("60%");
-		dialog.setHeight("80%");
-		dialog.setResizable(true);
-		dialog.setCloseOnEsc(true);
-		dialog.setCloseOnOutsideClick(true);
-		dialog.open();
-
+		
+		return gridVars;
 	}
 
 	private void showProcessDefinitionSteps(ProcessDefinition processDefinition) {

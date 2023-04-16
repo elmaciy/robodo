@@ -36,6 +36,8 @@ public class DummyBingSearchByKeyword extends BaseSteps {
 		selenium.waitPageLoaded();
 		takeStepScreenShot(this.processInstanceStep, keyword, true);		
 		
+		setVariable("bing.param", "set");
+
 		
 	}
 	

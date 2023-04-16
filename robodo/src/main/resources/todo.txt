@@ -43,9 +43,11 @@
 	ikincisinde steple ilgili olarak human onayi almadan once bir dis sistemi tetikleyecegiz. 
 	ikinci tipte de hata durumlarini dusun
 
-86. parametre tablosunun env den öncelikli olarak kulanılmasını sağla
+86. parametre tablosunun env den öncelikli olarak kulanılmasını sağla. email gönderirken olmadı. kontrol edilmeli. 
 
 87. tanım ekranlarındaki boxlara maxlength falan koy  - db yi aşmasın 
+
+88. instance ekranında process definition sadece filtre olarak falan görünsün. Ekran ayrılsın. admin yetkisi gerekir çünkü. 
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 

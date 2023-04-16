@@ -20,8 +20,8 @@ public class DiscoverProcessGooggleSearch extends BaseDiscoverer {
 
 	@Override
 	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {
-		List<String> keywords = List.of("Yildiray","Elmacı","Eidhoven","Sevgi","Saygı","Hürmet");
-		//List<String> keywords = List.of("Yildiray");
+		//List<String> keywords = List.of("Yildiray","Elmacı","Eidhoven","Sevgi","Saygı","Hürmet");
+		List<String> keywords = List.of("Yildiray");
 		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
 		
 		for (String keyword : keywords) {
@@ -41,7 +41,10 @@ public class DiscoverProcessGooggleSearch extends BaseDiscoverer {
 			HashMap<String, String> hmVars=new HashMap<String, String>();
 			hmVars.put("processInstance.code", instance.getCode());
 			hmVars.put("keyword", keyword);
+			
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
+			instance.setInitialInstanceVariables(instance.getInstanceVariables());
+
 			
 			for (var definitedSteps : processDefinition.getSteps()) {
 				ProcessInstanceStep instanceStep = new ProcessInstanceStep();

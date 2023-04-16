@@ -46,8 +46,10 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseDiscoverer {
 			hmVars.put("eposta", "ipmaintenance.epats@ankarapatent.com");
 			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺2.450,00"));
 			hmVars.put("talepTuru", "Tam");
-			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			
+			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
+			instance.setInitialInstanceVariables(instance.getInstanceVariables());
+
 			for (var definitedSteps : processDefinition.getSteps()) {
 				ProcessInstanceStep instanceStep = new ProcessInstanceStep();
 				instanceStep.setStepCode(definitedSteps.getCode());
