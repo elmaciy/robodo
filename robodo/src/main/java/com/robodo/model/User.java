@@ -27,7 +27,6 @@ public class User  {
 	String fullname;
 	String email;
 	boolean valid;
-	LocalDateTime lastLogin;
 	LocalDateTime lastPasswordChange;
 	LocalDateTime created;
 	LocalDateTime updated;
@@ -70,12 +69,6 @@ public class User  {
 	}
 	public void setValid(boolean valid) {
 		this.valid = valid;
-	}
-	public LocalDateTime getLastLogin() {
-		return lastLogin;
-	}
-	public void setLastLogin(LocalDateTime lastLogin) {
-		this.lastLogin = lastLogin;
 	}
 	public LocalDateTime getLastPasswordChange() {
 		return lastPasswordChange;

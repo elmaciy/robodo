@@ -99,7 +99,6 @@ public class UIUsers extends UIBase {
 				.setKey("valid").setHeader("Valid").setSortable(true).setAutoWidth(true);
 		grid.addComponentColumn(p -> makeRolesEditor(p)).setKey("roles").setHeader("Roles").setAutoWidth(true);
 		grid.addComponentColumn(p -> makePasswordEditor(p)).setKey("password").setHeader("Password").setWidth("10em");
-		grid.addColumn(p -> dateFormat(p.getLastLogin())).setHeader("Last Login").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getLastPasswordChange())).setHeader("Last Password Change").setAutoWidth(true);
 	
 		grid.addComponentColumn(p -> {

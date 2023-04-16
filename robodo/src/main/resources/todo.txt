@@ -1,4 +1,9 @@
 17. dashboardda iş bazında bekleyenler, tamamlananlar vs görünsün. 
+	dashboard verileri bir job ile arada sırada güncellenmeli. anlık çekilmemeli. 
+	- işlem tipi bazında statü grupları
+	- ortalama işlem süreleri
+	- işlemlerdeki ortalama süreler
+	- genel rakamlar. (günlük işlenen) saatlik işlenen haftalık işlenen falan... 
 
 18. kullanıcı yönetimi ekranına arama koy
 
@@ -6,10 +11,11 @@
 
 37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? 
 	context vs koyarak halledilebilir belki de. 
+	ayrıca onay/red/izleme kodu ortaklaştırılmalı. Mail içinde özel parametre isimleri ile konulmalı 
+	bunları mail içinde görünce o anda oluşturup replace etmeli bir fonksiyonla. 
+	${HUMAN.APPROVE_LINK}, ${HUMAN.DECLINE_LINK}, ${HUMAN.VIEW_LINK}
 
-38. gizli bilgileirn, mail parametrelerini, kredi kartı gibi kuruma özel bilgileri properties yerine parametre dosyasından aldır. 
-	Bussinessvariables olsun bunlar ve env parametrelerini ezsin aynı parametre burada da tanımlı ise
-	Aynı ekrana ayrıca tüm env parametrelerinin listelenmesini sağla. orada env parametresini de görsün. 
+ 
 	
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
@@ -19,15 +25,11 @@
 
 60. login success sayfasını "/home" ya da process e falan ayarlayalım
 	
-64. işlemlerin çalışmayacağı zaman aralıkları olmalı. 
+64. işlemlerin çalışacağı / çalışmayacağı zaman aralıkları olmalı. 
 	Mesela bazı işlemler öğlene kadar yapılabilir gibi... 
 	hatta bazı günlerde hiç çalışma olmamalı falan...
 	
 71. process definitions a bunu görebileceklerin listesini mi eklesek? sadece o kişiler ya da o roldekiler bu işlemi  görebilecek böylece. 
-
-72. backward yapınca  variable leri de eski haline nasıl getirebiliriz? 
-	Bunun için stepin başlamadan önceki variableleri saklanır. 
-	en son step alındığında, yani new ya da retry olduğunda başlangıç parametreleri instance dan kopyalansın
 
 47. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
@@ -37,20 +39,18 @@
 	
 83. thread windowundaki kuyruk ve thread lar sıfırlanabilmelidir. ???
 
-84. Kullanıcı last login alanını loginlerde güncelle ya da o alanı sil çok önemli değilse. 
-
 85. Human interactionda iki türlü olsun. 1nci mail göndersin. 2ncsi ise bir stepAction calistirsin. 
 	ikincisinde steple ilgili olarak human onayi almadan once bir dis sistemi tetikleyecegiz. 
 	ikinci tipte de hata durumlarini dusun
 
-86. parametre tablosunun env den öncelikli olarak kulanılmasını sağla. email gönderirken olmadı. kontrol edilmeli. 
+86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
 
 87. tanım ekranlarındaki boxlara maxlength falan koy  - db yi aşmasın 
 
 88. instance ekranında process definition sadece filtre olarak falan görünsün. Ekran ayrılsın. admin yetkisi gerekir çünkü. 
 
 89. backward yapılınca önceki adıma geçmiyor, doğru refresh etmiyor. 
-90. human aşamasında maille ilgii setlediği variableleri ve önceki aşamanın variablelerini yüklemiyor
+90. human aşamasında maille ilgili variableleri instance a yüklemiyor. onay verdikten sonra yükleniyor. 
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -101,4 +101,9 @@ TAMAMLANANLAR
 	3 rol olmalı => ADMIN, SUPERVISOR, USER
 	Admin ile SUPERVISOR arasında fark var. ADMIN sistemin sahibi, SUPERVISOR şirketin. 
 77. email template ekranı yaz 
-
+72. backward yapınca  variable leri de eski haline nasıl getirebiliriz? 
+	Bunun için stepin başlamadan önceki variableleri saklanır. 
+	en son step alındığında, yani new ya da retry olduğunda başlangıç parametreleri instance dan kopyalansın
+38. gizli bilgileirn, mail parametrelerini, kredi kartı gibi kuruma özel bilgileri properties yerine parametre dosyasından aldır. 
+	Bussinessvariables olsun bunlar ve env parametrelerini ezsin aynı parametre burada da tanımlı ise
+	Aynı ekrana ayrıca tüm env parametrelerinin listelenmesini sağla. orada env parametresini de görsün.
