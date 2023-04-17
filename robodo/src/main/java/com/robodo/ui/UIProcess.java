@@ -352,15 +352,6 @@ public class UIProcess extends UIBase {
 	
 	private int getIndexOfStep(ProcessDefinition processDefinition, ProcessDefinitionStep stepToCheck) {
 		return processDefinition.getSteps().indexOf(stepToCheck);
-		/*
-		int i=-1;
-		for (ProcessDefinitionStep step : processDefinition.getSteps()) {
-			if (step.getId().equals(stepToCheck.getId())) {
-				i++;
-			}
-		}
-		return i;
-		*/
 	}
 
 
