@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,7 +28,7 @@ public class ProcessDefinition {
 	String code;
 	String description;
 	@OneToMany(mappedBy = "processDefinition", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	List<ProcessDefinitionStep> steps;
+	private List<ProcessDefinitionStep> steps;
 	String discovererClass;
 	Integer maxAttemptCount;
 	Integer maxThreadCount;
@@ -53,9 +55,6 @@ public class ProcessDefinition {
 		this.description = description;
 	}
 	public List<ProcessDefinitionStep> getSteps() {
-		return steps;
-	}
-	public void setSteps(List<ProcessDefinitionStep> steps) {
 		Collections.sort(steps, new Comparator<ProcessDefinitionStep>() {
 
 			@Override
@@ -63,7 +62,10 @@ public class ProcessDefinition {
 				return o1.getOrderNo().compareTo(o2.getOrderNo());
 			}
 		});
-		
+		return steps;
+	}
+	
+	public void setSteps(List<ProcessDefinitionStep> steps) {
 		this.steps = steps;
 	}
 	public Integer getMaxAttemptCount() {
@@ -116,5 +118,13 @@ public class ProcessDefinition {
 		this.updated= LocalDateTime.now();
 	}
 	
+	public String getNextStepOrder() {
+		if (this.getSteps().size()==0) {
+			return "01";
+		}
+		
+		ProcessDefinitionStep lastStep = this.getSteps().get(this.getSteps().size()-1);
+		return StringUtils.right("0000%d".formatted(Integer.valueOf(lastStep.getOrderNo())+1), 2);
+	}
 	
 }

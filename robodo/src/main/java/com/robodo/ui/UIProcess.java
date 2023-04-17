@@ -2,6 +2,7 @@ package com.robodo.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,10 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
 import com.vaadin.flow.router.Route;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -50,7 +54,7 @@ public class UIProcess extends UIBase {
 		setTitle("Processes", VaadinIcon.COG.create());
 
 		gridProcessDefinition = new Grid<>(ProcessDefinition.class, false);
-		gridProcessDefinition.addColumn(p -> p.getId()).setHeader("#").setWidth("1em");
+		gridProcessDefinition.addColumn(p -> p.getId()).setKey("id").setHeader("#").setWidth("1em");
 		gridProcessDefinition.addComponentColumn(p ->{
 			var editor = makeEditorTextField(
 						p.getCode(),
@@ -100,11 +104,16 @@ public class UIProcess extends UIBase {
 		
 		gridProcessDefinition.addComponentColumn(p -> {
 			Checkbox chActive = new Checkbox(p.isActive());
+
 			chActive.addValueChangeListener(e -> {
 				boolean newVal = e.getValue();
-				p.setActive(newVal);
-				processService.saveProcessDefinition(p);
-				notifySuccess("process activation changed");
+				if (newVal && p.getSteps().isEmpty()) {
+					chActive.setValue(false);
+					notifyError("Can not be activeted. Has not step yet.");
+				} else {
+					p.setActive(newVal);
+					processService.saveProcessDefinition(p);					
+				}
 			});
 			return chActive;
 		}).setHeader("Active").setWidth("2em").setTextAlign(ColumnTextAlign.CENTER);
@@ -151,9 +160,12 @@ public class UIProcess extends UIBase {
 		
 		//------------------------------------------------------------
 		gridProcessDefinitionSteps = new Grid<>(ProcessDefinitionStep.class, false);
-		gridProcessDefinitionSteps.addColumn(p -> p.getId()).setHeader("#").setWidth("1em");
-		gridProcessDefinitionSteps.addComponentColumn(p->makeReorderingComponent(p))
-		.setHeader("Order").setWidth("2em").setTextAlign(ColumnTextAlign.CENTER);
+		
+		gridProcessDefinitionSteps.addColumn(p -> p.getId()).setKey("id").setHeader("#").setWidth("1em");
+		
+		gridProcessDefinitionSteps.addComponentColumn(p->makeReorderingComponent(p.getProcessDefinition(), p))
+			.setHeader("Order").setWidth("2em").setTextAlign(ColumnTextAlign.CENTER);
+		
 		gridProcessDefinitionSteps.addComponentColumn(p ->{
 			return makeEditorTextField(
 					p.getCode(),
@@ -166,6 +178,7 @@ public class UIProcess extends UIBase {
 					(e)-> p.getProcessDefinition().getSteps().stream().noneMatch(s->s.getCode().equals(e) && !s.getId().equals(p.getId()))
 					);
 		}).setHeader("Code").setAutoWidth(true);
+		
 		gridProcessDefinitionSteps.addComponentColumn(p ->{
 			return makeEditorTextField(
 					p.getDescription(),
@@ -176,6 +189,7 @@ public class UIProcess extends UIBase {
 					}, 
 					(e)-> HelperUtil.isValidDescription(e));
 		}).setHeader("Description").setAutoWidth(true);
+		
 		gridProcessDefinitionSteps.addComponentColumn(p ->{
 			return makeEditorTextField(
 					p.getCommands(),
@@ -186,6 +200,7 @@ public class UIProcess extends UIBase {
 					}, 
 					(e)-> HelperUtil.isValidCommand(e));
 		}).setHeader("Command to run").setAutoWidth(true);
+		
 		gridProcessDefinitionSteps.addComponentColumn(p -> {
 			Checkbox chSingleAtATime = new Checkbox(p.isSingleAtATime());
 			chSingleAtATime.addValueChangeListener(e -> {
@@ -197,13 +212,12 @@ public class UIProcess extends UIBase {
 			return chSingleAtATime;
 		}).setHeader("Single").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
 		
-		
 		gridProcessDefinitionSteps.addComponentColumn(p -> {
 			Button btnDelete = new Button("", new Icon(VaadinIcon.TRASH));
 			btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
 			btnDelete.addClickListener(e -> {
-				confirmAndRun("Delete", "Sure to remove process step :%s".formatted(p.getCode()), ()->removeProcessDefinitionStep(p.getProcessDefinition(), p.getCode()));
-			});
+				confirmAndRun("Delete", "Sure to remove process step :%s".formatted(p.getCode()), ()->removeProcessDefinitionStep(p));
+			});	
 			btnDelete.setEnabled(!hasAnyInstance(p.getProcessDefinition()));
 			return btnDelete;
 		}).setHeader("Steps").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
@@ -221,8 +235,8 @@ public class UIProcess extends UIBase {
 
 		//------------------------------------------------------------
 		
-		gridProcessDefinition.setMaxHeight("40%");
-		gridProcessDefinitionSteps.setHeightFull();
+		gridProcessDefinition.setSizeFull();
+		gridProcessDefinitionSteps.setSizeFull();
 		
 		gridProcessDefinition.getColumns().forEach(col -> {
 			col.setResizable(true);
@@ -239,9 +253,9 @@ public class UIProcess extends UIBase {
 		
 		
 		
-		Button btnAddNewProcessDefinition = new Button("Add new parameter", new Icon(VaadinIcon.PLUS));
+		Button btnAddNewProcessDefinition = new Button("Add", new Icon(VaadinIcon.PLUS));
 		btnAddNewProcessDefinition.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
-		btnAddNewProcessDefinition.setWidth("30em");
+		btnAddNewProcessDefinition.setWidthFull();
 		btnAddNewProcessDefinition.addClickListener(e -> {
 			String id=String.valueOf(System.currentTimeMillis());
 			
@@ -260,9 +274,9 @@ public class UIProcess extends UIBase {
 			
 		});
 		
-		Button btnAddNewStep = new Button("Add new step", new Icon(VaadinIcon.PLUS));
+		Button btnAddNewStep = new Button("Add", new Icon(VaadinIcon.PLUS));
 		btnAddNewStep.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
-		btnAddNewStep.setWidth("30em");
+		btnAddNewStep.setWidthFull();
 		btnAddNewStep.addClickListener(e -> {
 			
 			var it = gridProcessDefinition.getSelectedItems().iterator();
@@ -281,26 +295,32 @@ public class UIProcess extends UIBase {
 			
 			String id=String.valueOf(System.currentTimeMillis());
 			
-			ProcessDefinitionStep step = new ProcessDefinitionStep();
-			step.setProcessDefinition(processDefinition);
-			step.setCode("%s".formatted(id));
-			step.setDescription("Description of %s".formatted(id));
-			step.setCommands("runStepClass  StepClass%s".formatted(id));
-			step.setSingleAtATime(false);
-			step.setOrderNo("99");
+			ProcessDefinitionStep newStep = new ProcessDefinitionStep();
+			newStep.setProcessDefinition(processDefinition);
+			newStep.setCode("%s".formatted(id));
+			newStep.setDescription("Description of %s".formatted(id));
+			newStep.setCommands("runStepClass  StepClass%s".formatted(id));
+			newStep.setSingleAtATime(false);
+			newStep.setOrderNo(processDefinition.getNextStepOrder());
 			
-			processDefinition.getSteps().add(step);
+			processDefinition.getSteps().add(newStep);
 			
 			ProcessDefinition saveProcessDefinition = processService.saveProcessDefinition(processDefinition);
 			refreshProcessDefinitionGrid();
 			selectProcessDefinition(saveProcessDefinition);
+			selectProcessDefinitionStep(newStep);
 			
 		});
 		
-		add(btnAddNewProcessDefinition);
-		add(gridProcessDefinition);
-		add(btnAddNewStep);
-		add(gridProcessDefinitionSteps);
+		gridProcessDefinition.getColumnByKey("id").setHeader(btnAddNewProcessDefinition);
+		gridProcessDefinitionSteps.getColumnByKey("id").setHeader(btnAddNewStep);
+		
+		SplitLayout splitter=new SplitLayout(gridProcessDefinition, gridProcessDefinitionSteps);
+		splitter.setSizeFull();
+		splitter.setSplitterPosition(40);
+		splitter.setOrientation(Orientation.VERTICAL);
+		
+		add(splitter);
 
 		
 		refreshProcessDefinitionGrid();
@@ -310,28 +330,29 @@ public class UIProcess extends UIBase {
 
 	
 
-	private HorizontalLayout makeReorderingComponent(ProcessDefinitionStep step) {
+	private HorizontalLayout makeReorderingComponent(ProcessDefinition processDefinition,  ProcessDefinitionStep step) {
 		HorizontalLayout lay=new HorizontalLayout();
 		lay.setMargin(false);
 		lay.setSpacing(false);
-		
+		lay.setWidthFull();
+		lay.setAlignItems(Alignment.CENTER);
 		
 		Button btUp = new Button("", new Icon(VaadinIcon.ARROW_UP));
-		btUp.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		btUp.addThemeVariants(ButtonVariant.LUMO_ICON);
 		btUp.setWidth("1em");
-		btUp.setEnabled(!isFirsStep(step) && !hasAnyInstance(step.getProcessDefinition()));
+		btUp.setEnabled(!isFirsStep(step));
 
 		btUp.addClickListener(e -> {
-			reorderStep(step,"UP");
+			reorderStep(processDefinition, step,"UP");
 		});
 		
 		
 		Button btDown = new Button("", new Icon(VaadinIcon.ARROW_DOWN));
-		btDown.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		btDown.addThemeVariants(ButtonVariant.LUMO_ICON);
 		btDown.setWidth("1em");
-		btDown.setEnabled(!isLastStep(step) && !hasAnyInstance(step.getProcessDefinition()));
+		btDown.setEnabled(!isLastStep(step));
 		btDown.addClickListener(e -> {
-			reorderStep(step,"DOWN");
+			reorderStep(processDefinition, step,"DOWN");
 		});
 		
 		lay.add(btUp, btDown);
@@ -357,25 +378,47 @@ public class UIProcess extends UIBase {
 
 
 
-	private void reorderStep(ProcessDefinitionStep p, String string) {
-		// TODO Auto-generated method stub
+	private void reorderStep(ProcessDefinition  processDefinition, ProcessDefinitionStep processDefinitionStep, String direction) {
+		var steps = processDefinition.getSteps();
 		
+		int a = steps.indexOf(processDefinitionStep);
+		int b=direction.equals("UP") ? a - 1  : a + 1;
+		
+		String tmpOrderNo=steps.get(a).getOrderNo();
+		steps.get(a).setOrderNo(steps.get(b).getOrderNo());
+		steps.get(b).setOrderNo(tmpOrderNo);
+		
+		Collections.swap(steps, a, b);
+		
+		processService.saveProcessDefinition(processDefinitionStep.getProcessDefinition());
+		refreshProcessDefinitionGrid();
+		selectProcessDefinition(processDefinition);
+		selectProcessDefinitionStep(steps.get(b));
+
 	}
 
 
 
 
-	private void removeProcessDefinitionStep(ProcessDefinition processDefinition, String stepCode) {
+	private void removeProcessDefinitionStep(ProcessDefinitionStep step) {
+		Iterator<ProcessDefinition> it=gridProcessDefinition.getSelectedItems().iterator();
+		
+		if (!it.hasNext()) {
+			return;
+		}
+		
+		ProcessDefinition processDefinition =it.next();
+		processDefinition.setDescription(processDefinition.getDescription()+"+");
+		
 		if (hasAnyInstance(processDefinition)) {
 			runAndInform("Error", "Process step can't be removed since it has inherited instances.", ()->{});
 			return;
 		}
 		
-		processDefinition.getSteps().removeIf(p->p.getCode().equals(stepCode));
+		processService.removeProcessDefinitionStep(step);
 		
-		processService.deleteProcessDefinition(processDefinition);
 		refreshProcessDefinitionGrid();
-		selectProcessDefinition(processDefinition);
+		selectProcessDefinition(processService.getProcessDefinitionById(processDefinition.getId()));
 	}
 
 
@@ -411,22 +454,26 @@ public class UIProcess extends UIBase {
 		List<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();
 		gridProcessDefinition.setItems(processDefinitions);
 		ProcessDefinition selection = processDefinitions.stream().findAny().orElse(null);
-		
-		if (selection!=null) {
-			gridProcessDefinition.select(selection);
-		}
-		
+	
 		selectProcessDefinition(selection);
 	}
 
 
 	private void selectProcessDefinition(ProcessDefinition processDefinition) {
 		if (processDefinition==null) {
-			gridProcessDefinitionSteps.setItems(Collections.emptyList());
 			return;
 		}
 		
+		gridProcessDefinition.select(processDefinition);
 		gridProcessDefinitionSteps.setItems(processDefinition.getSteps());
+	}
+
+	private void selectProcessDefinitionStep(ProcessDefinitionStep processDefinitionStep) {
+		if (processDefinitionStep==null) {
+			return;
+		}
+
+		gridProcessDefinitionSteps.select(processDefinitionStep);
 	}
 
 	private void runProcessDiscoverer(ProcessDefinition processDefinition) {

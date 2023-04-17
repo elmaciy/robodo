@@ -10,11 +10,9 @@ import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.robodo.model.CorporateParameter;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
+import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
@@ -33,6 +32,7 @@ import com.robodo.model.UserRole;
 import com.robodo.repo.CorporateParameterRepo;
 import com.robodo.repo.EmailTemplateRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
+import com.robodo.repo.ProcessDefinitionStepRepo;
 import com.robodo.repo.ProcessInstanceRepo;
 import com.robodo.repo.ProcessInstanceStepFileRepo;
 import com.robodo.repo.TokenizationRepo;
@@ -75,6 +75,9 @@ public class ProcessService {
 	@Autowired
 	CorporateParameterRepo corporateParameterRepo;
 	
+	@Autowired
+	ProcessDefinitionStepRepo processDefinitionStepRepo;
+	
 	@Cacheable("processDefinitions")
 	public List<ProcessDefinition> getProcessDefinitions() {
 		return StreamSupport.stream(processDefinitionRepo.findAll().spliterator(), false).collect(Collectors.toList());
@@ -88,6 +91,12 @@ public class ProcessService {
 	@CacheEvict(value = "processDefinitions", allEntries = true)
 	public void deleteProcessDefinition(ProcessDefinition p) {
 		processDefinitionRepo.delete(p);
+	}
+
+	@CacheEvict(value = "processDefinitions", allEntries = true)
+	public void removeProcessDefinitionStep(ProcessDefinitionStep step) {
+		processDefinitionStepRepo.delete(step);
+		
 	}
 
 	public ProcessInstance saveProcessInstance(ProcessInstance processInstance) {		
@@ -376,5 +385,6 @@ public class ProcessService {
 	private String getCorporateParameterByCode(String parameterName) {
 		return getCorporateParametersAll().stream().filter(p->p.getCode().equals(parameterName)).map(p->p.getValue()).findAny().orElse(null);
 	}
+
 
 }

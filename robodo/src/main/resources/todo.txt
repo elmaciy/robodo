@@ -15,8 +15,6 @@
 	bunları mail içinde görünce o anda oluşturup replace etmeli bir fonksiyonla. 
 	${HUMAN.APPROVE_LINK}, ${HUMAN.DECLINE_LINK}, ${HUMAN.VIEW_LINK}
 
- 
-	
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
 
@@ -34,7 +32,7 @@
 47. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
 
-81. silme yerine arşive taşıma yapalım. 
+81. instance silme yerine arşive taşıma yapalım. 
 	Aramaya arşivde ara seçeneği eklenirse arşivde de arama yapar. 
 	
 83. thread windowundaki kuyruk ve thread lar sıfırlanabilmelidir. ???
@@ -47,24 +45,19 @@
 
 87. tanım ekranlarındaki boxlara maxlength falan koy  - db yi aşmasın 
 
-
 89. backward yapılınca önceki adıma geçmiyor, doğru refresh etmiyor. 
 90. human aşamasında maille ilgili variableleri instance a yüklemiyor. onay verdikten sonra yükleniyor. 
 
-91. process definition ekranında editlenmeyen alanlara editleme koy
-	ayrıca stepleri alta al ayrı pencerede olmasın. 
-	
-92. discover buttonunu instance ekranına da al ya da sadece orada olsun 
-
-93. process definition kodunu ya da steplerini degistirince sorun olabilir. 
-	kod degisince mevcut instanceler varsa degisime izin vermesin. yoksa tüm süreçler karışır. 
-	belki koşan instance yoksa da izin verebiliriz. 
-	
+		
 94. süreç duplikasyonu olabilmeli. yeni tanımlama yapmay kolaylaştırır. duplike edilen kayıt direk invalid başlasın. 
 
-95. süreç silme olmalı. burada silerken instanceler varsa sildirmemeli. 
+97. processDefinition un da hmVars ları olsun. Discovery sırasında kafadan set edilsinler. 
+		Böylece bazı parametreler için kodlama gerekmez.  
 
-96. en az 1 stepi olmadan definition aktif olmaz. Ya da stepi olmayanlar baslatilamaz, discover edilemez. 
+99. Aynı anda aynı discoverer in birden fazla aktif olması engellenebilir mi? 
+	hem discoverer alanı hem aktif alanında trigger olmalıdır. 
+
+
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -122,4 +115,11 @@ TAMAMLANANLAR
 	Bussinessvariables olsun bunlar ve env parametrelerini ezsin aynı parametre burada da tanımlı ise
 	Aynı ekrana ayrıca tüm env parametrelerinin listelenmesini sağla. orada env parametresini de görsün.
 88. instance ekranında process definition sadece filtre olarak falan görünsün. Ekran ayrılsın. admin yetkisi gerekir çünkü. 
+96. en az 1 stepi olmadan definition aktif olmaz. Ya da stepi olmayanlar baslatilamaz, discover edilemez. 
+93. process definition kodunu ya da steplerini degistirince sorun olabilir. 
+	kod degisince mevcut instanceler varsa degisime izin vermesin. yoksa tüm süreçler karışır. 
+	belki koşan instance yoksa da izin verebiliriz. 
+95. süreç silme olmalı. burada silerken instanceler varsa sildirmemeli. 
+91. process definition ekranında editlenmeyen alanlara editleme koy
+	ayrıca stepleri alta al ayrı pencerede olmasın. 
 	
