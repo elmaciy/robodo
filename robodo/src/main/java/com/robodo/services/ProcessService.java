@@ -81,14 +81,13 @@ public class ProcessService {
 	}
 
 	@CacheEvict(value = "processDefinitions", allEntries = true)
-	public boolean saveProcessDefinition(ProcessDefinition p) {
-		try {
-			processDefinitionRepo.save(p);
-			return true;
-		} catch(Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public ProcessDefinition saveProcessDefinition(ProcessDefinition p) {
+		return processDefinitionRepo.save(p);
+	}
+	
+	@CacheEvict(value = "processDefinitions", allEntries = true)
+	public void deleteProcessDefinition(ProcessDefinition p) {
+		processDefinitionRepo.delete(p);
 	}
 
 	public ProcessInstance saveProcessInstance(ProcessInstance processInstance) {		
@@ -174,6 +173,10 @@ public class ProcessService {
 
 	public List<ProcessInstance> getProcessInstancesByProcessDefinition(ProcessDefinition processDefinition) {
 		return processInstanceRepo.findByProcessDefinitionId(processDefinition.getId());
+	}
+	
+	public boolean hasAnyInstanceByProcessDefinition(ProcessDefinition processDefinition) {
+		return !processInstanceRepo.findTop1ByProcessDefinitionId(processDefinition.getId()).isEmpty();
 	}
 	
 	public List<ProcessInstance> getProcessInstancesByProcessDefinitionAndStatusAndSearchString(

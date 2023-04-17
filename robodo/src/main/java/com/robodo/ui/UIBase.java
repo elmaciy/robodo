@@ -5,6 +5,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -38,6 +41,9 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
@@ -361,7 +367,29 @@ public class UIBase extends AppLayout {
 		return btn;
 	}
 	
-	
+	public TextField makeEditorTextField(String initialValue, Consumer<String> consumer, Predicate<String>...validators) {
+		TextField tf=new TextField();
+		tf.setValue(initialValue);
+		tf.setWidthFull();
+		tf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+		tf.setValueChangeMode(ValueChangeMode.LAZY);
+		tf.addValueChangeListener(e->{
+			String value=e.getValue();
+			boolean isValid =validators ==null || List.of(validators).stream().allMatch(v->v.test(value));
+			
+			if (!isValid) {
+				consumer.accept(value);
+			} 
+			else {
+				e.getSource().setValue(initialValue);
+				e.getSource().focus();
+				notifyError("invalid entry");
+			}
+			
+		});
+
+		return tf;
+	}
 
 	
 

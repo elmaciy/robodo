@@ -420,6 +420,15 @@ public class HelperUtil {
 	public static boolean isValidCode(String code) {
 		return HelperUtil.patternMatches(code, "^[0-9A-Za-z\\.\\\\_\\\\$]{5,100}$");
 	}
+	
+	public static boolean isValidDescription(String code) {
+		return code!=null && code.length()>3 &&  code.length()<=100;
+	}
+
+
+	public static boolean isValidCommand(String command) {
+		return command!=null && command.length()>3 &&  command.length()<=1000;
+	}
 
 
 }

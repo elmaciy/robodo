@@ -1,5 +1,7 @@
 package com.robodo.ui;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,18 +13,19 @@ import com.robodo.model.UserRole;
 import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
+import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.Route;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -37,6 +40,7 @@ public class UIProcess extends UIBase {
 	ProcessService processService;
 
 	Grid<ProcessDefinition> gridProcessDefinition;
+	Grid<ProcessDefinitionStep> gridProcessDefinitionSteps;
 
 	@Autowired
 	public UIProcess(ProcessService processService, SecurityService securityService) {
@@ -46,25 +50,45 @@ public class UIProcess extends UIBase {
 		setTitle("Processes", VaadinIcon.COG.create());
 
 		gridProcessDefinition = new Grid<>(ProcessDefinition.class, false);
-		gridProcessDefinition.addColumn(p -> p.getId()).setHeader("#").setWidth("3em");
-		gridProcessDefinition.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
-		gridProcessDefinition.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
+		gridProcessDefinition.addColumn(p -> p.getId()).setHeader("#").setWidth("1em");
+		gridProcessDefinition.addComponentColumn(p ->{
+			var editor = makeEditorTextField(
+						p.getCode(),
+							(c)->{
+								p.setCode(c);
+								processService.saveProcessDefinition(p);
+								notifySuccess("process definition saved");
+						}, 
+						(e)-> HelperUtil.isValidCode(e),
+						(e)-> !hasSameCode(p,e));
+			editor.setReadOnly(hasAnyInstance(p));
+			return editor;
+		}).setHeader("Code").setAutoWidth(true);
+		
+		gridProcessDefinition.addComponentColumn(p ->{
+			return makeEditorTextField(
+					p.getDescription(),
+						(c)->{
+								p.setDescription(c);
+								processService.saveProcessDefinition(p);
+								notifySuccess("process definition saved");
+					}, 
+					(e)-> HelperUtil.isValidDescription(e));
+		}).setHeader("Description").setAutoWidth(true);
+		
+		gridProcessDefinition.addComponentColumn(p ->{
+			return makeEditorTextField(
+					p.getDiscovererClass(),
+					(c)->{
+						p.setDiscovererClass(c);
+						processService.saveProcessDefinition(p);
+						notifySuccess("process definition saved");
+					}, 
+					(e)-> HelperUtil.isValidForFileName(e));
+		}).setHeader("Discoverer");
+
 		gridProcessDefinition.addComponentColumn(p -> {
-			Checkbox chActive = new Checkbox(p.isActive());
-			chActive.addValueChangeListener(e -> {
-				boolean newVal = e.getValue();
-				p.setActive(newVal);
-				boolean isOk = processService.saveProcessDefinition(p);
-				if (!isOk) {
-					notifyError("Error saving");
-				} else {
-					notifySuccess("process is %s".formatted(newVal ? "active" : "pasive"));
-				}
-			});
-			return chActive;
-		}).setHeader("Active").setWidth("2em");
-		gridProcessDefinition.addComponentColumn(p -> {
-			var fld = makeIntegerMinMaxField(p.getMaxAttemptCount(), 1, 100);
+			var fld = makeIntegerMinMaxField(p.getMaxAttemptCount(), 0, 100);
 			fld.addValueChangeListener(e -> {
 				Integer value = e.getValue();
 				p.setMaxAttemptCount(value);
@@ -73,8 +97,21 @@ public class UIProcess extends UIBase {
 			});
 			return fld;
 		}).setHeader("Attempt").setWidth("2em");
+		
 		gridProcessDefinition.addComponentColumn(p -> {
-			var fld = makeIntegerMinMaxField(p.getMaxThreadCount(), 1, 10);
+			Checkbox chActive = new Checkbox(p.isActive());
+			chActive.addValueChangeListener(e -> {
+				boolean newVal = e.getValue();
+				p.setActive(newVal);
+				processService.saveProcessDefinition(p);
+				notifySuccess("process activation changed");
+			});
+			return chActive;
+		}).setHeader("Active").setWidth("2em").setTextAlign(ColumnTextAlign.CENTER);
+		
+
+		gridProcessDefinition.addComponentColumn(p -> {
+			var fld = makeIntegerMinMaxField(p.getMaxThreadCount(), 0, 10);
 			fld.addValueChangeListener(e -> {
 				Integer value = e.getValue();
 				p.setMaxThreadCount(value);
@@ -83,7 +120,6 @@ public class UIProcess extends UIBase {
 			});
 			return fld;
 		}).setHeader("Thread").setWidth("2em");
-		gridProcessDefinition.addColumn(p -> p.getDiscovererClass()).setHeader("Discoverer");
 
 		gridProcessDefinition.addComponentColumn(p -> {
 			Button btnRun = new Button("", new Icon(VaadinIcon.SEARCH));
@@ -97,51 +133,82 @@ public class UIProcess extends UIBase {
 			return btnRun;
 		}).setHeader("Discover").setWidth("3em").setTextAlign(ColumnTextAlign.CENTER);
 		
-		
 		gridProcessDefinition.addComponentColumn(p -> {
-			Button btnShowSteps = new Button("", new Icon(VaadinIcon.LINES_LIST));
-			btnShowSteps.addThemeVariants(ButtonVariant.LUMO_SMALL);
-			btnShowSteps.setDisableOnClick(true);
-			btnShowSteps.addClickListener(e -> {
-				showProcessDefinitionSteps(p);
-				btnShowSteps.setEnabled(true);
+			Button btnDelete = new Button("", new Icon(VaadinIcon.TRASH));
+			btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+			btnDelete.addClickListener(e -> {
+				confirmAndRun("Delete", "Sure to remove process definition :%s".formatted(p.getCode()), ()->removeProcessDefinition(p));
 			});
-			return btnShowSteps;
-		}).setHeader("Steps").setWidth("3em").setTextAlign(ColumnTextAlign.CENTER);
-		;
-		//------------------------------------------------------------
+			btnDelete.setEnabled(!hasAnyInstance(p));
+			return btnDelete;
+		}).setHeader("Steps").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
 		
-		gridProcessDefinition.setSizeFull();
-		gridProcessDefinition.setColumnReorderingAllowed(true);
 		
-		gridProcessDefinition.getColumns().forEach(col -> {
-			col.setResizable(true);
+		gridProcessDefinition.addSelectionListener(e->{
+			ProcessDefinition selection = e.getAllSelectedItems().stream().findFirst().orElse(null);
+			selectProcessDefinition(selection);
 		});
-
-		gridProcessDefinition.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,
-				GridVariant.LUMO_ROW_STRIPES);
 		
-		add(gridProcessDefinition);
-
-		fillGrid();
-	}
-
-	private void showProcessDefinitionSteps(ProcessDefinition processDefinition) {
-		Dialog dialog = new Dialog();
-		String title = "steps for %s (%s)".formatted(processDefinition.getCode(), processDefinition.getDescription());
-		dialog.setHeaderTitle(title);
-
-		VerticalLayout dialogLayout = new VerticalLayout();
-		dialogLayout.setSizeFull();
-
-		// --------------------------------------------------------------------
-		Grid<ProcessDefinitionStep> gridProcessDefinitionSteps = new Grid<>(ProcessDefinitionStep.class, false);
-		gridProcessDefinitionSteps.addColumn(p -> p.getId()).setHeader("#").setWidth("2em");
-		gridProcessDefinitionSteps.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("2em");
-		gridProcessDefinitionSteps.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true);
-		gridProcessDefinitionSteps.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true);
-		gridProcessDefinitionSteps.addColumn(p -> p.getCommands()).setHeader("Command to run").setAutoWidth(true);
-		gridProcessDefinitionSteps.addComponentColumn(p -> makeTrueFalseIcon(p.isSingleAtATime())).setHeader("Single").setAutoWidth(true);
+		//------------------------------------------------------------
+		gridProcessDefinitionSteps = new Grid<>(ProcessDefinitionStep.class, false);
+		gridProcessDefinitionSteps.addColumn(p -> p.getId()).setHeader("#").setWidth("1em");
+		gridProcessDefinitionSteps.addComponentColumn(p->makeReorderingComponent(p))
+		.setHeader("Order").setWidth("2em").setTextAlign(ColumnTextAlign.CENTER);
+		gridProcessDefinitionSteps.addComponentColumn(p ->{
+			return makeEditorTextField(
+					p.getCode(),
+					(c)->{
+						p.setCode(c);
+						processService.saveProcessDefinition(p.getProcessDefinition());
+						notifySuccess("step saved");
+					}, 
+					(e)-> HelperUtil.isValidCode(e),
+					(e)-> p.getProcessDefinition().getSteps().stream().noneMatch(s->s.getCode().equals(e) && !s.getId().equals(p.getId()))
+					);
+		}).setHeader("Code").setAutoWidth(true);
+		gridProcessDefinitionSteps.addComponentColumn(p ->{
+			return makeEditorTextField(
+					p.getDescription(),
+					(c)->{
+						p.setDescription(c);
+						processService.saveProcessDefinition(p.getProcessDefinition());
+						notifySuccess("step saved");
+					}, 
+					(e)-> HelperUtil.isValidDescription(e));
+		}).setHeader("Description").setAutoWidth(true);
+		gridProcessDefinitionSteps.addComponentColumn(p ->{
+			return makeEditorTextField(
+					p.getCommands(),
+					(c)->{
+						p.setCommands(c);
+						processService.saveProcessDefinition(p.getProcessDefinition());
+						notifySuccess("step saved");
+					}, 
+					(e)-> HelperUtil.isValidCommand(e));
+		}).setHeader("Command to run").setAutoWidth(true);
+		gridProcessDefinitionSteps.addComponentColumn(p -> {
+			Checkbox chSingleAtATime = new Checkbox(p.isSingleAtATime());
+			chSingleAtATime.addValueChangeListener(e -> {
+				boolean newVal = e.getValue();
+				p.setSingleAtATime(newVal);
+				processService.saveProcessDefinition(p.getProcessDefinition());
+				notifySuccess("singleton status changed");
+			});
+			return chSingleAtATime;
+		}).setHeader("Single").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
+		
+		
+		gridProcessDefinitionSteps.addComponentColumn(p -> {
+			Button btnDelete = new Button("", new Icon(VaadinIcon.TRASH));
+			btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+			btnDelete.addClickListener(e -> {
+				confirmAndRun("Delete", "Sure to remove process step :%s".formatted(p.getCode()), ()->removeProcessDefinitionStep(p.getProcessDefinition(), p.getCode()));
+			});
+			btnDelete.setEnabled(!hasAnyInstance(p.getProcessDefinition()));
+			return btnDelete;
+		}).setHeader("Steps").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
+		
+		
 		
 		gridProcessDefinitionSteps.setWidthFull();
 		gridProcessDefinitionSteps.setHeightFull();
@@ -152,54 +219,223 @@ public class UIProcess extends UIBase {
 		gridProcessDefinitionSteps.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,
 				GridVariant.LUMO_ROW_STRIPES);
 
-		gridProcessDefinitionSteps.setItems(processDefinition.getSteps());
+		//------------------------------------------------------------
+		
+		gridProcessDefinition.setMaxHeight("40%");
+		gridProcessDefinitionSteps.setHeightFull();
+		
+		gridProcessDefinition.getColumns().forEach(col -> {
+			col.setResizable(true);
+		});
+		gridProcessDefinitionSteps.getColumns().forEach(col -> {
+			col.setResizable(true);
+		});
 
-		dialogLayout.add(gridProcessDefinitionSteps);
+		gridProcessDefinition.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,
+				GridVariant.LUMO_ROW_STRIPES);
+		gridProcessDefinitionSteps.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,
+				GridVariant.LUMO_ROW_STRIPES);
+		
+		
+		
+		
+		Button btnAddNewProcessDefinition = new Button("Add new parameter", new Icon(VaadinIcon.PLUS));
+		btnAddNewProcessDefinition.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+		btnAddNewProcessDefinition.setWidth("30em");
+		btnAddNewProcessDefinition.addClickListener(e -> {
+			String id=String.valueOf(System.currentTimeMillis());
+			
+			ProcessDefinition newProcessDefinition = new ProcessDefinition();
+			newProcessDefinition.setActive(false);
+			newProcessDefinition.setCode("%s".formatted(id));
+			newProcessDefinition.setDescription("Description of %s".formatted(id));
+			newProcessDefinition.setDiscovererClass("ClassOf%s".formatted(id));
+			newProcessDefinition.setMaxAttemptCount(0);
+			newProcessDefinition.setMaxThreadCount(0);
+			newProcessDefinition.setSteps(new ArrayList<ProcessDefinitionStep>());
+			
+			ProcessDefinition saveProcessDefinition = processService.saveProcessDefinition(newProcessDefinition);
+			refreshProcessDefinitionGrid();
+			selectProcessDefinition(saveProcessDefinition);
+			
+		});
+		
+		Button btnAddNewStep = new Button("Add new step", new Icon(VaadinIcon.PLUS));
+		btnAddNewStep.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+		btnAddNewStep.setWidth("30em");
+		btnAddNewStep.addClickListener(e -> {
+			
+			var it = gridProcessDefinition.getSelectedItems().iterator();
+			if (!it.hasNext()) {
+				notifyInfo("Choose a process definition to which add a step");
+				return;
+			}
+			
+			ProcessDefinition processDefinition = it.next();
+			
+			boolean hasAnyInstance = hasAnyInstance(processDefinition);
+			if (hasAnyInstance) {
+				notifyInfo("This process can't be changed since it has instances.");
+				return;
+			}
+			
+			String id=String.valueOf(System.currentTimeMillis());
+			
+			ProcessDefinitionStep step = new ProcessDefinitionStep();
+			step.setProcessDefinition(processDefinition);
+			step.setCode("%s".formatted(id));
+			step.setDescription("Description of %s".formatted(id));
+			step.setCommands("runStepClass  StepClass%s".formatted(id));
+			step.setSingleAtATime(false);
+			step.setOrderNo("99");
+			
+			processDefinition.getSteps().add(step);
+			
+			ProcessDefinition saveProcessDefinition = processService.saveProcessDefinition(processDefinition);
+			refreshProcessDefinitionGrid();
+			selectProcessDefinition(saveProcessDefinition);
+			
+		});
+		
+		add(btnAddNewProcessDefinition);
+		add(gridProcessDefinition);
+		add(btnAddNewStep);
+		add(gridProcessDefinitionSteps);
 
-		dialog.add(dialogLayout);
-		Button cancelButton = new Button("Close", e -> dialog.close());
-		dialog.getFooter().add(cancelButton);
-		dialog.setWidth("80%");
-		dialog.setHeight("60%");
-		dialog.setResizable(true);
-		dialog.setCloseOnEsc(true);
-		dialog.setCloseOnOutsideClick(true);
-		dialog.open();
+		
+		refreshProcessDefinitionGrid();
+		
+	}
+	
 
+	
+
+	private HorizontalLayout makeReorderingComponent(ProcessDefinitionStep step) {
+		HorizontalLayout lay=new HorizontalLayout();
+		lay.setMargin(false);
+		lay.setSpacing(false);
+		
+		
+		Button btUp = new Button("", new Icon(VaadinIcon.ARROW_UP));
+		btUp.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		btUp.setWidth("1em");
+		btUp.setEnabled(!isFirsStep(step) && !hasAnyInstance(step.getProcessDefinition()));
+
+		btUp.addClickListener(e -> {
+			reorderStep(step,"UP");
+		});
+		
+		
+		Button btDown = new Button("", new Icon(VaadinIcon.ARROW_DOWN));
+		btDown.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		btDown.setWidth("1em");
+		btDown.setEnabled(!isLastStep(step) && !hasAnyInstance(step.getProcessDefinition()));
+		btDown.addClickListener(e -> {
+			reorderStep(step,"DOWN");
+		});
+		
+		lay.add(btUp, btDown);
+		
+		return lay;
 	}
 
 
-	public boolean refreshProcessDefinitionGrid() {
 
-		if (!isAttached()) {
-			return false;
+
+	private boolean isFirsStep(ProcessDefinitionStep stepToCheck) {
+		return getIndexOfStep(stepToCheck.getProcessDefinition(), stepToCheck)==0;
+	}
+	
+	private boolean isLastStep(ProcessDefinitionStep stepToCheck) {
+		return getIndexOfStep(stepToCheck.getProcessDefinition(), stepToCheck)==stepToCheck.getProcessDefinition().getSteps().size()-1;
+	}
+	
+	private int getIndexOfStep(ProcessDefinition processDefinition, ProcessDefinitionStep stepToCheck) {
+		return processDefinition.getSteps().indexOf(stepToCheck);
+		/*
+		int i=-1;
+		for (ProcessDefinitionStep step : processDefinition.getSteps()) {
+			if (step.getId().equals(stepToCheck.getId())) {
+				i++;
+			}
 		}
-		if (!isVisible()) {
-			return false;
-		}
-
-		var selection = gridProcessDefinition.getSelectedItems();
-		if (selection.isEmpty()) {
-			return true;
-		}
-
-		setData(selection.iterator().next());
-
-		return true;
+		return i;
+		*/
 	}
 
-	private void fillGrid() {
+
+
+
+	private void reorderStep(ProcessDefinitionStep p, String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+	private void removeProcessDefinitionStep(ProcessDefinition processDefinition, String stepCode) {
+		if (hasAnyInstance(processDefinition)) {
+			runAndInform("Error", "Process step can't be removed since it has inherited instances.", ()->{});
+			return;
+		}
+		
+		processDefinition.getSteps().removeIf(p->p.getCode().equals(stepCode));
+		
+		processService.deleteProcessDefinition(processDefinition);
+		refreshProcessDefinitionGrid();
+		selectProcessDefinition(processDefinition);
+	}
+
+
+
+
+	private boolean hasAnyInstance(ProcessDefinition processDefinition) {
+		return processService.hasAnyInstanceByProcessDefinition(processDefinition);
+	}
+
+
+
+
+	private void removeProcessDefinition(ProcessDefinition processDefinition) {
+		if (hasAnyInstance(processDefinition)) {
+			runAndInform("Error", "Process definition can't be removed since it has inherited instances.", ()->{});
+			return;
+		}
+		processService.deleteProcessDefinition(processDefinition);
+		refreshProcessDefinitionGrid();
+	}
+
+
+
+
+	private boolean hasSameCode(ProcessDefinition processDefinition,  String newCode) {
+		return processService.getProcessDefinitions().stream().anyMatch(p->p.getCode().equals(newCode) && !p.getId().equals(processDefinition.getId()));
+	}
+
+
+
+
+	public void refreshProcessDefinitionGrid() {
 		List<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();
 		gridProcessDefinition.setItems(processDefinitions);
-
-		if (!processDefinitions.isEmpty()) {
-			setData(processDefinitions.get(0));
+		ProcessDefinition selection = processDefinitions.stream().findAny().orElse(null);
+		
+		if (selection!=null) {
+			gridProcessDefinition.select(selection);
 		}
-
+		
+		selectProcessDefinition(selection);
 	}
 
-	private void setData(ProcessDefinition processDefinition) {
-		gridProcessDefinition.select(processDefinition);
+
+	private void selectProcessDefinition(ProcessDefinition processDefinition) {
+		if (processDefinition==null) {
+			gridProcessDefinitionSteps.setItems(Collections.emptyList());
+			return;
+		}
+		
+		gridProcessDefinitionSteps.setItems(processDefinition.getSteps());
 	}
 
 	private void runProcessDiscoverer(ProcessDefinition processDefinition) {
