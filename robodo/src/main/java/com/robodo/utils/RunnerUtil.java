@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 
 import com.robodo.base.BaseDiscoverer;
 import com.robodo.base.BaseStep;
+import com.robodo.base.BaseWebStep;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ExecutionResultsForCommand;
 import com.robodo.model.ProcessDefinition;

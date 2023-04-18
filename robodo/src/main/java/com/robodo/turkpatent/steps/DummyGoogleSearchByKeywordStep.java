@@ -3,11 +3,11 @@ package com.robodo.turkpatent.steps;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import com.robodo.base.BaseStep;
+import com.robodo.base.BaseWebStep;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.utils.RunnerUtil;
 
-public class DummyGoogleSearchByKeywordStep extends BaseStep {
+public class DummyGoogleSearchByKeywordStep extends BaseWebStep {
 
 	public DummyGoogleSearchByKeywordStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);

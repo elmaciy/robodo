@@ -51,6 +51,8 @@
 		
 94. süreç duplikasyonu olabilmeli. yeni tanımlama yapmay kolaylaştırır. duplike edilen kayıt direk invalid başlasın. 
 
+95. step yoksa discovery de yapılmasın
+
 97. processDefinition un da hmVars ları olsun. Discovery sırasında kafadan set edilsinler. 
 		Böylece bazı parametreler için kodlama gerekmez.  
 		su parametreler properties dosyasindan degil, buradan alınabilir. Bazıları direk parametreye konulabilir. Ortak olanlar. 		

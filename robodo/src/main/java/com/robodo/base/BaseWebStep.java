@@ -10,27 +10,15 @@ import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 import com.robodo.utils.SeleniumUtil;
 
-public abstract class BaseStep {
+public abstract class BaseWebStep extends BaseStep {
 	
 	 protected RunnerUtil runnerUtil;
 	 protected ProcessInstanceStep processInstanceStep;
 	 protected SeleniumUtil selenium;
 	 int fileOrder;
 	 
-	 public BaseStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
-		 this.runnerUtil=runnerUtil;
-		 this.processInstanceStep=processInstanceStep;
-		 this.selenium=new SeleniumUtil(runnerUtil);
-		 this.fileOrder=1;
-	 }
-	 
-	 public void setVariable(String key, String value) {
-		runnerUtil.logger("set variable %s=[%s]".formatted(key,value)); 
-		runnerUtil.setVariable(key,value);
-	 }
-	 
-	 public String getVariable(String key) {
-		 return runnerUtil.getVariable(key);
+	 public BaseWebStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+		super(runnerUtil, processInstanceStep);
 	 }
 	 
 	 
@@ -76,9 +64,7 @@ public abstract class BaseStep {
 		 
 		 runnerUtil.processService.saveProcessInstanceStepFile(file);
 	 }
-	 
-	 public abstract void setup();
-	 public abstract void run();
-	 public abstract void teardown();
+
+
 
 }

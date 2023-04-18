@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Splitter;
-import com.robodo.base.BaseStep;
+import com.robodo.base.BaseWebStep;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.turkpatent.pages.PageEdevletLogin;
 import com.robodo.turkpatent.pages.PageEpatsBasvuruYapan;
@@ -26,7 +26,7 @@ import com.robodo.turkpatent.pages.PageEpatsTalepTuru;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
-public class BaseEpatsStep extends BaseStep {
+public class BaseEpatsStep extends BaseWebStep {
 	
 	PageEpatsHome home;
 	PageEdevletLogin edevletLogin;
