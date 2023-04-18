@@ -45,6 +45,9 @@ public class DiscoverProcessGooggleSearch extends BaseEpatsStep implements Disco
 			hmVars.put("processInstance.code", instance.getCode());
 			hmVars.put("keyword", keyword);
 			
+			//this step must be included 
+			createApprovalLinks(hmVars, instance.getCode());
+			
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			instance.setInitialInstanceVariables(instance.getInstanceVariables());
 

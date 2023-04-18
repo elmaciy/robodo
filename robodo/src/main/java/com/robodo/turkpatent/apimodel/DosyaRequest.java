@@ -2,24 +2,29 @@ package com.robodo.turkpatent.apimodel;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+
+@JsonInclude(Include.NON_EMPTY)
 public class DosyaRequest {
-    public int id;
+    public Integer id;
 	public String basvuruno;
     public String basvurusahibi;
     public String dekontno;
-    public int durum;
+    public Integer durum;
     public String gorevadimi;
     public Date islemTarihi;
-    public int islemadimi;
-    public int islemkategorisi;
-    public int islemturu;
+    public Integer islemadimi;
+    public Integer islemkategorisi;
+    public Integer islemturu;
     public Date kayittarihi;
     public String linkkontrol;
     public String linkonayla;
     public String linkreddet;
     public Personel personel;
     public String referansno;
-    public int statu;
+    public Integer statu;
     public String tahakkukno;
     
     
@@ -42,10 +47,10 @@ public class DosyaRequest {
 	public void setDekontno(String dekontno) {
 		this.dekontno = dekontno;
 	}
-	public int getDurum() {
+	public Integer getDurum() {
 		return durum;
 	}
-	public void setDurum(int durum) {
+	public void setDurum(Integer durum) {
 		this.durum = durum;
 	}
 	public String getGorevadimi() {
@@ -54,10 +59,10 @@ public class DosyaRequest {
 	public void setGorevadimi(String gorevadimi) {
 		this.gorevadimi = gorevadimi;
 	}
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 	public Date getIslemTarihi() {
@@ -66,22 +71,22 @@ public class DosyaRequest {
 	public void setIslemTarihi(Date islemTarihi) {
 		this.islemTarihi = islemTarihi;
 	}
-	public int getIslemadimi() {
+	public Integer getIslemadimi() {
 		return islemadimi;
 	}
-	public void setIslemadimi(int islemadimi) {
+	public void setIslemadimi(Integer islemadimi) {
 		this.islemadimi = islemadimi;
 	}
-	public int getIslemkategorisi() {
+	public Integer getIslemkategorisi() {
 		return islemkategorisi;
 	}
-	public void setIslemkategorisi(int islemkategorisi) {
+	public void setIslemkategorisi(Integer islemkategorisi) {
 		this.islemkategorisi = islemkategorisi;
 	}
-	public int getIslemturu() {
+	public Integer getIslemturu() {
 		return islemturu;
 	}
-	public void setIslemturu(int islemturu) {
+	public void setIslemturu(Integer islemturu) {
 		this.islemturu = islemturu;
 	}
 	public Date getKayittarihi() {
@@ -120,10 +125,10 @@ public class DosyaRequest {
 	public void setReferansno(String referansno) {
 		this.referansno = referansno;
 	}
-	public int getStatu() {
+	public Integer getStatu() {
 		return statu;
 	}
-	public void setStatu(int statu) {
+	public void setStatu(Integer statu) {
 		this.statu = statu;
 	}
 	public String getTahakkukno() {
@@ -133,5 +138,30 @@ public class DosyaRequest {
 		this.tahakkukno = tahakkukno;
 	}
     
+    public static DosyaRequest create(Integer id) {
+    	DosyaRequest dosyaRequest= new DosyaRequest();
+    	dosyaRequest.setId(id);
+    	return dosyaRequest;
+    }
     
+    public DosyaRequest withStatu(int statu) {
+    	this.setStatu(statu);
+    	return this;
+    }
+    
+    public DosyaRequest withLinks(String linkkontrol, String linkonayla, String linkreddet) {
+    	this.setLinkkontrol(linkkontrol);
+    	this.setLinkonayla(linkonayla);
+    	this.setLinkreddet(linkreddet);
+    	return this;
+    }
+	public DosyaRequest withTahakkukNo(String tahakkukNo) {
+		this.setTahakkukno(tahakkukNo);
+    	return this;
+	}
+	public DosyaRequest withDekontNo(String dekontNo) {
+		this.setDekontno(dekontNo);
+    	return this;
+		
+	}
 }

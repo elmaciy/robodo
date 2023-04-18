@@ -124,7 +124,7 @@ public class RobodoApplication {
 			stepPatentDekontIsle.setProcessDefinition(yillikPatentUcretiProcess);
 			
 			
-			//yillikPatentUcreti.getSteps().add(stepDosyaOku);
+			yillikPatentUcretiProcess.getSteps().add(stepPatentDosyaOku);
 			yillikPatentUcretiProcess.getSteps().add(stepPatentTahakkukOlustur);
 			yillikPatentUcretiProcess.getSteps().add(stepOnay);
 			yillikPatentUcretiProcess.getSteps().add(stepPatentOde);
@@ -351,11 +351,11 @@ public class RobodoApplication {
 					+ "İyi çalışmalar"
 					+ "<hr>"
 					+ "<center>"
-					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/APPROVE/EMAIL/${token}\"><b><font color=green>[+ Onayla]</font></b></a> "
+					+ "<a href=\"${LINK.APPROVE}\"><b><font color=green>[+ Onayla]</font></b></a> "
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/DECLINE/EMAIL/${token}\"><font color=red>[-Reddet]</font></a> "
+					+ "<a href=\"${LINK.DECLINE}\"><font color=red>[-Reddet]</font></a> "
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/VIEW/EMAIL/${token}\"><font color=blue>[İncele]</font></a> "
+					+ "<a href=\"${LINK.VIEW}\"><font color=blue>[İncele]</font></a> "
 					+ "</center>"
 					+ "<hr>"
 					+ " ");
@@ -380,11 +380,11 @@ public class RobodoApplication {
 					+ "İyi çalışmalar"
 					+ "<hr>"
 					+ "<center>"
-					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/APPROVE/EMAIL/${token}\"><b><font color=green>[+ Onayla]</font></b></a> "
+					+ "<a href=\"${LINK.APPROVE}\"><b><font color=green>[+ Onayla]</font></b></a> "
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/DECLINE/EMAIL/${token}\"><font color=red>[-Reddet]</font></a> "
+					+ "<a href=\"${LINK.DECLINE}\"><font color=red>[-Reddet]</font></a> "
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-					+ "<a href=\"http://localhost:8080/approve/${processInstance.code}/VIEW/EMAIL/${token}\"><font color=blue>[İncele]</font></a> "
+					+ "<a href=\"${LINK.VIEW}\"><font color=blue>[İncele]</font></a> "
 					+ "</center>"
 					+ "<hr>"
 					+ " ");

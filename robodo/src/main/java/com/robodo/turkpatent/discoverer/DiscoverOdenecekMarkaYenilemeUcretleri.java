@@ -50,6 +50,9 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseEpatsStep implem
 			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺2.450,00"));
 			hmVars.put("talepTuru", "Tam");
 			
+			//this step must be included 
+			createApprovalLinks(hmVars, instance.getCode());
+			
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			instance.setInitialInstanceVariables(instance.getInstanceVariables());
 

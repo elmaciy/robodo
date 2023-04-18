@@ -49,6 +49,9 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 			hmVars.put("eposta", "ipmaintenance.epats@ankarapatent.com");
 			hmVars.put("odemeTutari", HelperUtil.normalizeAmount("₺1.710,00"));
 			
+			//this step must be included 
+			createApprovalLinks(hmVars, instance.getCode());
+			
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			instance.setInitialInstanceVariables(instance.getInstanceVariables());
 
@@ -70,5 +73,7 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 		
 		return instances;
 	}
+
+
 
 }

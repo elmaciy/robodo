@@ -20,7 +20,7 @@ public class DummyApiSteps extends BaseApiStep {
 	@Override
 	public void run() {
 		String endpoint=getVariable("url");
-		ApiResponse response = getResponse(Method.GET,endpoint,null,null);
+		ApiResponse response = httpRequest(Method.GET,endpoint,null,null);
 		
 		setVariable("response.statusCode", "%d".formatted(response.getResponseCode()));
 		setVariable("response.headers", "\n%s".formatted(response.getHeadersPrintable()));

@@ -5,12 +5,13 @@ import static io.restassured.RestAssured.given;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.robodo.model.ApiResponse;
 import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessInstanceStep;
+import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
-import com.robodo.utils.SeleniumUtil;
 
 import io.restassured.http.Method;
 import io.restassured.response.Response;
@@ -18,12 +19,6 @@ import io.restassured.specification.RequestSpecification;
 
 public abstract class BaseApiStep extends BaseStep {
 	
-	 protected RunnerUtil runnerUtil;
-	 protected ProcessInstanceStep processInstanceStep;
-	 protected SeleniumUtil selenium;
-	 int fileOrder;
-	 
-	 
 	 public BaseApiStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
 	 }
@@ -42,22 +37,35 @@ public abstract class BaseApiStep extends BaseStep {
 
 
 	 
-	 public ApiResponse getResponse(Method method, String endPoint, List<KeyValue> headers, Object body) {
+	 public ApiResponse httpRequest(Method method, String endPoint, List<KeyValue> headers, Object body)  {
 		 RequestSpecification given = given();
 		 given.contentType("application/json; charset=UTF-16");
 		 
+		 runnerUtil.logger("Request: %s %s".formatted(method.toString(),endPoint));
+
+		 
 		 if (headers!=null && !headers.isEmpty()) {
 			 for (KeyValue header : headers) {
+				 runnerUtil.logger("add header=> %s : %s".formatted(header.getKey(), header.getValue()));
 				 given.header(header.getKey(), header.getValue());
 			 } 
 		 }
 		
 		 if (body!=null) {
+			 runnerUtil.logger("-------------------------------------");
+			 runnerUtil.logger("body");
+			 runnerUtil.logger("-------------------------------------");
+			 
 			 if (body instanceof String) {
+				 runnerUtil.logger((String) body);
 				 given.body(body); 
 			 } else {
+				String bodyString = HelperUtil.obj2String(body);
+				runnerUtil.logger(bodyString);
+
 				 given.body(body);
 			 }
+			 
 			 
 		 }
 

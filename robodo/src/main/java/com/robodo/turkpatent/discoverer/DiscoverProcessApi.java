@@ -47,6 +47,9 @@ public class DiscoverProcessApi extends ApiERPBaseStep implements Discoverable  
 				hmVars.put("processInstance.code", instance.getCode());
 				hmVars.put("url", instanceKey);
 				
+				//this step must be included 
+				createApprovalLinks(hmVars, instance.getCode());
+				
 				instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 				instance.setInitialInstanceVariables(instance.getInstanceVariables());
 	

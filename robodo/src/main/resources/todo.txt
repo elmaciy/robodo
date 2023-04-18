@@ -9,15 +9,8 @@
 
 16. kurulan yerde chrome güncellenmemeli
 
-37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? 
-	context vs koyarak halledilebilir belki de. 
-	ayrıca onay/red/izleme kodu ortaklaştırılmalı. Mail içinde özel parametre isimleri ile konulmalı 
-	bunları mail içinde görünce o anda oluşturup replace etmeli bir fonksiyonla. 
-	${HUMAN.APPROVE_LINK}, ${HUMAN.DECLINE_LINK}, ${HUMAN.VIEW_LINK}
-
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
-
 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
 	
@@ -35,9 +28,7 @@
 	
 83. thread windowundaki kuyruk ve thread lar sıfırlanabilmelidir. ???
 
-85. Human interactionda iki türlü olsun. 1nci mail göndersin. 2ncsi ise bir stepAction calistirsin. 
-	ikincisinde steple ilgili olarak human onayi almadan once bir dis sistemi tetikleyecegiz. 
-	ikinci tipte de hata durumlarini dusun
+85. Human interactionda mail atma seçeneği olmayabilir. Bu durumda mail adresini bış girerek ya da <nuLL> girerek tamamlarız
 
 86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
 
@@ -64,6 +55,15 @@
 
 101. chrome headless çalıştırılmalı. Browser biraz daha esnek olabilir mi? Farklı browserlere de geçilebilmeşli. driver e de. 
 
+102. createApprovalLinks doğru yerde değil. unutulabilir. Bunu bir şekilde doğru yere koyalım
+
+103. otomatik koşum başlar başlamaz ekrandan instane i tetikleyince 2 kere başladı. 
+
+104. instance ekranında seçili olan process definition session a kaydedilsin. her ekrana girişte kaybolmasın. 
+		hatta mümkünse filtreler de o şekilde session a kaydedilsin. 
+		
+105. AUTO IT yi ekle robodo ya https://www.autoitscript.com/site/autoit/		
+		
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
 2. RPA işlemi aldıktan sonra statüyü "RPA işlemde" olarak güncelleyecek. bu aşamada kontrol linki direk paylaşılacak ki ekrandan durum görülebilsin. 
@@ -129,3 +129,8 @@ TAMAMLANANLAR
 	ayrıca stepleri alta al ayrı pencerede olmasın. 
 18. kullanıcı yönetimi ekranına arama koy
 101. discoverer classları da aslında birer step olmalı. Böylece ortak step komutlarını kullanabilierler. 
+37. maildeki localhost:8080 değişecek. otomatik oluşabilir mi acaba? 
+	context vs koyarak halledilebilir belki de. 
+	ayrıca onay/red/izleme kodu ortaklaştırılmalı. Mail içinde özel parametre isimleri ile konulmalı 
+	bunları mail içinde görünce o anda oluşturup replace etmeli bir fonksiyonla. 
+	${HUMAN.APPROVE_LINK}, ${HUMAN.DECLINE_LINK}, ${HUMAN.VIEW_LINK}

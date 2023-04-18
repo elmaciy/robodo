@@ -78,7 +78,15 @@ public class HelperUtil {
 		return df.format(tamsayiDbl+ondalikDbl);
 	}
 
-	
+	public static String obj2String(Object obj) {
+		 try {
+			 ObjectMapper mapper=new ObjectMapper();
+			 return mapper.writeValueAsString(obj);
+		 } catch(Exception e) {
+			 e.printStackTrace();
+			 return null;
+		 }
+	}
 	public static String hashMap2String(HashMap<String,String> hm) {
 		List<KeyValue> list = hm.keySet().stream().map(key-> {
 			return new KeyValue(key, hm.get(key));
@@ -109,9 +117,6 @@ public class HelperUtil {
 	public static void sendEmailByTemplate(EmailTemplate emailTemplate, ProcessInstanceStep step, RunnerUtil runnerUtil) {
 		String instanceVariables = step.getProcessInstance().getInstanceVariables();
 		HashMap<String, String> hmVars=String2HashMap(instanceVariables);
-		long tokenDuration=Long.valueOf(runnerUtil.processService.getEnvProperty("token.duration"));
-		Tokenization token = Tokenization.generateNewToken(runnerUtil.processService,"FOR_APPROVAL",step.getProcessInstance().getCode(),  tokenDuration);
-		hmVars.put("token", token.getToken());
 		emailTemplate.setSubject(replaceVariables(emailTemplate.getSubject(),hmVars));
 		emailTemplate.setBody(replaceVariables(emailTemplate.getBody(), hmVars));
 		sendEmail(step.getProcessInstance(), emailTemplate, runnerUtil);

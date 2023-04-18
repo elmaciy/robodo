@@ -663,7 +663,7 @@ public class UIInstance extends UIBase {
 		Grid<KeyValue> gridVars = new Grid<>(KeyValue.class, false);
 		gridVars.addColumn(p -> p.getKey()).setHeader("Variable Name").setWidth("30%");
 		gridVars.addComponentColumn(p -> {
-			boolean isMultiline=p.getValue().split("\n|\r").length>1;
+			boolean isMultiline=p.getValue()!=null && p.getValue().split("\n|\r").length>1;
 			if (isMultiline) {
 				TextArea textArea=new TextArea();
 				textArea.setWidthFull();
