@@ -4,9 +4,13 @@ import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.base.Splitter;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.User;
 import com.robodo.model.UserRole;
@@ -24,12 +28,16 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.Setter;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoUtility.Margin.Horizontal;
 
 import jakarta.annotation.security.RolesAllowed;
 
@@ -51,10 +59,13 @@ public class UIUsers extends UIBase {
 
 	Grid<User> grid = new Grid<>(User.class, false);
 	Editor<User> editor = null;
+	TextField searchField;
 
 	private void drawScreen() {
 
 		removeAll();
+		
+		
 		Button btnAddNew = new Button("Add new user", new Icon(VaadinIcon.PLUS));
 		btnAddNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
 		btnAddNew.addClickListener(e -> {
@@ -66,7 +77,18 @@ public class UIUsers extends UIBase {
 			editor.editItem(grid.getSelectedItems().iterator().next());
 		});
 		
-		add(btnAddNew);
+		searchField =new TextField();
+		searchField.setPlaceholder("Search");
+		searchField.setWidth("10em");
+		searchField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+		searchField.setSuffixComponent(VaadinIcon.SEARCH.create());
+		searchField.addValueChangeListener(e->fillGrid(null));
+		searchField.setValueChangeMode(ValueChangeMode.LAZY);
+		
+		HorizontalLayout layTop=new HorizontalLayout(btnAddNew, searchField);
+		layTop.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+		
+		add(layTop);
 		
 		makeGrid();
 
@@ -396,9 +418,13 @@ public class UIUsers extends UIBase {
 
 	private void fillGrid(User user) {
 		List<User> usersAll = processService.getUsersAll();
-		grid.setItems(usersAll);
+		var s=searchField.getValue();
+		Predicate<? super User> predicate=p->s==null || s.isBlank() || StringUtils.containsIgnoreCase(p.getUsername()+" "+p.getFullname()+ " " + p.getEmail(), s);
+		List<User> filteredUsers = usersAll.stream().filter(predicate).collect(Collectors.toList());
+		grid.setItems(filteredUsers);
+		
 		if (user!=null) {
-			grid.select(usersAll.stream().filter(p->p.getId().equals(user.getId())).findAny().get());
+			grid.select(filteredUsers.stream().filter(p->p.getId().equals(user.getId())).findAny().get());
 			return;
 		} 
 		

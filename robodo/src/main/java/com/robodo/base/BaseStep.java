@@ -2,20 +2,15 @@ package com.robodo.base;
 
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.utils.RunnerUtil;
-import com.robodo.utils.SeleniumUtil;
 
 public abstract class BaseStep {
 	
 	 protected RunnerUtil runnerUtil;
 	 protected ProcessInstanceStep processInstanceStep;
-	 protected SeleniumUtil selenium;
-	 int fileOrder;
 	 
 	 public BaseStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		 this.runnerUtil=runnerUtil;
 		 this.processInstanceStep=processInstanceStep;
-		 this.selenium=new SeleniumUtil(runnerUtil);
-		 this.fileOrder=1;
 	 }
 	 
 	 public void setVariable(String key, String value) {

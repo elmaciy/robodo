@@ -5,18 +5,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.robodo.base.BaseDiscoverer;
+import com.robodo.model.Discoverable;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
-import com.robodo.model.ProcessInstanceStepFile;
+import com.robodo.turkpatent.steps.BaseEpatsStep;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
-public class DiscoverProcessGooggleSearch extends BaseDiscoverer {
+public class DiscoverProcessGooggleSearch extends BaseEpatsStep implements Discoverable {
 
-	public DiscoverProcessGooggleSearch(RunnerUtil runnerUtil) {
-		super(runnerUtil);
+	
+	public DiscoverProcessGooggleSearch(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+		super(runnerUtil, processInstanceStep);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override

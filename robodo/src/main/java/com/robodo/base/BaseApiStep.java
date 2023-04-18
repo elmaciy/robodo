@@ -2,11 +2,9 @@ package com.robodo.base;
 
 import static io.restassured.RestAssured.given;
 
-import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.robodo.model.ApiResponse;
 import com.robodo.model.KeyValue;
@@ -15,7 +13,6 @@ import com.robodo.utils.RunnerUtil;
 import com.robodo.utils.SeleniumUtil;
 
 import io.restassured.http.Method;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 

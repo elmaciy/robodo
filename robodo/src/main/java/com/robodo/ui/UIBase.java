@@ -375,6 +375,7 @@ public class UIBase extends AppLayout {
 		tf.setValueChangeMode(ValueChangeMode.LAZY);
 		tf.addValueChangeListener(e->{
 			String value=e.getValue();
+			
 			boolean isValid =validators ==null || List.of(validators).stream().allMatch(v->v.test(value));
 			
 			if (!isValid) {

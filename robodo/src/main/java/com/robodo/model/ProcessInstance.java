@@ -209,10 +209,16 @@ public class ProcessInstance {
 	
 	public ProcessInstanceStep getLatestProcessedStep() {
 		ProcessInstanceStep latestProcessedStep=null;
+		int i=0;
 		for (ProcessInstanceStep step : this.getSteps()) {
 			if (step.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
+				if (i==0) {
+					return null;
+				}
+				
 				break;
 			} 
+			i++;
 
 			latestProcessedStep=step;
 		}

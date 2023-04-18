@@ -5,7 +5,7 @@
 	- işlemlerdeki ortalama süreler
 	- genel rakamlar. (günlük işlenen) saatlik işlenen haftalık işlenen falan... 
 
-18. kullanıcı yönetimi ekranına arama koy
+
 
 16. kurulan yerde chrome güncellenmemeli
 
@@ -20,8 +20,6 @@
 
 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
-
-60. login success sayfasını "/home" ya da process e falan ayarlayalım
 	
 64. işlemlerin çalışacağı / çalışmayacağı zaman aralıkları olmalı. 
 	Mesela bazı işlemler öğlene kadar yapılabilir gibi... 
@@ -44,10 +42,6 @@
 86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
 
 87. tanım ekranlarındaki boxlara maxlength falan koy  - db yi aşmasın 
-
-89. backward yapılınca önceki adıma geçmiyor, doğru refresh etmiyor. 
-90. human aşamasında maille ilgili variableleri instance a yüklemiyor. onay verdikten sonra yükleniyor. 
-
 		
 94. süreç duplikasyonu olabilmeli. yeni tanımlama yapmay kolaylaştırır. duplike edilen kayıt direk invalid başlasın. 
 
@@ -67,6 +61,8 @@
 	hem discoverer alanı hem aktif alanında trigger olmalıdır. 
 
 100. process definition ekranındaki class name ler verify edilmeli. parametreler de oyle. Command builder yapılabilir elle yazılmak yerine. 
+
+101. chrome headless çalıştırılmalı. Browser biraz daha esnek olabilir mi? Farklı browserlere de geçilebilmeşli. driver e de. 
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -131,4 +127,5 @@ TAMAMLANANLAR
 95. süreç silme olmalı. burada silerken instanceler varsa sildirmemeli. 
 91. process definition ekranında editlenmeyen alanlara editleme koy
 	ayrıca stepleri alta al ayrı pencerede olmasın. 
-	
+18. kullanıcı yönetimi ekranına arama koy
+101. discoverer classları da aslında birer step olmalı. Böylece ortak step komutlarını kullanabilierler. 

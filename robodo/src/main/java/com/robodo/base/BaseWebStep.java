@@ -12,13 +12,14 @@ import com.robodo.utils.SeleniumUtil;
 
 public abstract class BaseWebStep extends BaseStep {
 	
-	 protected RunnerUtil runnerUtil;
-	 protected ProcessInstanceStep processInstanceStep;
 	 protected SeleniumUtil selenium;
-	 int fileOrder;
+	 int fileOrder=1;
 	 
 	 public BaseWebStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
+		 this.selenium=new SeleniumUtil(runnerUtil);
+		 this.fileOrder=1;
+
 	 }
 	 
 	 

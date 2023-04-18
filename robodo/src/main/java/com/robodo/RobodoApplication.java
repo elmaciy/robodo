@@ -1,7 +1,6 @@
 package com.robodo;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -321,11 +320,11 @@ public class RobodoApplication {
 			apiProcess.setActive(false);
 
 			ProcessDefinitionStep apiSampleStep=new ProcessDefinitionStep();
-			apiSampleStep.setCode("ApiERPStep");
+			apiSampleStep.setCode("DummyApiSteps");
 			apiSampleStep.setDescription("api test steps");
 			apiSampleStep.setOrderNo("01");
 			apiSampleStep.setSingleAtATime(false);
-			apiSampleStep.setCommands("runStepClass ApiERPStep");
+			apiSampleStep.setCommands("runStepClass DummyApiSteps");
 			apiSampleStep.setProcessDefinition(apiProcess);
 			
 

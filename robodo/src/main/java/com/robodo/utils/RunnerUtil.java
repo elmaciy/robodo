@@ -9,9 +9,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 
-import com.robodo.base.BaseDiscoverer;
 import com.robodo.base.BaseStep;
-import com.robodo.base.BaseWebStep;
+import com.robodo.model.Discoverable;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ExecutionResultsForCommand;
 import com.robodo.model.ProcessDefinition;
@@ -300,9 +299,10 @@ public class RunnerUtil {
 		try {
 			String packageName = processService.getEnvProperty("discovery.package");
 			Class<?> clazz = Class.forName(packageName + "." + processDefinition.getDiscovererClass());
-			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class);
-			BaseDiscoverer discovererInstance = (BaseDiscoverer) constructor.newInstance(this);
-			return discovererInstance.discover(processDefinition);
+			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class, ProcessInstanceStep.class);
+			BaseStep discovererInstance = (BaseStep) constructor.newInstance(this, null);
+			return ((Discoverable) discovererInstance).discover(processDefinition);
+			//return discovererInstance.discover(processDefinition);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ArrayList<ProcessInstance>();

@@ -7,13 +7,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessDefinition;
-import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
@@ -23,9 +21,7 @@ import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.threads.ThreadForInstanceRunner;
 import com.robodo.utils.HelperUtil;
-import com.robodo.utils.RunnerUtil;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -591,6 +587,8 @@ public class UIInstance extends UIBase {
 		stepToBackward.setError(null);
 		stepToBackward.setLogs(null);
 		stepToBackward.setInstanceVariables(null);
+		stepToBackward.setStarted(null);
+		stepToBackward.setFinished(null);
 
 		long countOfNonNew = steps.stream().filter(p -> !p.getStatus().equals(ProcessInstanceStep.STATUS_NEW)).count();
 
@@ -610,8 +608,8 @@ public class UIInstance extends UIBase {
 
 
 		grid.setItems(saveProcessInstance.getSteps());
-		var theStepToSelect = saveProcessInstance.getSteps().stream().filter(p->p.getStepCode().equals(stepToBackward.getStepCode())).findFirst().get();
-		fillStepsGrid(grid, theStepToSelect.getStepCode());
+
+		fillStepsGrid(grid, saveProcessInstance.getCode());
 		notifySuccess("backwarded");
 	}
 
@@ -649,7 +647,7 @@ public class UIInstance extends UIBase {
 		dialog.add(dialogLayout);
 		Button cancelButton = new Button("Close", e -> dialog.close());
 		dialog.getFooter().add(cancelButton);
-		dialog.setWidth("60%");
+		dialog.setWidth("80%");
 		dialog.setHeight("80%");
 		dialog.setResizable(true);
 		dialog.setCloseOnEsc(true);
@@ -663,8 +661,19 @@ public class UIInstance extends UIBase {
 		String variablesStr = processInstanceStep == null ? processInstance.getInstanceVariables() : processInstanceStep.getInstanceVariables(); 
 		HashMap<String, String> hmVars = HelperUtil.String2HashMap(variablesStr);
 		Grid<KeyValue> gridVars = new Grid<>(KeyValue.class, false);
-		gridVars.addColumn(p -> p.getKey()).setHeader("Variable Name").setWidth("20em");
+		gridVars.addColumn(p -> p.getKey()).setHeader("Variable Name").setWidth("30%");
 		gridVars.addComponentColumn(p -> {
+			boolean isMultiline=p.getValue().split("\n|\r").length>1;
+			if (isMultiline) {
+				TextArea textArea=new TextArea();
+				textArea.setWidthFull();
+				textArea.setValue(p.getValue() == null ? "" : p.getValue());
+				textArea.setHeight("10em");
+				textArea.addValueChangeListener(e -> {
+					p.setValue(e.getValue());
+				});
+				return textArea;
+			} 
 			TextField textField = new TextField();
 			textField.setWidthFull();
 			textField.setValue(p.getValue() == null ? "" : p.getValue());
@@ -672,10 +681,12 @@ public class UIInstance extends UIBase {
 				p.setValue(e.getValue());
 			});
 			return textField;
-		}).setHeader("Value").setWidth("30em");
+			
+			
+		}).setHeader("Value").setWidth("55%");
 
 		gridVars.addComponentColumn(p -> {
-			Button btnUpdate = new Button("Update", new Icon(VaadinIcon.DOWNLOAD));
+			Button btnUpdate = new Button("", new Icon(VaadinIcon.DOWNLOAD));
 			btnUpdate.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 			btnUpdate.setDisableOnClick(true);
 			btnUpdate.addClickListener(e -> {
@@ -693,10 +704,10 @@ public class UIInstance extends UIBase {
 				btnUpdate.setEnabled(true);
 			});
 			return btnUpdate;
-		}).setHeader("Update").setAutoWidth(true);
+		}).setHeader("Update").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
 
 		gridVars.addComponentColumn(p -> {
-			Button btnRemove = new Button("Remove", new Icon(VaadinIcon.DOWNLOAD));
+			Button btnRemove = new Button("", new Icon(VaadinIcon.TRASH));
 			btnRemove.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
 			btnRemove.addClickListener(e -> {
 				
@@ -718,7 +729,7 @@ public class UIInstance extends UIBase {
 				
 			});
 			return btnRemove;
-		}).setHeader("Remove").setAutoWidth(true);
+		}).setHeader("Remove").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
 
 		gridVars.getColumns().forEach(col -> {
 			col.setResizable(true);
