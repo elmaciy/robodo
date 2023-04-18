@@ -2,15 +2,20 @@ package com.robodo.base;
 
 import static io.restassured.RestAssured.given;
 
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.robodo.model.ApiResponse;
 import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.utils.RunnerUtil;
 import com.robodo.utils.SeleniumUtil;
 
+import io.restassured.http.Method;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -21,10 +26,6 @@ public abstract class BaseApiStep extends BaseStep {
 	 protected SeleniumUtil selenium;
 	 int fileOrder;
 	 
-	 public static final String HTTP_GET="GET";
-	 public static final String HTTP_POST="POST";
-	 public static final String HTTP_PUT="PUT";
-	 public static final String HTTP_DELETE="DELETE";
 	 
 	 public BaseApiStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
@@ -41,18 +42,10 @@ public abstract class BaseApiStep extends BaseStep {
 			// all static : nothing to teardown
 		
 	 }
-	
+
+
 	 
-	 public ApiResponse getResponse(String endPoint) {
-		 return getResponse(HTTP_GET, endPoint, null, null);
-	 }
-	 
-	 public ApiResponse getResponse(String endPoint, List<KeyValue> headers) {
-		 return getResponse(HTTP_GET, endPoint, headers, null);
-	 }
-	 
-	 
-	 public ApiResponse getResponse(String method, String endPoint, List<KeyValue> headers, String body) {
+	 public ApiResponse getResponse(Method method, String endPoint, List<KeyValue> headers, Object body) {
 		 RequestSpecification given = given();
 		 given.contentType("application/json; charset=UTF-16");
 		 
@@ -62,11 +55,18 @@ public abstract class BaseApiStep extends BaseStep {
 			 } 
 		 }
 		
-		 if (body!=null && !body.isBlank()) {
-			 given.body(body);
+		 if (body!=null) {
+			 if (body instanceof String) {
+				 given.body(body); 
+			 } else {
+				 given.body(body);
+			 }
+			 
 		 }
+
+
 		 
-		 Response r = given.when().get(endPoint);
+		 Response r = given.when().request(method, endPoint);
 		 
 		 var apiResponse = ApiResponse.create()
 				 .withBody(r.body().asString())
@@ -88,7 +88,21 @@ public abstract class BaseApiStep extends BaseStep {
 	 }
 	 
 	 
+	 
 
 
+	 
+	 public <T> T json2Object(String jsonInput, Class<T> clz) {
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				return mapper.readValue(jsonInput, clz);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+
+		}
+
+	 
 
 }

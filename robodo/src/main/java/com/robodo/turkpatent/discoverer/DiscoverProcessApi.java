@@ -20,7 +20,10 @@ public class DiscoverProcessApi extends BaseDiscoverer {
 
 	@Override
 	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {
-		List<String> keys = List.of("https://catfact.ninja/breeds");
+		List<String> keys = List.of(
+				"https://catfact.ninja/breeds"
+				//,"https://www.boredapi.com/api/activity"
+				);
 		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
 		
 		for (String instanceKey : keys) {

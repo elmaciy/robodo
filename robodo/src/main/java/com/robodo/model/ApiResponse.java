@@ -103,4 +103,14 @@ public class ApiResponse {
 		}
 		return sb.toString();
 	}
+	
+	public String getHeaderValueByName(String key) {
+		return this.headers.stream().filter(p->p.getKey().equals(key)).map(p->p.getValue()).findAny().or(null).get();
+	}
+	
+	public String getCookieValueByName(String key) {
+		return this.cookies.stream().filter(p->p.getKey().equals(key)).map(p->p.getValue()).findAny().or(null).get();
+	}
+	
+
 }

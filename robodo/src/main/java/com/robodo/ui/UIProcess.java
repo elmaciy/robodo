@@ -134,6 +134,7 @@ public class UIProcess extends UIBase {
 			Button btnRun = new Button("", new Icon(VaadinIcon.SEARCH));
 			btnRun.addThemeVariants(ButtonVariant.LUMO_SMALL);
 			btnRun.setDisableOnClick(true);
+			btnRun.setEnabled(!p.getSteps().isEmpty());
 			btnRun.addClickListener(e -> {
 				runProcessDiscoverer(p);
 				gridProcessDefinition.select(p);
