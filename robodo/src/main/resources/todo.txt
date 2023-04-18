@@ -53,11 +53,20 @@
 
 97. processDefinition un da hmVars ları olsun. Discovery sırasında kafadan set edilsinler. 
 		Böylece bazı parametreler için kodlama gerekmez.  
+		su parametreler properties dosyasindan degil, buradan alınabilir. Bazıları direk parametreye konulabilir. Ortak olanlar. 		
+			tckno=50053246498
+			sifre=k7e6s3k9
+			ceptel=5322118332
+			eposta=ipmaintenance.epats@ankarapatent.com
+			ankarapatent.vergino=0700694032
+			kredikarti.no=2212929200009993
+			kredikarti.gecerlilik=0625
+			kredikarti.cvv=123
 
 99. Aynı anda aynı discoverer in birden fazla aktif olması engellenebilir mi? 
 	hem discoverer alanı hem aktif alanında trigger olmalıdır. 
 
-
+100. process definition ekranındaki class name ler verify edilmeli. parametreler de oyle. Command builder yapılabilir elle yazılmak yerine. 
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 

@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 
 import com.robodo.base.BaseDiscoverer;
-import com.robodo.base.BaseSteps;
+import com.robodo.base.BaseStep;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ExecutionResultsForCommand;
 import com.robodo.model.ProcessDefinition;
@@ -260,13 +260,13 @@ public class RunnerUtil {
 
 	private ExecutionResultsForCommand runStepClass(ProcessInstanceStep step,  String className) {
 		ExecutionResultsForCommand result = new ExecutionResultsForCommand();
-		BaseSteps stepClassInstance=null;
+		BaseStep stepClassInstance=null;
 		try {
 			String packageName = processService.getEnvProperty("steps.package");
 			Class<?> clazz = Class.forName(packageName + "." + className);
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class, ProcessInstanceStep.class);
 		
-			stepClassInstance = (BaseSteps) constructor.newInstance(this, step);
+			stepClassInstance = (BaseStep) constructor.newInstance(this, step);
 			if (stepClassInstance!=null) {
 				stepClassInstance.setup();
 			}

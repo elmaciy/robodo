@@ -87,7 +87,7 @@ public class RobodoApplication {
 			stepPatentDosyaOku.setDescription("Ücreti ödenecek patent dosyasının okunması");
 			stepPatentDosyaOku.setOrderNo("01");
 			stepPatentDosyaOku.setSingleAtATime(false);
-			stepPatentDosyaOku.setCommands("runStepClass YillikPatentUcretDosyasiOkuSteps");
+			stepPatentDosyaOku.setCommands("runStepClass YillikPatentUcretDosyasiOkuStep");
 			stepPatentDosyaOku.setProcessDefinition(yillikPatentUcretiProcess);
 			
 
@@ -96,7 +96,7 @@ public class RobodoApplication {
 			stepPatentTahakkukOlustur.setDescription("Patent yıllık ücreti tahakkuk oluşturma");
 			stepPatentTahakkukOlustur.setOrderNo("02");
 			stepPatentTahakkukOlustur.setSingleAtATime(false);
-			stepPatentTahakkukOlustur.setCommands("runStepClass YillikPatentUcretiTahakkukOlustur");
+			stepPatentTahakkukOlustur.setCommands("runStepClass YillikPatentUcretiTahakkukOlusturStep");
 			stepPatentTahakkukOlustur.setProcessDefinition(yillikPatentUcretiProcess);
 			
 			ProcessDefinitionStep stepOnay=new ProcessDefinitionStep();
@@ -112,7 +112,7 @@ public class RobodoApplication {
 			stepPatentOde.setDescription("Tahakkuk ödeme");
 			stepPatentOde.setOrderNo("04");
 			stepPatentOde.setSingleAtATime(true);  //bu ödeme için true olacak
-			stepPatentOde.setCommands("runStepClass GenelTahakkukOdeme");
+			stepPatentOde.setCommands("runStepClass GenelTahakkukOdemeStep");
 			stepPatentOde.setProcessDefinition(yillikPatentUcretiProcess);
 			
 			
@@ -121,7 +121,7 @@ public class RobodoApplication {
 			stepPatentDekontIsle.setDescription("Ödeme dekont bilgisini sisteme kaydet");
 			stepPatentDekontIsle.setOrderNo("05");
 			stepPatentDekontIsle.setSingleAtATime(false);
-			stepPatentDekontIsle.setCommands("runStepClass GenelDekontKaydetSteps");
+			stepPatentDekontIsle.setCommands("runStepClass GenelDekontKaydetStep");
 			stepPatentDekontIsle.setProcessDefinition(yillikPatentUcretiProcess);
 			
 			
@@ -155,7 +155,7 @@ public class RobodoApplication {
 			stepMarkaYenilemeDosyaOku.setDescription("Ücreti ödenecek marka yenileme dosyasının okunması");
 			stepMarkaYenilemeDosyaOku.setOrderNo("01");
 			stepMarkaYenilemeDosyaOku.setSingleAtATime(false);
-			stepMarkaYenilemeDosyaOku.setCommands("runStepClass MarkaYenilemeDosyasiOkuSteps");
+			stepMarkaYenilemeDosyaOku.setCommands("runStepClass MarkaYenilemeDosyasiOkuStep");
 			stepMarkaYenilemeDosyaOku.setProcessDefinition(markaYenilemeProcess);
 
 			ProcessDefinitionStep stepMarkeYenilemeTahakkukOlustur=new ProcessDefinitionStep();
@@ -163,7 +163,7 @@ public class RobodoApplication {
 			stepMarkeYenilemeTahakkukOlustur.setDescription("Marka yenileme tahakkuk oluşturma");
 			stepMarkeYenilemeTahakkukOlustur.setOrderNo("02");
 			stepMarkeYenilemeTahakkukOlustur.setSingleAtATime(false);
-			stepMarkeYenilemeTahakkukOlustur.setCommands("runStepClass MarkaYenilemeTahakkukOlustur");
+			stepMarkeYenilemeTahakkukOlustur.setCommands("runStepClass MarkaYenilemeTahakkukOlusturStep");
 			stepMarkeYenilemeTahakkukOlustur.setProcessDefinition(markaYenilemeProcess);
 			
 			ProcessDefinitionStep stepMarkaYenilemeOnay=new ProcessDefinitionStep();
@@ -179,7 +179,7 @@ public class RobodoApplication {
 			stepMarkaOde.setDescription("Tahakkuk ödeme");
 			stepMarkaOde.setOrderNo("04");
 			stepMarkaOde.setSingleAtATime(true);  //bu ödeme için true olacak
-			stepMarkaOde.setCommands("runStepClass GenelTahakkukOdeme");
+			stepMarkaOde.setCommands("runStepClass GenelTahakkukOdemeStep");
 			stepMarkaOde.setProcessDefinition(markaYenilemeProcess);
 			
 			ProcessDefinitionStep stepMarkaDekontIsle=new ProcessDefinitionStep();
@@ -187,7 +187,7 @@ public class RobodoApplication {
 			stepMarkaDekontIsle.setDescription("Ödeme dekont bilgisini sisteme kaydet");
 			stepMarkaDekontIsle.setOrderNo("05");
 			stepMarkaDekontIsle.setSingleAtATime(false);
-			stepMarkaDekontIsle.setCommands("runStepClass GenelDekontKaydetSteps");
+			stepMarkaDekontIsle.setCommands("runStepClass GenelDekontKaydetStep");
 			stepMarkaDekontIsle.setProcessDefinition(markaYenilemeProcess);
 			
 			//markaYenilemeProcess.getSteps().add(stepMarkaYenilemeDosyaOku);
@@ -217,7 +217,7 @@ public class RobodoApplication {
 			stepMarka2nciItirazDosyaOku.setDescription("Marka Yayıma itirazın yeniden inceleneceği kayıtların okunması");
 			stepMarka2nciItirazDosyaOku.setOrderNo("01");
 			stepMarka2nciItirazDosyaOku.setSingleAtATime(false);
-			stepMarka2nciItirazDosyaOku.setCommands("runStepClass Marka2nciItirazOkuSteps");
+			stepMarka2nciItirazDosyaOku.setCommands("runStepClass Marka2nciItirazOkuStep");
 			stepMarka2nciItirazDosyaOku.setProcessDefinition(markaItiraz2);
 
 			ProcessDefinitionStep stepMarka2nciItirazOlustur=new ProcessDefinitionStep();
@@ -225,7 +225,7 @@ public class RobodoApplication {
 			stepMarka2nciItirazOlustur.setDescription("Marka yayınına itirazın yeniden inceleneceği kayıtlar için tahakkuk oluşturma");
 			stepMarka2nciItirazOlustur.setOrderNo("02");
 			stepMarka2nciItirazOlustur.setSingleAtATime(false);
-			stepMarka2nciItirazOlustur.setCommands("runStepClass Marka2nciItirazOlusturSteps");
+			stepMarka2nciItirazOlustur.setCommands("runStepClass Marka2nciItirazOlusturStep");
 			stepMarka2nciItirazOlustur.setProcessDefinition(markaItiraz2);
 			
 			ProcessDefinitionStep stepMarka2nciItirazOnay=new ProcessDefinitionStep();
@@ -241,7 +241,7 @@ public class RobodoApplication {
 			stepMarka2nciItirazOde.setDescription("Tahakkuk ödeme");
 			stepMarka2nciItirazOde.setOrderNo("04");
 			stepMarka2nciItirazOde.setSingleAtATime(true); //bu ödeme için true olacak
-			stepMarka2nciItirazOde.setCommands("runStepClass GenelTahakkukOdeme");
+			stepMarka2nciItirazOde.setCommands("runStepClass GenelTahakkukOdemeStep");
 			stepMarka2nciItirazOde.setProcessDefinition(markaItiraz2);
 			
 			ProcessDefinitionStep stepMarka2nciItirazDekontIsle=new ProcessDefinitionStep();
@@ -249,7 +249,7 @@ public class RobodoApplication {
 			stepMarka2nciItirazDekontIsle.setDescription("Ödeme dekont bilgisini sisteme kaydet");
 			stepMarka2nciItirazDekontIsle.setOrderNo("05");
 			stepMarka2nciItirazDekontIsle.setSingleAtATime(false);
-			stepMarka2nciItirazDekontIsle.setCommands("runStepClass GenelDekontKaydetSteps");
+			stepMarka2nciItirazDekontIsle.setCommands("runStepClass GenelDekontKaydetStep");
 			stepMarka2nciItirazDekontIsle.setProcessDefinition(markaItiraz2);
 			
 			//markaItiraz2.getSteps().add(stepMarka2nciItirazDosyaOku);
@@ -279,7 +279,7 @@ public class RobodoApplication {
 			googleSearchStep.setDescription("Search on google");
 			googleSearchStep.setOrderNo("01");
 			googleSearchStep.setSingleAtATime(false);
-			googleSearchStep.setCommands("runStepClass DummyGoogleSearchByKeyword");
+			googleSearchStep.setCommands("runStepClass DummyGoogleSearchByKeywordStep");
 			googleSearchStep.setProcessDefinition(dummyProcess);
 
 
@@ -296,7 +296,7 @@ public class RobodoApplication {
 			bingSearchStep.setDescription("Search on bing");
 			bingSearchStep.setOrderNo("03");
 			bingSearchStep.setSingleAtATime(true);
-			bingSearchStep.setCommands("runStepClass DummyBingSearchByKeyword");
+			bingSearchStep.setCommands("runStepClass DummyBingSearchByKeywordStep");
 			bingSearchStep.setProcessDefinition(dummyProcess);
 			
 			dummyProcess.getSteps().add(googleSearchStep);
