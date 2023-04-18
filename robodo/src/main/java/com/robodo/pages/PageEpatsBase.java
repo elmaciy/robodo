@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.robodo.base.BasePage;
 import com.robodo.utils.SeleniumUtil;
 
 public class PageEpatsBase extends BasePage {

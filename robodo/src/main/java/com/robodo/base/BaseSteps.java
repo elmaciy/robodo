@@ -1,4 +1,4 @@
-package com.robodo.steps;
+package com.robodo.base;
 
 import java.sql.Blob;
 
@@ -12,9 +12,9 @@ import com.robodo.utils.SeleniumUtil;
 
 public abstract class BaseSteps {
 	
-	 RunnerUtil runnerUtil;
-	 ProcessInstanceStep processInstanceStep;
-	 SeleniumUtil selenium;
+	 protected RunnerUtil runnerUtil;
+	 protected ProcessInstanceStep processInstanceStep;
+	 protected SeleniumUtil selenium;
 	 int fileOrder;
 	 
 	 public BaseSteps(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {

@@ -9,7 +9,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 
-import com.robodo.discoverer.BaseDiscoverer;
+import com.robodo.base.BaseDiscoverer;
+import com.robodo.base.BaseSteps;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ExecutionResultsForCommand;
 import com.robodo.model.ProcessDefinition;
@@ -18,7 +19,6 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
-import com.robodo.steps.BaseSteps;
 
 public class RunnerUtil {
 

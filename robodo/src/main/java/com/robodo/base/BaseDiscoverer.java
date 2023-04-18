@@ -1,4 +1,4 @@
-package com.robodo.discoverer;
+package com.robodo.base;
 
 import java.util.List;
 

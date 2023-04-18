@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.robodo.base.BaseDiscoverer;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;

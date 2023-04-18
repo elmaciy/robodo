@@ -3,7 +3,7 @@ package com.robodo.pages;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.robodo.utils.RunnerUtil;
+import com.robodo.base.BasePage;
 import com.robodo.utils.SeleniumUtil;
 
 public class PageEdevletLogin extends BasePage {

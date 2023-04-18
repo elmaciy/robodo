@@ -3,6 +3,7 @@ package com.robodo.steps;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import com.robodo.base.BaseSteps;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.utils.RunnerUtil;
 

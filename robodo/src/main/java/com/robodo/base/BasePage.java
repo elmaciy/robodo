@@ -1,8 +1,7 @@
-package com.robodo.pages;
+package com.robodo.base;
 
 import org.openqa.selenium.support.PageFactory;
 
-import com.robodo.utils.RunnerUtil;
 import com.robodo.utils.SeleniumUtil;
 
 public class BasePage {
