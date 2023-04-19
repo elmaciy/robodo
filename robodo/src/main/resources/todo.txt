@@ -56,39 +56,30 @@
 101. chrome headless çalıştırılmalı. Browser biraz daha esnek olabilir mi? Farklı browserlere de geçilebilmeşli. driver e de. 
 
 102. createApprovalLinks doğru yerde değil. unutulabilir. Bunu bir şekilde doğru yere koyalım
-
-103. otomatik koşum başlar başlamaz ekrandan instane i tetikleyince 2 kere başladı. 
-
-104. instance ekranında seçili olan process definition session a kaydedilsin. her ekrana girişte kaybolmasın. 
-		hatta mümkünse filtreler de o şekilde session a kaydedilsin. 
 		
 105. AUTO IT yi ekle robodo ya https://www.autoitscript.com/site/autoit/	
 
 107. serverde sistemi backup a eklettir. 
 108. serverde mysql i servis halinde çalıştır mümkünse. 
 
-109. kredi kartı ve edevlet servislerini de implemente et. headerde token alacak bunlar da 
-	Aktif edevlet sifreleri ---> post getEdevletRumuz
- 	Aktif kredi kartlari ---> post getKrediKartRumuz
-
-
-110. fiyat bilgisi serviste gelmeyecekmiş. karşılaştırmaya gerek yok. 
-111. mail personelinki mi kullanılacak
+111. mail olarak eşleşmelerdeki mail kullanılacak
 112. "buluş adı karşılaştırılıyor" kontrolü commentlendi servisten gelmediği için. sorulacak.
-		
-		
+				
 113. 2nci adımda geri almada hata çıktı
 
 114. sadece api çalışan steplerde chrome başlamasın
 
 115. onay ve redde /CALLBACK i entegre et
 
-116. güncelleme işleminin response ini de model olarak al. orada success ve hata kontrolü yap. mesaj gelirse oradan al. 
-
 117. Token'i instane e sakla sürekli olsun
 118. Retry action olsun. Retry edilince çalışsın. zorunlu olmasın. 
 119. Token'i 10 dakikada bir yenilenecek şekilde yap. her 
 120. Humaninteraction da email gönderilmeme opsiyonu olsun. 
+
+109. kredi kartı ve edevlet servislerini de implemente et. headerde token alacak bunlar da 
+	Aktif edevlet sifreleri ---> post getEdevletRumuz
+ 	Aktif kredi kartlari ---> post getKrediKartRumuz
+
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -182,3 +173,6 @@ TAMAMLANANLAR
 	ayrıca onay/red/izleme kodu ortaklaştırılmalı. Mail içinde özel parametre isimleri ile konulmalı 
 	bunları mail içinde görünce o anda oluşturup replace etmeli bir fonksiyonla. 
 	${HUMAN.APPROVE_LINK}, ${HUMAN.DECLINE_LINK}, ${HUMAN.VIEW_LINK}
+104. instance ekranında seçili olan process definition session a kaydedilsin. her ekrana girişte kaybolmasın. 
+		hatta mümkünse filtreler de o şekilde session a kaydedilsin. 
+	

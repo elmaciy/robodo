@@ -45,6 +45,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 
 import jakarta.annotation.security.RolesAllowed;
 
@@ -70,19 +71,35 @@ public class UIInstance extends UIBase {
 		//--------------------------------------------------------------------------
 		Label lblProcessDef = new Label("Process definition");
 		
+		Button btnRunDiscoverer= new Button("Discover", new Icon(VaadinIcon.SEARCH));
 		
 		comboForProcessDefinition=new ComboBox<ProcessDefinition>();
 		comboForProcessDefinition.setItemLabelGenerator(p->p.getDescription());
 		comboForProcessDefinition.setWidth("30em");
 		var activeProcessDefinitions = processService.getProcessDefinitions().stream().filter(p->p.isActive()).toList();
 		comboForProcessDefinition.setItems(activeProcessDefinitions);
+		ProcessDefinition selectedProcessDefinition = (ProcessDefinition) UI.getCurrent().getSession().getAttribute("selectedProcessDefinition");
+		if (selectedProcessDefinition!=null) {
+			comboForProcessDefinition.setValue(selectedProcessDefinition);
+		}
 		comboForProcessDefinition.addValueChangeListener(e->{
 			ProcessDefinition processDefinition = e.getValue();
 			fillProcessInstanceGrid(processDefinition);
+			btnRunDiscoverer.setEnabled(e.getValue()!=null);
+			UI.getCurrent().getSession().setAttribute("selectedProcessDefinition", e.getValue());
+		});
+
+		btnRunDiscoverer.addThemeVariants(ButtonVariant.LUMO_SMALL);
+		btnRunDiscoverer.setDisableOnClick(true);
+		btnRunDiscoverer.setEnabled(comboForProcessDefinition.getValue()!=null);
+		btnRunDiscoverer.addClickListener(e -> {
+			
+			runProcessDiscoverer(comboForProcessDefinition.getValue());
+			btnRunDiscoverer.setEnabled(true);
 		});
 
 		
-		HorizontalLayout layForProcessDefinitionFilter=new HorizontalLayout(lblProcessDef, comboForProcessDefinition);
+		HorizontalLayout layForProcessDefinitionFilter=new HorizontalLayout(lblProcessDef, comboForProcessDefinition, btnRunDiscoverer);
 		layForProcessDefinitionFilter.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
 		//--------------------------------------------------------------------------
@@ -212,6 +229,16 @@ public class UIInstance extends UIBase {
 	Checkbox chAnyMatch;
 
 	private HorizontalLayout makeHeaderForInstances() {
+		
+		instanceFilterNew=getBooleanFromSession("instanceFilterNew",instanceFilterNew);
+		instanceFilterCompleted=getBooleanFromSession("instanceFilterCompleted",instanceFilterCompleted);
+		instanceFilterRunning=getBooleanFromSession("instanceFilterRunning",instanceFilterRunning);
+		instanceFilterRetry=getBooleanFromSession("instanceFilterRetry",instanceFilterRetry);
+		instanceFilterFailed=getBooleanFromSession("instanceFilterFailed",instanceFilterFailed);
+		instanceFilterWaitingApproval=getBooleanFromSession("instanceFilterWaitingApproval",instanceFilterWaitingApproval);
+
+		
+		
 		HorizontalLayout layoutForProcessInstanceTop = new HorizontalLayout();
 		layoutForProcessInstanceTop.setSizeUndefined();
 		layoutForProcessInstanceTop.setDefaultVerticalComponentAlignment(Alignment.CENTER);
@@ -243,15 +270,16 @@ public class UIInstance extends UIBase {
 		layoutForProcessInstanceTop.add(btnRemoveSelected);
 
 		chAnyMatch = new Checkbox();
-		chAnyMatch.setValue(false);
+		chAnyMatch.setValue(getBooleanFromSession("chAnyMatch",false));
 		chAnyMatch.setLabel("Any");
 		chAnyMatch.addValueChangeListener(e->{
 			fillProcessInstanceGrid();
+			setSessionBoolean("chAnyMatch", e.getValue());
 		});
 
 		
 		searchField = new TextField();
-		searchField.setValue("");
+		searchField.setValue(getStringValueFromSession("searchValue",""));
 		searchField.setClearButtonVisible(true);
 		searchField.setPrefixComponent(VaadinIcon.SEARCH.create());
 		searchField.setSuffixComponent(chAnyMatch);
@@ -262,6 +290,7 @@ public class UIInstance extends UIBase {
 		
 		searchField.addValueChangeListener(e->{
 			fillProcessInstanceGrid();
+			setSessionString("searchValue", e.getValue());
 		});
 		
 
@@ -274,6 +303,7 @@ public class UIInstance extends UIBase {
 		checkboxNew.addValueChangeListener(e -> {
 			instanceFilterNew = e.getValue();
 			fillProcessInstanceGrid();
+			setSessionBoolean("instanceFilterNew", e.getValue());
 		});
 		layoutForProcessInstanceTop.add(checkboxNew);
 
@@ -283,6 +313,7 @@ public class UIInstance extends UIBase {
 		checkboxCompleted.addValueChangeListener(e -> {
 			instanceFilterCompleted = e.getValue();
 			fillProcessInstanceGrid();
+			setSessionBoolean("instanceFilterCompleted", e.getValue());
 		});
 		layoutForProcessInstanceTop.add(checkboxCompleted);
 
@@ -293,6 +324,7 @@ public class UIInstance extends UIBase {
 		checkboxRunning.addValueChangeListener(e -> {
 			instanceFilterRunning = e.getValue();
 			fillProcessInstanceGrid();
+			setSessionBoolean("instanceFilterRunning", e.getValue());
 		});
 		layoutForProcessInstanceTop.add(checkboxRunning);
 
@@ -302,6 +334,7 @@ public class UIInstance extends UIBase {
 		checkboxRetry.addValueChangeListener(e -> {
 			instanceFilterRetry = e.getValue();
 			fillProcessInstanceGrid();
+			setSessionBoolean("instanceFilterRetry", e.getValue());
 		});
 		layoutForProcessInstanceTop.add(checkboxRetry);
 
@@ -311,6 +344,7 @@ public class UIInstance extends UIBase {
 		chError.addValueChangeListener(e -> {
 			instanceFilterFailed = e.getValue();
 			fillProcessInstanceGrid();
+			setSessionBoolean("instanceFilterFailed", e.getValue());
 		});
 
 		layoutForProcessInstanceTop.add(chError);
@@ -321,6 +355,7 @@ public class UIInstance extends UIBase {
 		chWaitingApproval.addValueChangeListener(e -> {
 			instanceFilterWaitingApproval = e.getValue();
 			fillProcessInstanceGrid();
+			setSessionBoolean("instanceFilterWaitingApproval", e.getValue());
 		});
 
 		layoutForProcessInstanceTop.add(chWaitingApproval);
@@ -329,6 +364,32 @@ public class UIInstance extends UIBase {
 
 		
 		return layoutForProcessInstanceTop;
+	}
+
+	private void setSessionBoolean(String key, boolean value) {
+		UI.getCurrent().getSession().setAttribute(key, value);
+	}
+
+	private void setSessionString(String key, String value) {
+		UI.getCurrent().getSession().setAttribute(key, value);
+	}
+
+	private String getStringValueFromSession(String key, String initialValue) {
+		VaadinSession session = UI.getCurrent().getSession();
+		if (session.getAttribute(key)==null) {
+			return initialValue;
+		}
+		
+		return (String) session.getAttribute(key);	
+		}
+
+	private boolean getBooleanFromSession(String key, boolean initialValue) {
+		VaadinSession session = UI.getCurrent().getSession();
+		if (session.getAttribute(key)==null) {
+			return initialValue;
+		}
+		
+		return (Boolean) session.getAttribute(key);
 	}
 
 	private void removeSelectedInstances() {
@@ -793,7 +854,9 @@ public class UIInstance extends UIBase {
 			return;
 		}
 
-		if (RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode())) {
+		ProcessDefinition processDefinition = processService.getProcessDefinitionById(processInstance.getId());
+		
+		if (RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode(), processDefinition.getCode())) {
 			notifyError("this instance %s is already running. Please wait.".formatted(processInstance.getCode()));
 			return;
 		}

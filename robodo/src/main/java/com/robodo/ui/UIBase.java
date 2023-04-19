@@ -12,6 +12,8 @@ import java.util.function.Predicate;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.robodo.model.KeyValue;
+import com.robodo.model.ProcessDefinition;
+import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.model.RunningProcess;
@@ -20,6 +22,7 @@ import com.robodo.services.ProcessService;
 import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.utils.HelperUtil;
+import com.robodo.utils.RunnerUtil;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -391,6 +394,42 @@ public class UIBase extends AppLayout {
 
 		return tf;
 	}
+	
+	public void runProcessDiscoverer(ProcessDefinition processDefinition) {
+
+		String processId = "DISCOVERY.%s".formatted(processDefinition.getCode());
+		boolean isRunning = RunnerSingleton.getInstance().hasRunningInstance(processId);
+		if (isRunning) {
+			notifyError("Discovery is already running");
+			return;
+		}
+
+		RunnerUtil runner = new RunnerUtil(processService);
+
+		RunnerSingleton.getInstance().start(processId);
+		List<ProcessInstance> discoveredInstances = runner.runProcessDiscovery(processDefinition);
+		int discovered = 0;
+		for (ProcessInstance discoveredInstance : discoveredInstances) {
+			runner.logger("discovered : new instance [%s] of process [%s]".formatted(processDefinition.getCode(),
+					discoveredInstance.getCode()));
+			boolean isExists = processService.isProcessInstanceAlreadyExists(discoveredInstance);
+			if (isExists) {
+				runner.logger("skip process [%s]/%s".formatted(processDefinition.getCode(),
+						discoveredInstance.getCode(), processDefinition.getCode()));
+				continue;
+			}
+
+			processService.saveProcessInstance(discoveredInstance);
+			discovered++;
+		}
+
+		RunnerSingleton.getInstance().stop(processId);
+		notifyInfo(discovered == 0 ? "no new instance is discovered "
+				: "%d new instance discovered".formatted(discovered));
+
+	}
+
+
 
 	
 

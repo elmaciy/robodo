@@ -477,39 +477,5 @@ public class UIProcess extends UIBase {
 		gridProcessDefinitionSteps.select(processDefinitionStep);
 	}
 
-	private void runProcessDiscoverer(ProcessDefinition processDefinition) {
-
-		String processId = "DISCOVERY.%s".formatted(processDefinition.getCode());
-		boolean isRunning = RunnerSingleton.getInstance().hasRunningInstance(processId);
-		if (isRunning) {
-			notifyError("Discovery is already running");
-			return;
-		}
-
-		RunnerUtil runner = new RunnerUtil(processService);
-
-		RunnerSingleton.getInstance().start(processId);
-		List<ProcessInstance> discoveredInstances = runner.runProcessDiscovery(processDefinition);
-		int discovered = 0;
-		for (ProcessInstance discoveredInstance : discoveredInstances) {
-			runner.logger("discovered : new instance [%s] of process [%s]".formatted(processDefinition.getCode(),
-					discoveredInstance.getCode()));
-			boolean isExists = processService.isProcessInstanceAlreadyExists(discoveredInstance);
-			if (isExists) {
-				runner.logger("skip process [%s]/%s".formatted(processDefinition.getCode(),
-						discoveredInstance.getCode(), processDefinition.getCode()));
-				continue;
-			}
-
-			processService.saveProcessInstance(discoveredInstance);
-			discovered++;
-		}
-
-		RunnerSingleton.getInstance().stop(processId);
-		notifyInfo(discovered == 0 ? "no new instance is discovered "
-				: "%d new instance discovered".formatted(discovered));
-
-	}
-
 
 }
