@@ -55,7 +55,7 @@ public class PageEpatsTahakkukOde extends PageEpatsBase {
 	
 	public String getDekontNo() {
 		//todo : buraya gerçek kod eklenecek. 
-		return String.valueOf(System.currentTimeMillis());
+		return "DEK"+String.valueOf(System.currentTimeMillis());
 	}
 	
 	private void close() {

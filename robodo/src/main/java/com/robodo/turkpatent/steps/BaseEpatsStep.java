@@ -1,6 +1,12 @@
 package com.robodo.turkpatent.steps;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -8,10 +14,14 @@ import com.google.common.base.Splitter;
 import com.robodo.base.BaseWebStep;
 import com.robodo.model.ApiResponse;
 import com.robodo.model.KeyValue;
+import com.robodo.model.ProcessDefinition;
+import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.turkpatent.apimodel.DosyaListeleri;
 import com.robodo.turkpatent.apimodel.DosyaRequest;
+import com.robodo.turkpatent.apimodel.DosyaResponse;
 import com.robodo.turkpatent.apimodel.TokenRequest;
+import com.robodo.turkpatent.apimodel.TokenResponse;
 import com.robodo.turkpatent.pages.PageEdevletLogin;
 import com.robodo.turkpatent.pages.PageEpatsBasvuruYapan;
 import com.robodo.turkpatent.pages.PageEpatsBenimSayfam;
@@ -37,10 +47,12 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 	
 
-	public final static Integer EPATS_STATU_TASLAK=0; //????
+	public final static Integer EPATS_STATU_TASLAK=531; //????
 	public final static Integer EPATS_STATU_ISLEMDE=1; // "RPA işlemde";
 	public final static Integer EPATS_STATU_TAHAKKUK=2; // "RPA Tahakkuk";
 	public final static Integer EPATS_STATU_ODEME=3; //"RPA ödeme";
+	
+	
 
 	
 	PageEpatsHome home;
@@ -142,7 +154,7 @@ public class BaseEpatsStep extends BaseWebStep {
 		epatsBasvuruYapan.devamEt();
 	}
 	
-	boolean isBulus() {
+	boolean isPatent() {
 		return "PATENT".contains(getVariable("basvuruTuru"));
 	}
 	
@@ -158,7 +170,7 @@ public class BaseEpatsStep extends BaseWebStep {
 		setVariable("dosyabilgisi.dosyabilgisi.basvuruNumarasi", epatsDosyaBilgisi.getBasvuruNumarasi());
 		setVariable("dosyabilgisi.dosyabilgisi.basvuruTarihi", epatsDosyaBilgisi.getBasvuruTarihi());
 		
-		if (isBulus()) {
+		if (isPatent()) {
 			setVariable("dosyabilgisi.dosyabilgisi.bulusBasligi", epatsDosyaBilgisi.getBulusBasligi());
 		}
 		if (isMarka()) {
@@ -167,8 +179,8 @@ public class BaseEpatsStep extends BaseWebStep {
 		
 		karsilastir(getVariable("dosyabilgisi.dosyabilgisi.basvuruNumarasi"), getVariable("dosyaNumarasi"), "dosya numarası karşılaştırılıyor");
 		
-		if (isBulus()) {
-			karsilastir(getVariable("dosyabilgisi.dosyabilgisi.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
+		if (isPatent()) {
+			//karsilastir(getVariable("dosyabilgisi.dosyabilgisi.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
 		}
 		
 		if (isMarka()) {
@@ -261,7 +273,7 @@ public class BaseEpatsStep extends BaseWebStep {
 		setVariable("onizleme.odenecek.dosyaNumarasi", epatsOnIzleme.getDosyaNumarasi());
 		setVariable("onizleme.odenecek.referansNumarasi", epatsOnIzleme.getRefeansTakipNumarasi());
 		
-		if (isBulus()) {			
+		if (isPatent()) {			
 			setVariable("onizleme.odenecek.bulusBasligi", epatsOnIzleme.getBulusBasligi());
 		}
 
@@ -275,8 +287,8 @@ public class BaseEpatsStep extends BaseWebStep {
 		karsilastir(getVariable("onizleme.odenecek.dosyaNumarasi"), getVariable("dosyaNumarasi"), "dosya numarası karşılaştırılıyor");
 		karsilastir(getVariable("onizleme.odenecek.referansNumarasi"), getVariable("takipNumarasi"), "başvuru takip/referans numarası karşılaştırılıyor");
 		
-		if (isBulus()) {			
-			karsilastir(getVariable("onizleme.odenecek.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
+		if (isPatent()) {			
+			//karsilastir(getVariable("onizleme.odenecek.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
 		}
 		
 		if (isMarka()) {			
@@ -366,16 +378,19 @@ public class BaseEpatsStep extends BaseWebStep {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/updateRpadosyaislemleri".formatted(apiHostname );
 		String token=getToken();
-		List<KeyValue> headers=List.of(new KeyValue("Authorization","Bearer %s".formatted(token)));
+		List<KeyValue> headers=List.of(
+				new KeyValue("Authorization","Bearer %s".formatted(token)),
+				new KeyValue("Content-type","application/json")
+				);
 		
-		ApiResponse response = httpRequest(Method.POST, endPoint, headers, dosyaRequest);
+		ApiResponse response = httpRequest(Method.PATCH, endPoint, headers, dosyaRequest);
 
 		if (response.getResponseCode()!=200) {
 			throw new RuntimeException("Güncelleme başarısız : ".formatted(description));
 		}
 	}
 	
-	public DosyaListeleri getTaslakDosyalar() {
+	public List<DosyaResponse> getTaslakDosyalar(Predicate<DosyaResponse> filter) {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/listRpadosyalar".formatted(apiHostname );
 		String token=getToken();
@@ -387,29 +402,38 @@ public class BaseEpatsStep extends BaseWebStep {
 			throw new RuntimeException("dosyalar listelenemedi");
 		}
 		
-		return json2Object(response.getBody(), DosyaListeleri.class);
+		var dosyaListeleri = json2Object(response.getBody(), DosyaListeleri.class);
+		return dosyaListeleri.getData().stream().filter(filter).collect(Collectors.toList());
 	}
 	
 	
 	
 	public String getToken() {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
+		String tokenLang = runnerUtil.getEnvironmentParameter("ankarapatent.api.token.lang");
 		String tokenUsername = runnerUtil.getEnvironmentParameter("ankarapatent.api.token.username");
 		String tokenPassword = runnerUtil.getEnvironmentParameter("ankarapatent.api.token.password");
 		
 		String endPoint="%s/login".formatted(apiHostname );
 		
 		TokenRequest tokenRequest= new TokenRequest();
+		tokenRequest.setDil(tokenLang);
 		tokenRequest.setKullaniciadi(tokenUsername);
-		tokenRequest.setPassword(tokenPassword);
+		tokenRequest.setSifre(tokenPassword);
 		
 		ApiResponse response = httpRequest(Method.POST, endPoint, null, tokenRequest);
 		
 		if (response.getResponseCode()!=200) {
-			throw new RuntimeException("token alınamadı");
+			throw new RuntimeException("token request başarısız");
 		}
 		
-		String token = response.getHeaderValueByName("jwttoken");
+		if (response.getBody()==null) {
+			throw new RuntimeException("token body is null.");
+		}
+		
+		TokenResponse tokenResponse = json2Object(response.getBody(), TokenResponse.class);
+		String token = tokenResponse.getData().getJwttoken();
+		
 		
 		if (token==null) {
 			throw new RuntimeException("token headeri bulunamadı");
@@ -420,6 +444,92 @@ public class BaseEpatsStep extends BaseWebStep {
 	}
 
 
-	
 
+	public List<ProcessInstance> createEpatsInstances(
+			ProcessDefinition processDefinition,
+			List<DosyaResponse> dosyalar, 
+			Function<DosyaResponse, String> forInstanceCode, 
+			Function<DosyaResponse, String> forDescription) {
+		
+		List<ProcessInstance> instances=new ArrayList<ProcessInstance>();
+
+		for (DosyaResponse dosya : dosyalar) {
+			String instanceKey=forInstanceCode.apply(dosya);
+			String description=forDescription.apply(dosya);
+			
+			ProcessInstance instance =new ProcessInstance();
+			instance=new ProcessInstance();
+			instance.setCode(instanceKey);
+			instance.setDescription(description);
+			instance.setCreated(LocalDateTime.now());
+			instance.setStarted(LocalDateTime.now());
+			instance.setFinished(null);
+			instance.setAttemptNo(0);
+			instance.setStatus(ProcessInstance.STATUS_NEW);
+			instance.setProcessDefinitionId(processDefinition.getId());
+			instance.setSteps(new ArrayList<ProcessInstanceStep>());
+			
+			HashMap<String, String> hmVars=new HashMap<String, String>();
+			hmVars.put("processInstance.code", instance.getCode());
+			hmVars.put("dosyaResponse.JSON", HelperUtil.obj2String(dosya));
+			hmVars.put("dosya.id", String.valueOf(dosya.getId()));
+			
+			//this step must be included 
+			createApprovalLinks(hmVars, instance.getCode());
+			
+			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
+			instance.setInitialInstanceVariables(instance.getInstanceVariables());
+
+			
+			for (var definitedSteps : processDefinition.getSteps()) {
+				ProcessInstanceStep instanceStep = new ProcessInstanceStep();
+				instanceStep.setStepCode(definitedSteps.getCode());
+				instanceStep.setProcessInstance(instance);
+				instanceStep.setStatus(ProcessInstanceStep.STATUS_NEW);
+				instanceStep.setCommands(definitedSteps.getCommands());
+				instanceStep.setCreated(LocalDateTime.now());
+				instanceStep.setOrderNo(definitedSteps.getOrderNo());
+
+				instance.getSteps().add(instanceStep);
+			}
+			
+			instances.add(instance);
+		}
+
+		return instances;
+	}
+	
+	protected void dosyaLinkleriGuncelle() {
+		int id=Integer.valueOf(getVariable("dosya.id"));
+		String lnkKontrol=getVariable("LINK.VIEW");
+		String lnkOnay=getVariable("LINK.APPROVE");
+		String lnkRed=getVariable("LINK.DECLINE");
+		
+		dosyaLinkleriGuncelle(id, lnkKontrol, lnkOnay, lnkRed);
+		dosyaDurumGuncelle(id, EPATS_STATU_ISLEMDE);
+		
+	}
+	
+	
+	
+	public void dosyaTahakkukKaydet() {
+		int id=Integer.valueOf(getVariable("dosya.id"));
+		String tahakkukNo=getVariable("tahakkukNo");
+		dosyaLTahakkukNoGuncelle(id, tahakkukNo);
+		dosyaDurumGuncelle(id, EPATS_STATU_TAHAKKUK);
+	}
+
+
+	public void dosyaDekontKaydet() {
+		int id=Integer.valueOf(getVariable("dosya.id"));
+		String dekontNo=getVariable("dekontNo");
+		dosyaLDekontNoGuncelle(id, dekontNo);
+		dosyaDurumGuncelle(id, EPATS_STATU_ODEME);
+	}
+	
+	public  void dosyaTahakkukVeDekontSifirla() {
+		int id=Integer.valueOf(getVariable("dosya.id"));
+		dosyaLTahakkukNoGuncelle(id, "");
+		dosyaLDekontNoGuncelle(id, "");
+	}
 }

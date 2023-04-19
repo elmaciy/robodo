@@ -11,22 +11,15 @@ public class YillikPatentUcretDosyasiOkuStep extends BaseEpatsStep {
 
 	@Override
 	public void run() {
-		String lnkKontrol=getVariable("LINK.VIEW");
-		String lnkOnay=getVariable("LINK.APPROVE");
-		String lnkRed=getVariable("LINK.DECLINE");
 		
-		String tahakkukNo=getVariable("tahakkukNo");
-		String dekontNo=getVariable("dekontNo");
-
-		int id=1;
-		
-		dosyaLinkleriGuncelle(id, lnkKontrol, lnkOnay, lnkRed);
-		dosyaDurumGuncelle(id, EPATS_STATU_ISLEMDE);
-		
-		dosyaLTahakkukNoGuncelle(id, tahakkukNo);
-		dosyaLDekontNoGuncelle(id, dekontNo);
+		dosyaTahakkukVeDekontSifirla();
+		dosyaLinkleriGuncelle();
 
 	}
+
+	
+
+	
 
 	
 

@@ -1,22 +1,30 @@
 package com.robodo.turkpatent.apimodel;
 
 public class TokenRequest {
+	String dil;
 	String kullaniciadi;
-	String password;
+	String sifre;
 	
 	
+	public String getDil() {
+		return dil;
+	}
+	public void setDil(String dil) {
+		this.dil = dil;
+	}
 	public String getKullaniciadi() {
 		return kullaniciadi;
 	}
 	public void setKullaniciadi(String kullaniciadi) {
 		this.kullaniciadi = kullaniciadi;
 	}
-	public String getPassword() {
-		return password;
+	public String getSifre() {
+		return sifre;
 	}
-	public void setPassword(String password) {
-		this.password = password;
+	public void setSifre(String sifre) {
+		this.sifre = sifre;
 	}
+	
 	
 	
 }

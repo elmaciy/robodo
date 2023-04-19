@@ -11,7 +11,7 @@ public class GenelDekontKaydetStep extends BaseEpatsStep {
 
 	@Override
 	public void run() {
-		selenium.sleep(5L);
+		dosyaDekontKaydet();
 
 	}
 

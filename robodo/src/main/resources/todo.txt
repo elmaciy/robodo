@@ -62,8 +62,26 @@
 104. instance ekranında seçili olan process definition session a kaydedilsin. her ekrana girişte kaybolmasın. 
 		hatta mümkünse filtreler de o şekilde session a kaydedilsin. 
 		
-105. AUTO IT yi ekle robodo ya https://www.autoitscript.com/site/autoit/		
+105. AUTO IT yi ekle robodo ya https://www.autoitscript.com/site/autoit/	
+
+106. serverde kod dosyalarını build sonrası sil. 
+107. serverde sistemi backup a eklettir. 
+108. serverde mysql i servis halinde çalıştır mümkünse. 
+
+109. kredi kartı ve edevlet servislerini de implemente et. headerde token alacak bunlar da 
+	Aktif edevlet sifreleri ---> post getEdevletRumuz
+ 	Aktif kredi kartlari ---> post getKrediKartRumuz
+
+
+110. fiyat bilgisi serviste gelmiyor. 
+111. mail personelinki mi kullanılacak
+112. "buluş adı karşılaştırılıyor" kontrolü commentlendi servisten gelmediği için. sorulacak.
 		
+		
+113. 2nci adımda geri almada hata çıktı
+
+114. sadece api çalışan steplerde chrome başlamasın
+
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
 2. RPA işlemi aldıktan sonra statüyü "RPA işlemde" olarak güncelleyecek. bu aşamada kontrol linki direk paylaşılacak ki ekrandan durum görülebilsin. 
@@ -71,6 +89,28 @@
 4. Onay alınıp işlem devam bittikten sonra statü "RPA ödeme"  olarak güncellenecek ve yanısıra a) dekont no sağlanacak. 
 5. Admin ekranı tamamlanınca, işlem tipine göre kredi kartı bilgilerini sağlayan servis geliştirilecek. Bu servisteki kredi kartı ödeme aşamasında çekilip kullanılacak. 
 Not : her işlem tipi için farklı kredi kartı kullanılacak. 
+
+
+islemTuru
+Marka : 1 
+Patent:2  
+Tasarım:3
+
+IslemKategorisi 
+Başvuru Öncesi : 1
+Başvuru : 2
+
+IslemAdimi 
+Yıllık Ücret Yenileme : 1
+Tescil Sonuçlandırma: 2
+Tam Marka Yenileme : 3
+
+rumuz
+E-devlet Rumuz : 1
+Kredi Kartı Rumuz : 2
+
+
+
 
 -------------------
 TAMAMLANANLAR 

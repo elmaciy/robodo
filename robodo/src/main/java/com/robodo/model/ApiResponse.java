@@ -3,6 +3,9 @@ package com.robodo.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.robodo.utils.HelperUtil;
+import com.robodo.utils.RunnerUtil;
+
 public class ApiResponse {
 	
 	private int responseCode;
@@ -61,30 +64,31 @@ public class ApiResponse {
 		return this;
 	}
 	
-	public void print() {
-		System.out.println("responseCode : %d".formatted(this.responseCode));
+	public void print(RunnerUtil runnerUtil) {
+		runnerUtil.logger("responseCode : %d".formatted(this.responseCode));
 		if (!this.headers.isEmpty()) {
-			System.out.println("\t   -------------------------------------------");
-			System.out.println("\t   HEADERS -----------------------------------");
-			System.out.println("\t   -------------------------------------------");
+			runnerUtil.logger("\t   -------------------------------------------");
+			runnerUtil.logger("\t   HEADERS -----------------------------------");
+			runnerUtil.logger("\t   -------------------------------------------");
 
 		}
 		for (KeyValue kv : this.headers) {
-			System.out.println("\t%s=[%s]".formatted(kv.getKey(), kv.getValue()));
+			runnerUtil.logger("\t%s=[%s]".formatted(kv.getKey(), kv.getValue()));
 		}
 
 		if (!this.headers.isEmpty()) {
-			System.out.println("\t   -------------------------------------------");
-			System.out.println("\t   COOKIES -----------------------------------");
-			System.out.println("\t   -------------------------------------------");
+			runnerUtil.logger("\t   -------------------------------------------");
+			runnerUtil.logger("\t   COOKIES -----------------------------------");
+			runnerUtil.logger("\t   -------------------------------------------");
 
 		}
 		for (KeyValue kv : this.cookies) {
-			System.out.println("\t%s=[%s]".formatted(kv.getKey(), kv.getValue()));
+			runnerUtil.logger("\t%s=[%s]".formatted(kv.getKey(), kv.getValue()));
 		}
 
-		
-		System.out.println("body : %d".formatted(this.body));
+		if (this.body!=null) {
+			runnerUtil.logger("body : %s".formatted(this.body));			
+		}
 	}
 
 

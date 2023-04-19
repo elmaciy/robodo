@@ -128,7 +128,7 @@ public class RobodoApplication {
 			yillikPatentUcretiProcess.getSteps().add(stepPatentTahakkukOlustur);
 			yillikPatentUcretiProcess.getSteps().add(stepOnay);
 			yillikPatentUcretiProcess.getSteps().add(stepPatentOde);
-			//yillikPatentUcreti.getSteps().add(stepPatentDekontIsle);
+			yillikPatentUcretiProcess.getSteps().add(stepPatentDekontIsle);
 
 			
 			if (processDefinitionRepo.findByCode(yillikPatentUcretiProcess.getCode()).isEmpty()) {

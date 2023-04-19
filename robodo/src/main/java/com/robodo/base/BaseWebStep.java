@@ -129,6 +129,7 @@ public abstract class BaseWebStep extends BaseStep {
 			 String value = r.cookies().get(key);
 			 apiResponse = apiResponse.withCookieEntity(key, value);
 		 }
+		 apiResponse.print(runnerUtil);
 		 
 		 return apiResponse;
  
