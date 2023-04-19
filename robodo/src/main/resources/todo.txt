@@ -64,7 +64,6 @@
 		
 105. AUTO IT yi ekle robodo ya https://www.autoitscript.com/site/autoit/	
 
-106. serverde kod dosyalarını build sonrası sil. 
 107. serverde sistemi backup a eklettir. 
 108. serverde mysql i servis halinde çalıştır mümkünse. 
 

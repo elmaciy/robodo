@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -20,6 +21,8 @@ import com.robodo.model.ProcessInstanceStep;
 import com.robodo.turkpatent.apimodel.DosyaListeleri;
 import com.robodo.turkpatent.apimodel.DosyaRequest;
 import com.robodo.turkpatent.apimodel.DosyaResponse;
+import com.robodo.turkpatent.apimodel.Rumuz;
+import com.robodo.turkpatent.apimodel.RumuzResponse;
 import com.robodo.turkpatent.apimodel.TokenRequest;
 import com.robodo.turkpatent.apimodel.TokenResponse;
 import com.robodo.turkpatent.pages.PageEdevletLogin;
@@ -527,5 +530,95 @@ public class BaseEpatsStep extends BaseWebStep {
 		dosyaLinkleriGuncelle(id, "-", "-", "-");
 		dosyaLTahakkukNoGuncelle(id, "-");
 		dosyaLDekontNoGuncelle(id, "-");
+	}
+	
+
+
+	public Rumuz getEdevletRumuz() {
+		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
+		String endPoint="%s/rpaservisleriController/getEdevletRumuz".formatted(apiHostname );
+		String token=getToken();
+		List<KeyValue> headers=List.of(
+				new KeyValue("Authorization","Bearer %s".formatted(token)),
+				new KeyValue("Content-type","application/json")
+				);
+		
+		ApiResponse response = httpRequest(Method.POST, endPoint, headers, null);
+		
+
+		if (response.getResponseCode()!=200) {
+			throw new RuntimeException("getEdevletRumuz başarısız : %d".formatted(response.getResponseCode()));
+		}
+
+		RumuzResponse rumuzResponse = json2Object(response.getBody(), RumuzResponse.class);
+		
+		if (!rumuzResponse.getMessage().equals("Success")) {
+			throw new RuntimeException("getEdevletRumuz response!=Success : %d".formatted(rumuzResponse.getMessage()));			
+		}
+		
+		Optional<Rumuz> anyRumuz = rumuzResponse.getData().stream().filter(p->
+			p.parametreturu==1
+			&& p.statu==1 
+			&& p.tckimlik!=null  
+			&& p.sifre!=null
+		).findAny();
+
+		if (anyRumuz.isEmpty()) {
+			throw new RuntimeException("getEdevletRumuz listede uygun rumuz yok");
+		}
+		
+		
+		return anyRumuz.get();
+	}
+
+	public Rumuz getKrediKartiRumuz() {
+		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
+		String endPoint="%s/rpaservisleriController/getKrediKartRumuz".formatted(apiHostname );
+		String token=getToken();
+		List<KeyValue> headers=List.of(
+				new KeyValue("Authorization","Bearer %s".formatted(token)),
+				new KeyValue("Content-type","application/json")
+				);
+		
+		ApiResponse response = httpRequest(Method.POST, endPoint, headers, null);
+		
+
+		if (response.getResponseCode()!=200) {
+			throw new RuntimeException("getKrediKartiRumuz başarısız : %d".formatted(response.getResponseCode()));
+		}
+
+
+		RumuzResponse rumuzResponse = json2Object(response.getBody(), RumuzResponse.class);
+		
+		if (!rumuzResponse.getMessage().equals("Success")) {
+			throw new RuntimeException("getKrediKartiRumuz response!=Success : %d".formatted(rumuzResponse.getMessage()));			
+		}
+		
+		Optional<Rumuz> anyRumuz = rumuzResponse.getData().stream().filter(p->
+			p.parametreturu==2
+			&& p.statu==1 
+			&& p.kredikartino!=null  
+			&& p.sonkullanimtarihi!=null
+			&& p.ccv!=null
+		).findAny();
+
+		if (anyRumuz.isEmpty()) {
+			throw new RuntimeException("getKrediKartiRumuz listede uygun rumuz yok");
+		}
+		
+		
+		return anyRumuz.get();
+		
+	}
+
+	public String date2SonKullanmaTarihi(String sonkullanimtarihi) {
+		if (sonkullanimtarihi==null) {
+			return null;
+		}
+		// "2025-12-30"
+		String year=sonkullanimtarihi.substring(5,7);
+		String month=sonkullanimtarihi.substring(2,4);
+		
+		return month + year;
 	}
 }
