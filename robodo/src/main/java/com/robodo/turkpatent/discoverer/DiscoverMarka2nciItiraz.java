@@ -11,11 +11,11 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.turkpatent.apimodel.DosyaListeleri;
 import com.robodo.turkpatent.apimodel.DosyaResponse;
-import com.robodo.turkpatent.steps.ApiERPBaseStep;
+import com.robodo.turkpatent.steps.BaseEpatsStep;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
-public class DiscoverMarka2nciItiraz extends ApiERPBaseStep implements Discoverable {
+public class DiscoverMarka2nciItiraz extends BaseEpatsStep implements Discoverable {
 
 	public DiscoverMarka2nciItiraz(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
@@ -140,6 +140,12 @@ public class DiscoverMarka2nciItiraz extends ApiERPBaseStep implements Discovera
 		
 		return instances;
 		*/
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

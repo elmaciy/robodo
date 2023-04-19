@@ -2,14 +2,14 @@ package com.robodo.turkpatent.steps;
 
 
 
-import com.robodo.base.BaseApiStep;
+import com.robodo.base.BaseWebStep;
 import com.robodo.model.ApiResponse;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.utils.RunnerUtil;
 
 import io.restassured.http.Method;
 
-public class DummyApiSteps extends BaseApiStep {
+public class DummyApiSteps extends BaseWebStep {
 
 	public DummyApiSteps(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
@@ -26,6 +26,22 @@ public class DummyApiSteps extends BaseApiStep {
 		setVariable("response.headers", "\n%s".formatted(response.getHeadersPrintable()));
 		setVariable("response.cookies", "\n%s".formatted(response.getCookiesPrintable()));
 		setVariable("response.body", "\n%s".formatted(response.getBody()));
+		
+	}
+
+
+
+	@Override
+	public void setup() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void teardown() {
+		// TODO Auto-generated method stub
 		
 	}
 

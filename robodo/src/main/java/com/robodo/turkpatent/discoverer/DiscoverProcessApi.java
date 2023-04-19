@@ -5,15 +5,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.robodo.base.BaseWebStep;
 import com.robodo.model.Discoverable;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
-import com.robodo.turkpatent.steps.ApiERPBaseStep;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
-public class DiscoverProcessApi extends ApiERPBaseStep implements Discoverable  {
+public class DiscoverProcessApi extends BaseWebStep implements Discoverable  {
 
 	public DiscoverProcessApi(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
@@ -70,6 +70,27 @@ public class DiscoverProcessApi extends ApiERPBaseStep implements Discoverable  
 			}
 			
 			return instances;
+		
+	}
+
+
+	@Override
+	public void setup() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void teardown() {
+		// TODO Auto-generated method stub
 		
 	}
 
