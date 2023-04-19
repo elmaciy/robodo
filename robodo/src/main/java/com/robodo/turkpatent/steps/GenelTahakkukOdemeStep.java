@@ -39,7 +39,6 @@ public class GenelTahakkukOdemeStep extends BaseEpatsStep {
 		String kartCVV=runnerUtil.getEnvironmentParameter("kredikarti.cvv");
 		selenium.switchIframe((p)->p.getAttribute("src").contains("/estpay/pay/"));
 		
-		karsilastir(HelperUtil.normalizeAmount(epatsTahakkukOde.getOdemeTutari()), HelperUtil.normalizeAmount(getVariable("odemeTutari")), "ödenecek tutarı karşılaştır");
 		epatsTahakkukOde.kartBilgileriniGir(kartNo, kartGecerlilik, kartCVV);
 		takeStepScreenShot(this.processInstanceStep, "Kart bilgileri girildi", false);
 		epatsTahakkukOde.odemeYap();

@@ -73,7 +73,7 @@
  	Aktif kredi kartlari ---> post getKrediKartRumuz
 
 
-110. fiyat bilgisi serviste gelmiyor. 
+110. fiyat bilgisi serviste gelmeyecekmiş. karşılaştırmaya gerek yok. 
 111. mail personelinki mi kullanılacak
 112. "buluş adı karşılaştırılıyor" kontrolü commentlendi servisten gelmediği için. sorulacak.
 		
@@ -85,6 +85,11 @@
 115. onay ve redde /CALLBACK i entegre et
 
 116. güncelleme işleminin response ini de model olarak al. orada success ve hata kontrolü yap. mesaj gelirse oradan al. 
+
+117. Token'i instane e sakla sürekli olsun
+118. Retry action olsun. Retry edilince çalışsın. zorunlu olmasın. 
+119. Token'i 10 dakikada bir yenilenecek şekilde yap. her 
+120. Humaninteraction da email gönderilmeme opsiyonu olsun. 
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 

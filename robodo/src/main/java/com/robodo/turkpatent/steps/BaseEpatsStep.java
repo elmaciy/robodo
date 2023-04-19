@@ -287,16 +287,11 @@ public class BaseEpatsStep extends BaseWebStep {
 		karsilastir(getVariable("onizleme.odenecek.dosyaNumarasi"), getVariable("dosyaNumarasi"), "dosya numarası karşılaştırılıyor");
 		karsilastir(getVariable("onizleme.odenecek.referansNumarasi"), getVariable("takipNumarasi"), "başvuru takip/referans numarası karşılaştırılıyor");
 		
-		if (isPatent()) {			
-			//karsilastir(getVariable("onizleme.odenecek.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
-		}
 		
 		if (isMarka()) {			
 			karsilastir(getVariable("onizleme.odenecek.markaAdi"), getVariable("markaAdi"), "marka adı karşılaştırılıyor");
 		}
-		
-		karsilastir(HelperUtil.normalizeAmount(getVariable("onizleme.odenecek.genelToplam")), HelperUtil.normalizeAmount(getVariable("odemeTutari")), "ödenecek tutar karşılaştırılıyor");
-		
+				
 		takeStepScreenShot(this.processInstanceStep, "Onizleme - 1 ", true, ()->waitProcessorGone());
 		epatsOnIzleme.scrollToCenteElement();
 		takeStepScreenShot(this.processInstanceStep, "Onizleme - 2", true, ()->waitProcessorGone());
@@ -527,8 +522,9 @@ public class BaseEpatsStep extends BaseWebStep {
 		dosyaDurumGuncelle(id, EPATS_STATU_ODEME);
 	}
 	
-	public  void dosyaTahakkukVeDekontSifirla() {
+	public  void dosyaLinkSifirla() {
 		int id=Integer.valueOf(getVariable("dosya.id"));
+		dosyaLinkleriGuncelle(id, "-", "-", "-");
 		dosyaLTahakkukNoGuncelle(id, "-");
 		dosyaLDekontNoGuncelle(id, "-");
 	}

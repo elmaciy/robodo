@@ -12,7 +12,7 @@ public class YillikPatentUcretDosyasiOkuStep extends BaseEpatsStep {
 	@Override
 	public void run() {
 		
-		dosyaTahakkukVeDekontSifirla();
+		dosyaLinkSifirla();
 		dosyaLinkleriGuncelle();
 
 	}

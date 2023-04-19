@@ -34,15 +34,6 @@ public class PageEpatsTahakkukOde extends PageEpatsBase {
 		super(selenium);
 	}
 	
-	public String getOdemeTutari() {
-		try {
-			return StringUtils.substringBefore(elPaymentAlert.getText(), " ödemeniz için");
-		} catch(Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("getOdemeTutari hesaplanırken beklenmeyen bir hata oluştu. %s".formatted(e.getMessage()));
-		}
-	}
-	
 	public void kartBilgileriniGir(String kartNo, String sonKullanma, String cvv) {
 		
 		
