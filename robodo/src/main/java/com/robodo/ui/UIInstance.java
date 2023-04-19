@@ -416,7 +416,7 @@ public class UIInstance extends UIBase {
 		
 		Button btnRefresh = new Button("", new Icon(VaadinIcon.REFRESH));
 		btnRefresh.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-		btnRefresh.addClickListener(e->fillStepsGrid(grid, processInstance.getCode()));
+		btnRefresh.addClickListener(e->fillStepsGrid(grid, processInstance.getCode(), null));
 
 		grid.addColumn(p -> p.getId()).setHeader(btnRefresh).setWidth("2em");
 		grid.addColumn(p -> p.getStepCode()).setHeader("Code").setAutoWidth(true);
@@ -470,7 +470,7 @@ public class UIInstance extends UIBase {
 		});
 		grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
-		fillStepsGrid(grid, processInstance.getCode());
+		fillStepsGrid(grid, processInstance.getCode(), null);
 		ProcessInstanceStep firstStep = processInstance.getSteps().get(0);
 		grid.select(firstStep);
 		
@@ -544,9 +544,19 @@ public class UIInstance extends UIBase {
 
 	
 
-	private void fillStepsGrid(Grid<ProcessInstanceStep> grid, String processInstanceCode) {
+	private void fillStepsGrid(Grid<ProcessInstanceStep> grid, String processInstanceCode, String stepCode) {
 		ProcessInstance processRefreshed = processService.getProcessInstanceByCode(processInstanceCode);
 		grid.setItems(processRefreshed.getSteps());
+		if (stepCode==null) {
+			var currentStep = processRefreshed.getCurrentStep();
+			if (currentStep!=null) {
+				grid.select(currentStep);
+				
+			}
+			return;
+		}
+		
+		grid.select(processRefreshed.getSteps().stream().filter(p->p.getStepCode().equals(stepCode)).findAny().get());
 		
 	}
 
@@ -603,13 +613,8 @@ public class UIInstance extends UIBase {
 		//reset initial variables
 		processInstance.setInstanceVariables(previousStepIndex==-1 ? processInstance.getInitialInstanceVariables() : steps.get(previousStepIndex).getInstanceVariables());
 		ProcessInstance saveProcessInstance = processService.saveProcessInstance(processInstance);
-		
-		
 
-
-		grid.setItems(saveProcessInstance.getSteps());
-
-		fillStepsGrid(grid, saveProcessInstance.getCode());
+		fillStepsGrid(grid, saveProcessInstance.getCode(), stepToBackward.getStepCode());
 		notifySuccess("backwarded");
 	}
 

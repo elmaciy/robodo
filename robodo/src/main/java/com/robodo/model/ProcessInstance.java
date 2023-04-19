@@ -208,22 +208,18 @@ public class ProcessInstance {
  	}
 	
 	public ProcessInstanceStep getLatestProcessedStep() {
-		ProcessInstanceStep latestProcessedStep=null;
-		int i=0;
-		for (ProcessInstanceStep step : this.getSteps()) {
+		int k=-1;
+		var steps=this.getSteps();
+		
+		for (int i=0;i<steps.size();i++) {
+			ProcessInstanceStep step = steps.get(i);
 			if (step.getStatus().equals(ProcessInstanceStep.STATUS_NEW)) {
-				if (i==0) {
-					return null;
-				}
-				
 				break;
 			} 
-			i++;
-
-			latestProcessedStep=step;
+			k=i;
 		}
 		
-		return latestProcessedStep;
+		return k==-1 ? null : steps.get(k);
 	}
 
 	public List<ProcessInstanceStep> getPreviousSteps(ProcessInstanceStep refStep) {
