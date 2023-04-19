@@ -82,6 +82,10 @@
 
 114. sadece api çalışan steplerde chrome başlamasın
 
+115. onay ve redde /CALLBACK i entegre et
+
+116. güncelleme işleminin response ini de model olarak al. orada success ve hata kontrolü yap. mesaj gelirse oradan al. 
+
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
 2. RPA işlemi aldıktan sonra statüyü "RPA işlemde" olarak güncelleyecek. bu aşamada kontrol linki direk paylaşılacak ki ekrandan durum görülebilsin. 

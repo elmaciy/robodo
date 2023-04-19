@@ -529,7 +529,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 	public  void dosyaTahakkukVeDekontSifirla() {
 		int id=Integer.valueOf(getVariable("dosya.id"));
-		dosyaLTahakkukNoGuncelle(id, "");
-		dosyaLDekontNoGuncelle(id, "");
+		dosyaLTahakkukNoGuncelle(id, "-");
+		dosyaLDekontNoGuncelle(id, "-");
 	}
 }
