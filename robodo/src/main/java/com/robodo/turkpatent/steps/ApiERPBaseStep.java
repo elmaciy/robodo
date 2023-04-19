@@ -68,7 +68,7 @@ public class ApiERPBaseStep extends BaseApiStep {
 		String token=getToken();
 		List<KeyValue> headers=List.of(new KeyValue("Authorization",token));
 		
-		ApiResponse response = httpRequest(Method.GET, endPoint, headers, dosyaRequest);
+		ApiResponse response = httpRequest(Method.POST, endPoint, headers, dosyaRequest);
 
 		if (response.getResponseCode()!=200) {
 			throw new RuntimeException("Güncelleme başarısız : ".formatted(description));
