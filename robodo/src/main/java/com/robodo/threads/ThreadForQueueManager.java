@@ -32,7 +32,7 @@ public class ThreadForQueueManager implements Runnable {
 		
 		
 		List<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();
-		List<ProcessDefinition> processDefinitionsActive=processDefinitions.stream().filter(p->p.isActive()).collect(Collectors.toList());
+		List<ProcessDefinition> processDefinitionsActive=processDefinitions.stream().filter(p->p.isActive() && p.getMaxThreadCount()>0).collect(Collectors.toList());
 		
 		for (ProcessDefinition processDefinition : processDefinitionsActive) {
 

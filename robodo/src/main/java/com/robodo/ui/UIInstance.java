@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -96,6 +97,7 @@ public class UIInstance extends UIBase {
 			
 			runProcessDiscoverer(comboForProcessDefinition.getValue());
 			btnRunDiscoverer.setEnabled(true);
+			fillProcessInstanceGrid();
 		});
 
 		
@@ -106,14 +108,15 @@ public class UIInstance extends UIBase {
 
 		gridProcessInstance = new Grid<>(ProcessInstance.class, false);
 		gridProcessInstance.addColumn(p -> p.getId()).setHeader("#").setAutoWidth(true)
-				.setFrozen(true).setTextAlign(ColumnTextAlign.END).setSortable(true);
-		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code").setAutoWidth(true).setFrozen(true).setSortable(true);
-		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description").setAutoWidth(true)
-				.setFrozen(true).setSortable(true).setVisible(false);
+			.setFrozen(true).setTextAlign(ColumnTextAlign.END).setSortable(true);
+		gridProcessInstance.addColumn(p -> p.getCode()).setHeader("Code").setWidth("8em")
+			.setFrozen(true).setSortable(true);
+		gridProcessInstance.addColumn(p -> p.getDescription()).setHeader("Description").setWidth("8em")
+			.setFrozen(true).setSortable(true).setVisible(true);
 		gridProcessInstance.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("3em").setFrozen(true).setSortable(true);
 		gridProcessInstance.addComponentColumn(p -> makeTrueFalseIcon(!p.isFailed()))
 			.setHeader("Res.").setWidth("3em").setSortable(true).setTextAlign(ColumnTextAlign.CENTER);
-		gridProcessInstance.addColumn(p -> p.getError()).setHeader("Error").setWidth("10em").setSortable(true)
+		gridProcessInstance.addColumn(p -> p.getError()).setHeader("Error").setWidth("3em").setSortable(true)
 			.setTooltipGenerator(p->HelperUtil.limitString(p.getError(), 1000));
 		gridProcessInstance.addComponentColumn(p -> {
 			ProgressBar progress = new ProgressBar();
@@ -126,11 +129,11 @@ public class UIInstance extends UIBase {
 		gridProcessInstance.addColumn(p -> p.getLatestProcessedStep() == null ? ProcessInstanceStep.STEP_NONE
 				: p.getLatestProcessedStep().getStepCode()).setHeader("Latest Step").setAutoWidth(true).setSortable(true);
 		gridProcessInstance.addColumn(p -> p.getAttemptNo()).setHeader("Attempt#").setWidth("2em")
-				.setTextAlign(ColumnTextAlign.END).setSortable(true);
+			.setTextAlign(ColumnTextAlign.END).setSortable(true);
 		gridProcessInstance.addColumn(p -> dateFormat(p.getCreated())).setHeader("Created").setWidth("3em")
-				.setTextAlign(ColumnTextAlign.END).setVisible(false);
+			.setTextAlign(ColumnTextAlign.END).setVisible(false);
 		gridProcessInstance.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setWidth("3em")
-				.setTextAlign(ColumnTextAlign.END).setVisible(false);
+			.setTextAlign(ColumnTextAlign.END).setVisible(false);
 		gridProcessInstance.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setWidth("3em")
 				.setTextAlign(ColumnTextAlign.END).setVisible(false);
 		gridProcessInstance.addComponentColumn(p -> {
@@ -173,7 +176,6 @@ public class UIInstance extends UIBase {
 
 			btnApprove.setDisableOnClick(true);
 			btnApprove.addClickListener(e -> {
-				// gridProcessInstance.select(p);
 				approveProcessInstance(p);
 				btnApprove.setEnabled(true);
 			});
@@ -187,10 +189,6 @@ public class UIInstance extends UIBase {
 			btnRun.addClickListener(e -> {
 				gridProcessInstance.select(p);
 				runProcessInstance(p);
-				try {
-					Thread.sleep(1000);
-				} catch (Exception ex) {
-				}
 				btnRun.setEnabled(true);
 			});
 			btnRun.setEnabled(!p.getStatus().equals(ProcessInstance.STATUS_COMPLETED));
@@ -414,6 +412,10 @@ public class UIInstance extends UIBase {
 	}
 
 	private void fillProcessInstanceGrid(ProcessDefinition processDefinition) {
+		
+		Set<ProcessInstance> selectedItems = gridProcessInstance.getSelectedItems();
+		
+		
 		List<ProcessInstance> filteredInstances = new ArrayList<ProcessInstance>();
 		
 		String searchString=searchField.getValue().strip();
@@ -454,6 +456,12 @@ public class UIInstance extends UIBase {
 		}
 
 		gridProcessInstance.setItems(filteredInstances);
+		
+		for (ProcessInstance instance : filteredInstances) {
+			if (selectedItems.stream().anyMatch(p->p.getCode().equals(instance.getCode()))) {
+				gridProcessInstance.select(instance);
+			}
+		}
 
 	}
 
@@ -466,7 +474,7 @@ public class UIInstance extends UIBase {
 		}
 
 		UI.getCurrent()
-				.navigate("/approve/%s/VIEW/SCREEN/%s".formatted(HelperUtil.encrypt(instance.getCode()), "notoken"));
+				.navigate("/approve/%s/VIEW/INTERNAL/%s".formatted(HelperUtil.encrypt(instance.getCode()), "notoken"));
 	}
 
 	private void showProcessInstanceSteps(String title, ProcessInstance processInstance) {

@@ -103,7 +103,8 @@ public class RobodoApplication {
 			stepOnay.setDescription("Patent yıllık ücreti ödeme için onay bekle");
 			stepOnay.setOrderNo("03");
 			stepOnay.setSingleAtATime(false);
-			stepOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
+			//stepOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
+			stepOnay.setCommands("waitHumanInteraction ");
 			stepOnay.setProcessDefinition(yillikPatentUcretiProcess);
 			
 			ProcessDefinitionStep stepPatentOde=new ProcessDefinitionStep();
@@ -170,7 +171,8 @@ public class RobodoApplication {
 			stepMarkaYenilemeOnay.setDescription("Marke yenileme tahakkuk ödeme için onay bekle");
 			stepMarkaYenilemeOnay.setOrderNo("03");
 			stepMarkaYenilemeOnay.setSingleAtATime(false);
-			stepMarkaYenilemeOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
+			//stepMarkaYenilemeOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
+			stepMarkaYenilemeOnay.setCommands("waitHumanInteraction");
 			stepMarkaYenilemeOnay.setProcessDefinition(markaYenilemeProcess);
 			
 			ProcessDefinitionStep stepMarkaOde=new ProcessDefinitionStep();
@@ -232,7 +234,8 @@ public class RobodoApplication {
 			stepMarka2nciItirazOnay.setDescription("Marka 2nci itiraz tahakkuk ödeme için onay bekle");
 			stepMarka2nciItirazOnay.setOrderNo("03");
 			stepMarka2nciItirazOnay.setSingleAtATime(false);
-			stepMarka2nciItirazOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
+			//stepMarka2nciItirazOnay.setCommands("waitHumanInteraction TAHAKKUK_ONAY");
+			stepMarka2nciItirazOnay.setCommands("waitHumanInteraction");
 			stepMarka2nciItirazOnay.setProcessDefinition(markaItiraz2);
 			
 			ProcessDefinitionStep stepMarka2nciItirazOde=new ProcessDefinitionStep();

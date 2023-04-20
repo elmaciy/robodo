@@ -1,11 +1,11 @@
 17. dashboardda iş bazında bekleyenler, tamamlananlar vs görünsün. 
 	dashboard verileri bir job ile arada sırada güncellenmeli. anlık çekilmemeli. 
+	- uzun süre (süre parametrik) hareketsiz bekleyenlerin raporu. 
+	- hatalı bekleyenlerin raporu. 
 	- işlem tipi bazında statü grupları
 	- ortalama işlem süreleri
 	- işlemlerdeki ortalama süreler
 	- genel rakamlar. (günlük işlenen) saatlik işlenen haftalık işlenen falan... 
-
-
 
 16. kurulan yerde chrome güncellenmemeli
 
@@ -46,38 +46,41 @@
 			kredikarti.gecerlilik=0625
 			kredikarti.cvv=123
 
-99. Aynı anda aynı discoverer in birden fazla aktif olması engellenebilir mi? 
+99. Process tanımlama ekranında aynı anda aynı discoverer in birden fazla aktif olması engellenebilir mi? 
 	hem discoverer alanı hem aktif alanında trigger olmalıdır. 
 
 100. process definition ekranındaki class name ler verify edilmeli. parametreler de oyle. Command builder yapılabilir elle yazılmak yerine. 
 
 101. chrome headless çalıştırılmalı. Browser biraz daha esnek olabilir mi? Farklı browserlere de geçilebilmeşli. driver e de. 
-
-102. createApprovalLinks doğru yerde değil. unutulabilir. Bunu bir şekilde doğru yere koyalım
 		
 105. AUTO IT yi ekle robodo ya https://www.autoitscript.com/site/autoit/	
 
 107. serverde sistemi backup a eklettir. 
 108. serverde mysql i servis halinde çalıştır mümkünse. 
 
-111. mail olarak eşleşmelerdeki mail kullanılacak
-112. "buluş adı karşılaştırılıyor" kontrolü commentlendi servisten gelmediği için. sorulacak.
+111. rumuz işlem eşleştirmelerindeki email kullanılacak
 				
-113. 2nci adımda geri almada hata çıktı
+113. 2nci adımda geri almada hata çıktı. Backward işlemi garip çalışıyor. Bunu belki silip adım adım geri alma yerine direk retry ettiririz. 
 
 114. sadece api çalışan steplerde chrome başlamasın
 
-115. onay ve redde /CALLBACK i entegre et
+115. onay ve redde /CALLBACK i entegre et. Bazı durumlarda gerekebilir. 
 
-117. Token'i instane e sakla sürekli olsun. bir kere setlensin. sonra retrylerde bile setlenmesine gerek yok. 
 118. Retry action olsun. Retry edilince çalışsın. zorunlu olmasın. 
-119. Token'i 10 dakikada bir yenilenecek şekilde yap. her 
-120. Humaninteraction da email gönderilmeme opsiyonu olsun. 
+119. ERP den aldığın Token'i 10 dakikada bir yenilenecek şekilde yap. her seferinde token almasın. Singleton ile hallet 
 
 109. kredi kartı ve edevlet servislerini de implemente et. headerde token alacak bunlar da 
 	Aktif edevlet sifreleri ---> post getEdevletRumuz
  	Aktif kredi kartlari ---> post getKrediKartRumuz
+ 	
+111. onay adımına süreci baştan başlatama seçeneği ekle. 
+114. EXTERNAL approve aşamasında bize onaylayan kullanıcıyı da göndermelerine olanak sağlanabilir. 
 
+115. Ekrandaki run butonu clicklendikten sonra neden disabled kaldı? 
+116. instance gridinde kodun yanında description da gösterelim. 
+117. process stepte bir değişiklik olduğunda ya da processdef de, bunu tüm instancelere uygula gibi bir seçenek olabilir mi? 
+
+118. Marka tescil ücreti işini de yap. 
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -173,4 +176,7 @@ TAMAMLANANLAR
 	${HUMAN.APPROVE_LINK}, ${HUMAN.DECLINE_LINK}, ${HUMAN.VIEW_LINK}
 104. instance ekranında seçili olan process definition session a kaydedilsin. her ekrana girişte kaybolmasın. 
 		hatta mümkünse filtreler de o şekilde session a kaydedilsin. 
-	
+117. Token'i instane e sakla sürekli olsun. bir kere setlensin. sonra retrylerde bile setlenmesine gerek yok. 
+110. queue yi dolduran proses, maxthread count<=0 lari doldurmasın boşuna. Diğer processlere de bir bakılabilir bu gözle. 
+113. SCREEN/EMAIL yerine INTERNAL/EXTERNAL link olsun isimlendirme. 
+120. Humaninteraction da email gönderilmeme opsiyonu olsun. 

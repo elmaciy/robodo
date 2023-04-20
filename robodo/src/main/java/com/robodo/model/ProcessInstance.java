@@ -72,7 +72,9 @@ public class ProcessInstance {
 
 	public void setCode(String code) {
 		this.code = code;
-		this.token =UUID.randomUUID().toString();
+		if (this.token==null) {
+			this.token =UUID.randomUUID().toString();
+		}
 	}
 
 	public String getDescription() {

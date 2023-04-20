@@ -5,7 +5,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.robodo.threads.ThreadForDiscoverers;
-import com.robodo.threads.ThreadForExpiredTokenRemoval;
 import com.robodo.threads.ThreadForInstanceStarter;
 import com.robodo.threads.ThreadForQueueManager;
 import com.robodo.threads.ThreadForRetryFailed;
@@ -40,11 +39,6 @@ public class ScheduledTasks {
 		Thread th=new Thread(new ThreadForRetryFailed(processService));
 		th.start();
 	}
-	
-	
-	@Scheduled(fixedRate = 30*1000, initialDelay = 0)
-	public void removeExpiredTokens() {
-		Thread th=new Thread(new ThreadForExpiredTokenRemoval(processService));
-		th.start();
-	}
+
+
 }

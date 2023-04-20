@@ -175,7 +175,8 @@ public class RunnerUtil {
 
 			return result.succeeded();
 		} else if (arg0.equalsIgnoreCase("waitHumanInteraction")) {
-			if (!step.isNotificationSent()) {
+			boolean isValidEmailTemplate=validateEmailTemplate(arg1);
+			if (isValidEmailTemplate && !step.isNotificationSent()) {
 				sendEmailNotificationForApproval(step, arg1);
 				step.setNotificationSent(true);
 				
@@ -191,6 +192,10 @@ public class RunnerUtil {
 		}
 
 		return result.succeeded();
+	}
+
+	private boolean validateEmailTemplate(String emailTemplateCode) {
+		return processService.getEmailTemplateByCode(emailTemplateCode)!=null;
 	}
 
 	private void sendEmailNotificationForApproval(ProcessInstanceStep step, String emailTemplateCode) {

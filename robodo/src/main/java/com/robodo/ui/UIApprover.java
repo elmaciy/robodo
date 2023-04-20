@@ -96,7 +96,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			return false;
 		}
 		
-		if ("EMAIL,SCREEN".indexOf(source)==-1) {
+		if ("EXTERNAL,INTERNAL".indexOf(source)==-1) {
 			notifyError("invalid source: %s".formatted(source));
 			return false;
 		}
@@ -275,7 +275,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 
 	private String getApprovingUser() {
 		if (!isAuthenticated()) {
-			return "EMAIL";
+			return "EXTERNAL";
 		}
 		
 		return getAuthenticatedUser();

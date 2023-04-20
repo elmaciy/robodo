@@ -49,8 +49,6 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseEpatsStep implem
 			hmVars.put("eposta", "ipmaintenance.epats@ankarapatent.com");
 			hmVars.put("talepTuru", "Tam");
 			
-			//this step must be included 
-			createApprovalLinks(hmVars, instance.getCode());
 			
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			instance.setInitialInstanceVariables(instance.getInstanceVariables());

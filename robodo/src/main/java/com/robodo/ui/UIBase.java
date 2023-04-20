@@ -381,7 +381,7 @@ public class UIBase extends AppLayout {
 			
 			boolean isValid =validators ==null || List.of(validators).stream().allMatch(v->v.test(value));
 			
-			if (!isValid) {
+			if (isValid) {
 				consumer.accept(value);
 			} 
 			else {

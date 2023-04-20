@@ -182,10 +182,6 @@ public class BaseEpatsStep extends BaseWebStep {
 		
 		karsilastir(getVariable("dosyabilgisi.dosyabilgisi.basvuruNumarasi"), getVariable("dosyaNumarasi"), "dosya numarası karşılaştırılıyor");
 		
-		if (isPatent()) {
-			//karsilastir(getVariable("dosyabilgisi.dosyabilgisi.bulusBasligi"), getVariable("bulusAdi"), "buluş adı karşılaştırılıyor");
-		}
-		
 		if (isMarka()) {
 			karsilastir(getVariable("dosyabilgisi.dosyabilgisi.markaAdi"), getVariable("markaAdi"), "marka adı karşılaştırılıyor");
 		}
@@ -497,9 +493,9 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 	protected void dosyaLinkleriGuncelle(ProcessInstance processInstance) {
 		int id=Integer.valueOf(getVariable("dosya.id"));
-		String lnkKontrol = HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance,  "VIEW", "EMAIL");
-		String lnkOnay=HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance, "APPROVE", "EMAIL");
-		String lnkRed=HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance, "DECLINE", "EMAIL");
+		String lnkKontrol = HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance,  "VIEW", "EXTERNAL");
+		String lnkOnay=HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance, "APPROVE", "EXTERNAL");
+		String lnkRed=HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance, "DECLINE", "EXTERNAL");
 		
 		dosyaLinkleriGuncelle(id, lnkKontrol, lnkOnay, lnkRed);
 		dosyaDurumGuncelle(id, EPATS_STATU_ISLEMDE);

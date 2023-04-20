@@ -76,7 +76,7 @@ public class UIEmailTemplates extends UIBase  {
 	private EmailTemplate  makeNewTemplate() {
 		EmailTemplate template=new EmailTemplate();
 		String id="%s".formatted(String.valueOf(System.currentTimeMillis()));
-		template.setCode("EMAIL%s".formatted(id));
+		template.setCode("EMAIL_TEMPLATE_%s".formatted(id));
 		template.setSubject("user_%s".formatted(id));
 		template.setToAddress("%s@acme.com".formatted(id));
 		template.setBody("body of the message goes here");
