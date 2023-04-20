@@ -45,7 +45,8 @@ public class GenelTahakkukOdemeStep extends BaseEpatsStep {
 		selenium.switchIframe((p)->p.getAttribute("src").contains("/estpay/pay/"));
 		
 		epatsTahakkukOde.kartBilgileriniGir(kartNo, kartGecerlilik, kartCVV);
-		takeStepScreenShot(this.processInstanceStep, "Kart bilgileri girildi", false);
+		//bu kisim guvenlik sebebiyle kapatildi. kerdi karti bilgisi icermektedir. 
+		//akeStepScreenShot(this.processInstanceStep, "Kart bilgileri girildi", false);
 		epatsTahakkukOde.odemeYap();
 		String dekontNo=epatsTahakkukOde.getDekontNo();
 		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);

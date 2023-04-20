@@ -9,6 +9,17 @@ public class GenelDekontKaydetStep extends BaseEpatsStep {
 		super(runnerUtil, processInstanceStep);
 	}
 
+	
+	@Override
+	public void setup() {
+		//selenium webdriver/chrome acmasin diye eziyoruz
+	}
+	
+	@Override
+	public void teardown() {
+		//selenium webdriver/chrome acmadigi icn eziyoruz
+	}
+	
 	@Override
 	public void run() {
 		dosyaDekontKaydet();

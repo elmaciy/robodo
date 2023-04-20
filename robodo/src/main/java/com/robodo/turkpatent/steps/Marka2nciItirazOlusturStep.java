@@ -15,6 +15,10 @@ public class Marka2nciItirazOlusturStep extends BaseEpatsStep {
 	
 	@Override
 	public void run() {
+		
+		dosyaLinkSifirla();
+		dosyaLinkleriGuncelle(this.processInstanceStep.getProcessInstance());
+		
 		sistemeGiris();
 		islemSec();
 		basvuruYap();

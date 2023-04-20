@@ -16,6 +16,9 @@ public class YillikPatentUcretiTahakkukOlusturStep extends BaseEpatsStep {
 	
 	@Override
 	public void run() {
+		dosyaLinkSifirla();
+		dosyaLinkleriGuncelle(this.processInstanceStep.getProcessInstance());
+		
 		sistemeGiris();
 		dosyaAra();
 		islemSec();

@@ -56,25 +56,24 @@
  	
 111. onay adımına süreci baştan başlatama seçeneği ekle. RESTART action
 114. EXTERNAL approve aşamasında bize onaylayan kullanıcıyı da göndermelerine olanak sağlanabilir. 
-115. Ekrandaki run butonu clicklendikten sonra neden disabled kaldı? 
 
 118. Marka tescil ücreti işini de yap. 
-119. benim gmail hesabımdan kurtul, firma kendisi gmail alsın bir tane. Şimdilik mail atılmadığı için gerek yok. 
-	Email şifresini silelim application.properties den. Gerekirse corporate parametrelere tanımlarız
 120. arada sırada webdriverlerin temizlenmesi mümkün olsun. 
 101. chrome headless çalıştırılmalı. Browser biraz daha esnek olabilir mi? Farklı browserlere de geçilebilmeşli. driver e de. 
 107. serverde sistemi backup a eklettir. 
 108. serverde mysql i servis halinde çalıştır mümkünse. 
 86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
 16. kurulan yerde chrome güncellenmemeli
-114. sadece api çalışan steplerde chrome başlamasın
 115. süreç isimlerini standart hale getir. 
 116. build sonrası kodları makineden silmesi lazım. Zaten bir süre sonra build scriptini serverden kaldır. Sadece JAR deploy ederiz. 
 117. Sadece dosya no değil, yıl parametresi de alınsın yıllık ödeme süreçlerinde. Yoksa önümüzdeki yıl ödeme yapmaz. 
 119. getRumuzEslemeByIslemAdimi funcitondaki daki test amacli bilgileri silmeyi unurma
 
-118. islemAdimiİ'ni parametrelere koy. Buradan okusun stepler. Ödeme yapılacak rumuzları da bu kodla çeksin yine. 
+
 119. discovery adımında oluşan hataların da görülmesini sağlayalım. Statüsü fail olsun mesela ve hataları loglayalım vs... 
+120. Ekrandaki discover butonları sadee admine acik olsun ve senkron çalışmasın thread başlatsın. 
+121. Kredi kartı tek sefer çalışsından emin ol. kodları buna göre ayarla. kontrolü iyi yap. 
+122. Ödeme ile dekont kaydetmeyi birleştirsek mi? 
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -177,3 +176,7 @@ TAMAMLANANLAR
 119. ERP den aldığın Token'i 10 dakikada bir yenilenecek şekilde yap. her seferinde token almasın. Singleton ile hallet 
 111. rumuz işlem eşleştirmelerindeki email kullanılacak
 118. ankarapatent.vergino parametresini de properties dosyasından kurtar
+118. islemAdimiİ'ni parametrelere koy. Buradan okusun stepler. Ödeme yapılacak rumuzları da bu kodla çeksin yine. 
+119. benim gmail hesabımdan kurtul, firma kendisi gmail alsın bir tane. Şimdilik mail atılmadığı için gerek yok. 
+	Email şifresini silelim application.properties den. Gerekirse corporate parametrelere tanımlarız
+114. sadece api çalışan steplerde chrome başlamasın

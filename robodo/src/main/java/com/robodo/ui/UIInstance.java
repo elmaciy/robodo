@@ -862,7 +862,7 @@ public class UIInstance extends UIBase {
 			return;
 		}
 
-		ProcessDefinition processDefinition = processService.getProcessDefinitionById(processInstance.getId());
+		ProcessDefinition processDefinition = processService.getProcessDefinitionById(processInstance.getProcessDefinitionId());
 		
 		if (RunnerSingleton.getInstance().hasRunningInstance(processInstance.getCode(), processDefinition.getCode())) {
 			notifyError("this instance %s is already running. Please wait.".formatted(processInstance.getCode()));

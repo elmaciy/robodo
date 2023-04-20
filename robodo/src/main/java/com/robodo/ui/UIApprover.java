@@ -245,6 +245,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		ProcessInstanceStep stepForApproval = getStepToApprove(processInstance);
 		if (stepForApproval==null) {
 			notifyError("no step to approve");
+			System.err.println("no step to approve");
 			return;
 		}
 		

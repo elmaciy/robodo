@@ -5,23 +5,23 @@ import com.robodo.turkpatent.steps.BaseEpatsStep;
 
 import io.restassured.http.Method;
 
-public class TokenManagerSingleton {
+public class SingletonForTokenManager {
 	
 	//10 dakika yeter
 	public static final long TTL=10*60*1000;
 	
-	private static TokenManagerSingleton instance;
+	private static SingletonForTokenManager instance;
 	private String jwtToken;
 	private long startTs=0;
 	
 	
-	private TokenManagerSingleton() {
+	private SingletonForTokenManager() {
 		
 	}
 	
-	public static TokenManagerSingleton getInstance() {
+	public static SingletonForTokenManager getInstance() {
 		if (instance==null) {
-			instance =new TokenManagerSingleton();
+			instance =new SingletonForTokenManager();
 		}
 		
 		return instance;
@@ -29,10 +29,9 @@ public class TokenManagerSingleton {
 
 	public String getJwtToken(BaseEpatsStep epatsStep) {
 		if (!isTokenValid()) {
-			
+			setToken(epatsStep);
 		}
-		
-		setToken(epatsStep);
+
 		return this.jwtToken;
 	}
 	
@@ -74,6 +73,7 @@ public class TokenManagerSingleton {
 		}
 		
 		this.jwtToken=token;
+		this.startTs = System.currentTimeMillis();
 		
 	}
 

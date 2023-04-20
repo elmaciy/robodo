@@ -24,7 +24,7 @@ import com.robodo.turkpatent.apimodel.DosyaResponse;
 import com.robodo.turkpatent.apimodel.Rumuz;
 import com.robodo.turkpatent.apimodel.RumuzEsleme;
 import com.robodo.turkpatent.apimodel.RumuzResponse;
-import com.robodo.turkpatent.apimodel.TokenManagerSingleton;
+import com.robodo.turkpatent.apimodel.SingletonForTokenManager;
 import com.robodo.turkpatent.pages.PageEdevletLogin;
 import com.robodo.turkpatent.pages.PageEpatsBasvuruYapan;
 import com.robodo.turkpatent.pages.PageEpatsBenimSayfam;
@@ -378,7 +378,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	private void dosyaGuncelle(DosyaRequest dosyaRequest, String description) {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/updateRpadosyaislemleri".formatted(apiHostname );
-		String token=TokenManagerSingleton.getInstance().getJwtToken(this);
+		String token=SingletonForTokenManager.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(
 				new KeyValue("Authorization","Bearer %s".formatted(token)),
 				new KeyValue("Content-type","application/json")
@@ -394,7 +394,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	public List<DosyaResponse> getTaslakDosyalarByIslemAdimi(int islemAdimi) {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/listRpadosyalar".formatted(apiHostname );
-		String token=TokenManagerSingleton.getInstance().getJwtToken(this);
+		String token=SingletonForTokenManager.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(new KeyValue("Authorization","Bearer %s".formatted(token)));
 		ApiResponse response = httpRequest(Method.GET, endPoint, headers, null);
 		
@@ -508,7 +508,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	private Rumuz getAnyEdevletRumuzSilinecek() {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/getEdevletRumuz".formatted(apiHostname );
-		String token=TokenManagerSingleton.getInstance().getJwtToken(this);
+		String token=SingletonForTokenManager.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(
 				new KeyValue("Authorization","Bearer %s".formatted(token)),
 				new KeyValue("Content-type","application/json")
@@ -545,7 +545,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	private Rumuz getAnyKrediKartiRumuzSilinecek() {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/getKrediKartRumuz".formatted(apiHostname );
-		String token=TokenManagerSingleton.getInstance().getJwtToken(this);
+		String token=SingletonForTokenManager.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(
 				new KeyValue("Authorization","Bearer %s".formatted(token)),
 				new KeyValue("Content-type","application/json")
