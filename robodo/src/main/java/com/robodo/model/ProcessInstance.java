@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.CascadeType;
@@ -51,6 +52,7 @@ public class ProcessInstance {
 	@Column(columnDefinition = "mediumtext")
 	String instanceVariables;	
 	Long processDefinitionId;
+	String token;
 	
 	@OneToMany(mappedBy = "processInstance", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	List<ProcessInstanceStep> steps;
@@ -70,6 +72,7 @@ public class ProcessInstance {
 
 	public void setCode(String code) {
 		this.code = code;
+		this.token =UUID.randomUUID().toString();
 	}
 
 	public String getDescription() {
@@ -185,6 +188,16 @@ public class ProcessInstance {
 
 	public void setFailed(boolean failed) {
 		this.failed = failed;
+	}
+	
+	
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	public ProcessInstanceStep getCurrentStep() {

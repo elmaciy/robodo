@@ -28,8 +28,6 @@
 	
 83. thread windowundaki kuyruk ve thread lar sıfırlanabilmelidir. ???
 
-85. Human interactionda mail atma seçeneği olmayabilir. Bu durumda mail adresini bış girerek ya da <nuLL> girerek tamamlarız
-
 86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
 
 87. tanım ekranlarındaki boxlara maxlength falan koy  - db yi aşmasın 
@@ -71,7 +69,7 @@
 
 115. onay ve redde /CALLBACK i entegre et
 
-117. Token'i instane e sakla sürekli olsun
+117. Token'i instane e sakla sürekli olsun. bir kere setlensin. sonra retrylerde bile setlenmesine gerek yok. 
 118. Retry action olsun. Retry edilince çalışsın. zorunlu olmasın. 
 119. Token'i 10 dakikada bir yenilenecek şekilde yap. her 
 120. Humaninteraction da email gönderilmeme opsiyonu olsun. 

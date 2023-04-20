@@ -110,7 +110,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		}
 		
 		if (!isAuthenticated()) {
-			boolean isValid = processService.isValidToken(token, "FOR_APPROVAL", processInstance.getCode());
+			boolean isValid =token!=null && token.equals(processInstance.getToken());
 			if (!isValid) {
 				notifyError("invalid token supplied");
 				return false;

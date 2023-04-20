@@ -467,13 +467,11 @@ public class BaseEpatsStep extends BaseWebStep {
 			instance.setProcessDefinitionId(processDefinition.getId());
 			instance.setSteps(new ArrayList<ProcessInstanceStep>());
 			
+			
 			HashMap<String, String> hmVars=new HashMap<String, String>();
 			hmVars.put("processInstance.code", instance.getCode());
 			hmVars.put("dosyaResponse.JSON", HelperUtil.obj2String(dosya));
 			hmVars.put("dosya.id", String.valueOf(dosya.getId()));
-			
-			//this step must be included 
-			createApprovalLinks(hmVars, instance.getCode());
 			
 			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			instance.setInitialInstanceVariables(instance.getInstanceVariables());
@@ -497,11 +495,11 @@ public class BaseEpatsStep extends BaseWebStep {
 		return instances;
 	}
 	
-	protected void dosyaLinkleriGuncelle() {
+	protected void dosyaLinkleriGuncelle(ProcessInstance processInstance) {
 		int id=Integer.valueOf(getVariable("dosya.id"));
-		String lnkKontrol=getVariable("LINK.VIEW");
-		String lnkOnay=getVariable("LINK.APPROVE");
-		String lnkRed=getVariable("LINK.DECLINE");
+		String lnkKontrol = HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance,  "VIEW", "EMAIL");
+		String lnkOnay=HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance, "APPROVE", "EMAIL");
+		String lnkRed=HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance, "DECLINE", "EMAIL");
 		
 		dosyaLinkleriGuncelle(id, lnkKontrol, lnkOnay, lnkRed);
 		dosyaDurumGuncelle(id, EPATS_STATU_ISLEMDE);
@@ -510,6 +508,8 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 	
 	
+
+
 	public void dosyaTahakkukKaydet() {
 		int id=Integer.valueOf(getVariable("dosya.id"));
 		String tahakkukNo=getVariable("tahakkukNo");

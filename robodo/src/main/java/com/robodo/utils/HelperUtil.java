@@ -42,7 +42,6 @@ import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
-import com.robodo.model.Tokenization;
 
 public class HelperUtil {
 	
@@ -113,10 +112,24 @@ public class HelperUtil {
 			return null;
 		}
 	}
+	
+	public static String generateInstanceApprovalLink(RunnerUtil runnerUtil, ProcessInstance processInstance, String action, String source) {
+		String encodedProcessInstanceCode=HelperUtil.encrypt(processInstance.getCode());
+		String serverHost=runnerUtil.getEnvironmentParameter("server.host.path");
+		String tokenKey=processInstance.getToken();
+		
+		//approve/06F6215153466D147B3798B5C0E258449D277FE1C16B6D07332AC0C378A99560/VIEW/EMAIL/266040db-274d-46f7-aee5-20c54db440cf
+		//approve/06F6215153466D147B3798B5C0E258449D277FE1C16B6D07332AC0C378A99560/APPROVE/EMAIL/266040db-274d-46f7-aee5-20c54db440cf
+		//approve/06F6215153466D147B3798B5C0E258449D277FE1C16B6D07332AC0C378A99560/DECLINE/EMAIL/266040db-274d-46f7-aee5-20c54db440cf
+		return "%s/approve/%s/%s/%s/%s".formatted(serverHost, encodedProcessInstanceCode, action, source, tokenKey);
+	}
 
 	public static void sendEmailByTemplate(EmailTemplate emailTemplate, ProcessInstanceStep step, RunnerUtil runnerUtil) {
 		String instanceVariables = step.getProcessInstance().getInstanceVariables();
 		HashMap<String, String> hmVars=String2HashMap(instanceVariables);
+		hmVars.put("LINK.APPROVE", generateInstanceApprovalLink(runnerUtil, step.getProcessInstance(), "APPROVE", "EMAIL"));
+		hmVars.put("LINK.DECLINE", generateInstanceApprovalLink(runnerUtil, step.getProcessInstance(), "DECLINE", "EMAIL"));
+		hmVars.put("LINK.VIEW", generateInstanceApprovalLink(runnerUtil, step.getProcessInstance(), "VIEW", "EMAIL"));
 		emailTemplate.setSubject(replaceVariables(emailTemplate.getSubject(),hmVars));
 		emailTemplate.setBody(replaceVariables(emailTemplate.getBody(), hmVars));
 		sendEmail(step.getProcessInstance(), emailTemplate, runnerUtil);

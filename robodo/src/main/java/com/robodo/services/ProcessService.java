@@ -26,7 +26,6 @@ import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
-import com.robodo.model.Tokenization;
 import com.robodo.model.User;
 import com.robodo.model.UserRole;
 import com.robodo.repo.CorporateParameterRepo;
@@ -35,7 +34,6 @@ import com.robodo.repo.ProcessDefinitionRepo;
 import com.robodo.repo.ProcessDefinitionStepRepo;
 import com.robodo.repo.ProcessInstanceRepo;
 import com.robodo.repo.ProcessInstanceStepFileRepo;
-import com.robodo.repo.TokenizationRepo;
 import com.robodo.repo.UserRepo;
 import com.robodo.repo.UserRoleRepo;
 import com.robodo.utils.HelperUtil;
@@ -59,8 +57,6 @@ public class ProcessService {
 	@Autowired
 	ProcessInstanceStepFileRepo processInstanceStepFileRepo;
 	
-	@Autowired
-	TokenizationRepo tokenizationRepo;
 	
 	@Autowired
 	UserRepo userRepo;
@@ -250,35 +246,6 @@ public class ProcessService {
 	public void deleteAllStepFiles(ProcessInstanceStep step) {
 		processInstanceStepFileRepo.deleteByProcessInstanceStepId(step.getId());
 		
-	}
-
-	public void saveToken(Tokenization token) {
-		tokenizationRepo.save(token);
-		
-	}
-
-	public boolean isValidToken(String token, String purpose, String purposeDetail) {
-		List<Tokenization> list = tokenizationRepo.findByTokenAndPurposeAndPurposeDetail(token, purpose, purposeDetail);
-		if (list.isEmpty()) return false;
-		
-		Tokenization tokenization = list.get(0);
-		var now = LocalDateTime.now();
-		return tokenization.getValidFrom().isBefore(now) && tokenization.getValidTo().isAfter(now);
-		
-	}
-
-	public Tokenization getToken(String purpose, String purposeDetail) {
-		List<Tokenization> list = tokenizationRepo.findByPurposeAndPurposeDetail( purpose, purposeDetail);
-		if (list.isEmpty()) return null;
-		return list.get(0);
-	}
-
-	public List<Tokenization> getTokensToRemove() {
-		return tokenizationRepo.findByValidToBefore(LocalDateTime.now());
-	}
-
-	public void removeToken(Tokenization token) {
-		tokenizationRepo.delete(token);
 	}
 
 	public User getUserByUsernameAndPassword(String username, String password) {
