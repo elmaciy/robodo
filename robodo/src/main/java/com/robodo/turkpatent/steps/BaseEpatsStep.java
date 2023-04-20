@@ -22,9 +22,9 @@ import com.robodo.turkpatent.apimodel.DosyaListeleri;
 import com.robodo.turkpatent.apimodel.DosyaRequest;
 import com.robodo.turkpatent.apimodel.DosyaResponse;
 import com.robodo.turkpatent.apimodel.Rumuz;
+import com.robodo.turkpatent.apimodel.RumuzEsleme;
 import com.robodo.turkpatent.apimodel.RumuzResponse;
-import com.robodo.turkpatent.apimodel.TokenRequest;
-import com.robodo.turkpatent.apimodel.TokenResponse;
+import com.robodo.turkpatent.apimodel.TokenManagerSingleton;
 import com.robodo.turkpatent.pages.PageEdevletLogin;
 import com.robodo.turkpatent.pages.PageEpatsBasvuruYapan;
 import com.robodo.turkpatent.pages.PageEpatsBenimSayfam;
@@ -121,10 +121,16 @@ public class BaseEpatsStep extends BaseWebStep {
 
 	public void sistemeGiris() {
 		//home.open();
+		
+		int islemAdimi=Integer.valueOf(getVariable("islemAdimi")); 		
+		Rumuz edevletRumuz =getRumuzEdevletByIslemAdimi(islemAdimi);
+		String tckno=edevletRumuz.getTckimlik();
+		String sifre=edevletRumuz.getSifre();
+		
+		
 		home.navigateEdevletGiris();
 		home.clickEdevlet();
-		String tckno=runnerUtil.getEnvironmentParameter("tckno");
-		String sifre=runnerUtil.getEnvironmentParameter("sifre");
+
 		edevletLogin.girisEdevlet(tckno, sifre);
 		takeStepScreenShot(processInstanceStep, "Sisteme giris yapildi", false, ()->waitProcessorGone());
 	}
@@ -150,8 +156,9 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 	public void basvuruYap() {
 		String eposta=getVariable("eposta");
-		String cepTel=runnerUtil.getEnvironmentParameter("ceptel");
+		String cepTel=getVariable("telefonNumarasi");
 		String referansNo=getVariable("takipNumarasi");
+		
 		epatsBasvuruYapan.basvuruBilgileriniDoldur(eposta, cepTel, referansNo);
 		takeStepScreenShot(this.processInstanceStep, "Basvuru Bilgileri", false, ()->waitProcessorGone());
 		epatsBasvuruYapan.devamEt();
@@ -371,7 +378,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	private void dosyaGuncelle(DosyaRequest dosyaRequest, String description) {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/updateRpadosyaislemleri".formatted(apiHostname );
-		String token=getToken();
+		String token=TokenManagerSingleton.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(
 				new KeyValue("Authorization","Bearer %s".formatted(token)),
 				new KeyValue("Content-type","application/json")
@@ -384,10 +391,10 @@ public class BaseEpatsStep extends BaseWebStep {
 		}
 	}
 	
-	public List<DosyaResponse> getTaslakDosyalar(Predicate<DosyaResponse> filter) {
+	public List<DosyaResponse> getTaslakDosyalarByIslemAdimi(int islemAdimi) {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/listRpadosyalar".formatted(apiHostname );
-		String token=getToken();
+		String token=TokenManagerSingleton.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(new KeyValue("Authorization","Bearer %s".formatted(token)));
 		ApiResponse response = httpRequest(Method.GET, endPoint, headers, null);
 		
@@ -397,45 +404,13 @@ public class BaseEpatsStep extends BaseWebStep {
 		}
 		
 		var dosyaListeleri = json2Object(response.getBody(), DosyaListeleri.class);
+		Predicate<? super DosyaResponse> filter=p->p.getIslemadimi()==islemAdimi && p.getStatu()==BaseEpatsStep.EPATS_STATU_TASLAK;
 		return dosyaListeleri.getData().stream().filter(filter).collect(Collectors.toList());
 	}
 	
 	
 	
-	public String getToken() {
-		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
-		String tokenLang = runnerUtil.getEnvironmentParameter("ankarapatent.api.token.lang");
-		String tokenUsername = runnerUtil.getEnvironmentParameter("ankarapatent.api.token.username");
-		String tokenPassword = runnerUtil.getEnvironmentParameter("ankarapatent.api.token.password");
-		
-		String endPoint="%s/login".formatted(apiHostname );
-		
-		TokenRequest tokenRequest= new TokenRequest();
-		tokenRequest.setDil(tokenLang);
-		tokenRequest.setKullaniciadi(tokenUsername);
-		tokenRequest.setSifre(tokenPassword);
-		
-		ApiResponse response = httpRequest(Method.POST, endPoint, null, tokenRequest);
-		
-		if (response.getResponseCode()!=200) {
-			throw new RuntimeException("token request başarısız");
-		}
-		
-		if (response.getBody()==null) {
-			throw new RuntimeException("token body is null.");
-		}
-		
-		TokenResponse tokenResponse = json2Object(response.getBody(), TokenResponse.class);
-		String token = tokenResponse.getData().getJwttoken();
-		
-		
-		if (token==null) {
-			throw new RuntimeException("token headeri bulunamadı");
-		}
-		
-		return token;
-		
-	}
+	
 
 
 
@@ -530,10 +505,10 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 
 
-	public Rumuz getEdevletRumuz() {
+	private Rumuz getAnyEdevletRumuzSilinecek() {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/getEdevletRumuz".formatted(apiHostname );
-		String token=getToken();
+		String token=TokenManagerSingleton.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(
 				new KeyValue("Authorization","Bearer %s".formatted(token)),
 				new KeyValue("Content-type","application/json")
@@ -567,10 +542,10 @@ public class BaseEpatsStep extends BaseWebStep {
 		return anyRumuz.get();
 	}
 
-	public Rumuz getKrediKartiRumuz() {
+	private Rumuz getAnyKrediKartiRumuzSilinecek() {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/getKrediKartRumuz".formatted(apiHostname );
-		String token=getToken();
+		String token=TokenManagerSingleton.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(
 				new KeyValue("Authorization","Bearer %s".formatted(token)),
 				new KeyValue("Content-type","application/json")
@@ -606,15 +581,113 @@ public class BaseEpatsStep extends BaseWebStep {
 		return anyRumuz.get();
 		
 	}
-
-	public String date2SonKullanmaTarihi(String sonkullanimtarihi) {
-		if (sonkullanimtarihi==null) {
-			return null;
-		}
-		// "2025-12-30"
-		String year=sonkullanimtarihi.substring(5,7);
-		String month=sonkullanimtarihi.substring(2,4);
+	
+	private List<RumuzEsleme> getRumuzEslemeByIslemAdimi(int islemAdimi) {
+		List<RumuzEsleme> rumuzlar=new ArrayList<RumuzEsleme>();
 		
-		return month + year;
+		
+		RumuzEsleme rumuzEslemeKrediKarti=new RumuzEsleme();
+		//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
+		rumuzEslemeKrediKarti.setIslemAdimi(islemAdimi);
+		rumuzEslemeKrediKarti.setEposta("elmaciy@hotmail.com");
+		rumuzEslemeKrediKarti.setTelefon("5423871425");
+		rumuzEslemeKrediKarti.setStatu(1);
+		Rumuz krediKartiRumuz = getAnyKrediKartiRumuzSilinecek();
+		
+		//test amacli veriler. servis gelince silinsin
+		//krediKartiRumuz.setKredikartino("2212929200009993");
+		//krediKartiRumuz.setSonkullanimtarihi("2033-07*09");
+		//krediKartiRumuz.setCcv("123");
+		rumuzEslemeKrediKarti.setKrediKartiRumuz(krediKartiRumuz);
+		
+		rumuzlar.add(rumuzEslemeKrediKarti);
+		
+		//-----------------------------------------------
+		RumuzEsleme rumuzEslemeEdevlet=new RumuzEsleme();
+		//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
+		rumuzEslemeEdevlet.setIslemAdimi(islemAdimi);
+		rumuzEslemeEdevlet.setEposta("yildirayelmaci@gmail.com");
+		rumuzEslemeEdevlet.setTelefon("5327833533");
+		rumuzEslemeEdevlet.setStatu(1);
+		
+		Rumuz edevletRumuz = getAnyEdevletRumuzSilinecek();
+		//test amacli veriler. servis gelince silinsin
+		edevletRumuz.setTckimlik("50053246498");
+		edevletRumuz.setSifre("k7e6s3k9");
+		rumuzEslemeEdevlet.setEdevletRumuz(edevletRumuz);
+		
+		rumuzlar.add(rumuzEslemeEdevlet);
+		
+		
+		
+		return rumuzlar;
 	}
+	
+	public Rumuz getRumuzEdevletByIslemAdimi(int islemAdimi) {
+		List<RumuzEsleme> eslemeler = getRumuzEslemeByIslemAdimi(islemAdimi);
+		
+		var opt = eslemeler.stream().filter(
+				p-> p.getStatu()==1 
+				&& p.getEdevletRumuz()!=null 
+				&& p.getEdevletRumuz().getStatu()==1
+				&& p.getEdevletRumuz().getTckimlik()!=null 
+				&& p.getEdevletRumuz().getSifre()!=null
+				)
+			.findAny();
+		
+		if (opt.isEmpty()) {
+			throw new RuntimeException("% islemi icin uygun edevlet rumuzu bulunamadi. ".formatted(islemAdimi));
+		}
+		
+		return opt.get().getEdevletRumuz();
+		
+	}
+	
+	public Rumuz getRumuzKrediKartiByIslemAdimi(int islemAdimi) {
+		List<RumuzEsleme> eslemeler = getRumuzEslemeByIslemAdimi(islemAdimi);
+		
+		var opt = eslemeler.stream().filter(
+				p-> p.getStatu()==1 
+				&& p.getKrediKartiRumuz()!=null
+				&& p.getKrediKartiRumuz().getStatu()==1
+				&& p.getKrediKartiRumuz().getKredikartino()!=null
+				&& p.getKrediKartiRumuz().getIslemTarihi()!=null
+				&& p.getKrediKartiRumuz().getCcv()!=null)
+			.findAny();
+		
+		if (opt.isEmpty()) {
+			throw new RuntimeException("% islemi icin uygun kredi karti rumuzu bulunamadi. ".formatted(islemAdimi));
+		}
+		
+		return opt.get().getKrediKartiRumuz();
+		
+	}
+	
+	
+	public String getRumuzEmailByIslemAdimi(int islemAdimi) {
+		List<RumuzEsleme> eslemeler = getRumuzEslemeByIslemAdimi(islemAdimi);
+		String email =eslemeler.stream().filter(p-> p.getStatu()==1 && p.getEdevletRumuz()!=null && p.getEposta()!=null && HelperUtil.isValidEmailAddress(p.getEposta()))
+				.map(p->p.getEposta()).findAny().orElse(null);
+		
+		if (email==null) {
+			throw new RuntimeException("%d islem adimi icin başvuruda kullanılacak uygun email adresi bulunamadi".formatted(islemAdimi));
+		}
+		
+		return email;
+	}
+	
+	public String getRumuzTelefonByIslemAdimi(int islemAdimi) {
+		List<RumuzEsleme> eslemeler = getRumuzEslemeByIslemAdimi(islemAdimi);
+		//email adresi dogru olan kaydi aldik genede
+		String telefon  =eslemeler.stream().filter(p-> p.getStatu()==1 && p.getEdevletRumuz()!=null && p.getTelefon()!=null && HelperUtil.isValidEmailAddress(p.getEposta()))
+				.map(p->p.getTelefon()).findAny().orElse(null);
+		
+		if (telefon==null) {
+			throw new RuntimeException("%d islem adimi icin başvuruda kullanılacak uygun telefon numarası bulunamadi".formatted(islemAdimi));
+		}
+		
+		return telefon;
+	}
+
+	
 }

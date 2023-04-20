@@ -8,11 +8,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import com.robodo.model.CorporateParameter;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessDefinitionStep;
 import com.robodo.model.User;
 import com.robodo.model.UserRole;
+import com.robodo.repo.CorporateParameterRepo;
 import com.robodo.repo.EmailTemplateRepo;
 import com.robodo.repo.ProcessDefinitionRepo;
 import com.robodo.repo.UserRepo;
@@ -28,10 +30,36 @@ public class RobodoApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demo(ProcessDefinitionRepo processDefinitionRepo, EmailTemplateRepo emailTemplateRepo, UserRepo userRepo, UserRoleRepo userRoleRepo) {
+	public CommandLineRunner demo(
+			ProcessDefinitionRepo processDefinitionRepo, 
+			EmailTemplateRepo emailTemplateRepo, 
+			UserRepo userRepo, 
+			UserRoleRepo userRoleRepo,
+			CorporateParameterRepo corporateParameterRepo) {
 		return (args) -> {
 			
 
+			//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
+			CorporateParameter paramIslemAdimi=new CorporateParameter("PatentYenileme.islemAdimi","1");
+			CorporateParameter paramMarkaTescil=new CorporateParameter("MarkaTescil.islemAdimi","2");
+			CorporateParameter paramMarkaYenileme=new CorporateParameter("MarkaYenileme.islemAdimi","3");
+			
+			if (corporateParameterRepo.findAllByCode(paramIslemAdimi.getCode()).isEmpty()) {
+				corporateParameterRepo.save(paramIslemAdimi);
+			}
+			if (corporateParameterRepo.findAllByCode(paramMarkaTescil.getCode()).isEmpty()) {
+				corporateParameterRepo.save(paramMarkaTescil);
+			}
+			if (corporateParameterRepo.findAllByCode(paramMarkaYenileme.getCode()).isEmpty()) {
+				corporateParameterRepo.save(paramMarkaYenileme);
+			}
+
+			
+			CorporateParameter paramAkaraPatentVergiNo=new CorporateParameter("ankarapatent.vergino","0700694032");
+			if (corporateParameterRepo.findAllByCode(paramAkaraPatentVergiNo.getCode()).isEmpty()) {
+				corporateParameterRepo.save(paramAkaraPatentVergiNo);
+			}
+			
 			
 			User admin=new User();
 			admin.setEmail("admin@hotmail.com");

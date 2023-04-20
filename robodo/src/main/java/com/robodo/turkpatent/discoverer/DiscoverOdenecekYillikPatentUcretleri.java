@@ -24,18 +24,10 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 	@Override
 	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {
 		
-		int islemTuru=2; 		//Marka : 1 Patent:2  Tasarım:3
-		int islemKategorisi=2; 	//Başvuru Öncesi : 1 Başvuru : 2
-		int islemAdimi=1; 		//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
-		int statu=BaseEpatsStep.EPATS_STATU_TASLAK;
-		
-		Predicate<DosyaResponse> filter=(p)->
-			p.getIslemturu()==islemTuru
-			&& p.getIslemkategorisi()==islemKategorisi
-			&& p.getIslemadimi() ==islemAdimi
-			&& p.getStatu() ==statu;
-			
-		List<DosyaResponse> dosyalar = getTaslakDosyalar(filter);
+		//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
+		int islemAdimi=Integer.valueOf(runnerUtil.getEnvironmentParameter("PatentYenileme.islemAdimi")); 		
+
+		List<DosyaResponse> dosyalar = getTaslakDosyalarByIslemAdimi(islemAdimi);
 		
 		var instances = createEpatsInstances(
 				processDefinition,
@@ -57,7 +49,11 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 			hmVars.put("basvuruTuru", "PATENT");
 			hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
 			hmVars.put("islemAdi", "Yıllık Ücret Ödeme");
-			hmVars.put("eposta", "ipmaintenance.epats@ankarapatent.com");	
+			hmVars.put("eposta", getRumuzEmailByIslemAdimi(islemAdimi));
+			hmVars.put("telefonNumarasi", getRumuzTelefonByIslemAdimi(islemAdimi));
+			
+			
+			hmVars.put("islemAdimi", String.valueOf(islemAdimi));
 			
 			p.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			p.setInitialInstanceVariables(p.getInstanceVariables());

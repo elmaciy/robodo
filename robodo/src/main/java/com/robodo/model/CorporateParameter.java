@@ -23,6 +23,18 @@ public class CorporateParameter {
 	String value;
 	LocalDateTime created;
 	LocalDateTime updated;
+	
+	public CorporateParameter() {
+	}
+	
+	
+	public CorporateParameter(String code, String value) {
+		super();
+		this.code = code;
+		this.value = value;
+	}
+	
+	
 	public Long getId() {
 		return id;
 	}

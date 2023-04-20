@@ -7,7 +7,6 @@
 	- işlemlerdeki ortalama süreler
 	- genel rakamlar. (günlük işlenen) saatlik işlenen haftalık işlenen falan... 
 
-16. kurulan yerde chrome güncellenmemeli
 
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
@@ -28,59 +27,54 @@
 	
 83. thread windowundaki kuyruk ve thread lar sıfırlanabilmelidir. ???
 
-86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
 
 87. tanım ekranlarındaki boxlara maxlength falan koy  - db yi aşmasın 
 		
 94. süreç duplikasyonu olabilmeli. yeni tanımlama yapmay kolaylaştırır. duplike edilen kayıt direk invalid başlasın. 
 
 97. processDefinition un da hmVars ları olsun. Discovery sırasında kafadan set edilsinler. 
-		Böylece bazı parametreler için kodlama gerekmez.  
-		su parametreler properties dosyasindan degil, buradan alınabilir. Bazıları direk parametreye konulabilir. Ortak olanlar. 		
-			tckno=50053246498
-			sifre=k7e6s3k9
-			ceptel=5322118332
-			eposta=ipmaintenance.epats@ankarapatent.com
-			ankarapatent.vergino=0700694032
-			kredikarti.no=2212929200009993
-			kredikarti.gecerlilik=0625
-			kredikarti.cvv=123
+		Böylece bazı parametreler için kodlama gerekmez. 
+		Ayrıca bu şekidle bazı parametrelerin (kredi kartı, şifreler vs..) admin tarafından yönetilebilmesi sağlanır
+98. Parametre ekranında sifre türü parametreler bir sekilde sifre olarak görünsün. Açık görünmesin. Ya da ayrı bir gizli parametre alanı yapaım. 
 
 99. Process tanımlama ekranında aynı anda aynı discoverer in birden fazla aktif olması engellenebilir mi? 
 	hem discoverer alanı hem aktif alanında trigger olmalıdır. 
-
 100. process definition ekranındaki class name ler verify edilmeli. parametreler de oyle. Command builder yapılabilir elle yazılmak yerine. 
-
-101. chrome headless çalıştırılmalı. Browser biraz daha esnek olabilir mi? Farklı browserlere de geçilebilmeşli. driver e de. 
-		
-105. AUTO IT yi ekle robodo ya https://www.autoitscript.com/site/autoit/	
-
-107. serverde sistemi backup a eklettir. 
-108. serverde mysql i servis halinde çalıştır mümkünse. 
-
-111. rumuz işlem eşleştirmelerindeki email kullanılacak
-				
+105. AUTO IT yi ekle robodo ya https://www.autoitscript.com/site/autoit/
+117. process stepte bir değişiklik olduğunda ya da processdef de, bunu tüm instancelere uygula gibi bir seçenek olabilir mi? 
+			
 113. 2nci adımda geri almada hata çıktı. Backward işlemi garip çalışıyor. Bunu belki silip adım adım geri alma yerine direk retry ettiririz. 
 
-114. sadece api çalışan steplerde chrome başlamasın
 
 115. onay ve redde /CALLBACK i entegre et. Bazı durumlarda gerekebilir. 
 
-118. Retry action olsun. Retry edilince çalışsın. zorunlu olmasın. 
-119. ERP den aldığın Token'i 10 dakikada bir yenilenecek şekilde yap. her seferinde token almasın. Singleton ile hallet 
+118. process definition a Retry step koyalım . zorunlu alan değil. Retry edilince bu step çalışsın. 
 
 109. kredi kartı ve edevlet servislerini de implemente et. headerde token alacak bunlar da 
 	Aktif edevlet sifreleri ---> post getEdevletRumuz
  	Aktif kredi kartlari ---> post getKrediKartRumuz
  	
-111. onay adımına süreci baştan başlatama seçeneği ekle. 
+111. onay adımına süreci baştan başlatama seçeneği ekle. RESTART action
 114. EXTERNAL approve aşamasında bize onaylayan kullanıcıyı da göndermelerine olanak sağlanabilir. 
-
 115. Ekrandaki run butonu clicklendikten sonra neden disabled kaldı? 
-116. instance gridinde kodun yanında description da gösterelim. 
-117. process stepte bir değişiklik olduğunda ya da processdef de, bunu tüm instancelere uygula gibi bir seçenek olabilir mi? 
 
 118. Marka tescil ücreti işini de yap. 
+119. benim gmail hesabımdan kurtul, firma kendisi gmail alsın bir tane. Şimdilik mail atılmadığı için gerek yok. 
+	Email şifresini silelim application.properties den. Gerekirse corporate parametrelere tanımlarız
+120. arada sırada webdriverlerin temizlenmesi mümkün olsun. 
+101. chrome headless çalıştırılmalı. Browser biraz daha esnek olabilir mi? Farklı browserlere de geçilebilmeşli. driver e de. 
+107. serverde sistemi backup a eklettir. 
+108. serverde mysql i servis halinde çalıştır mümkünse. 
+86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
+16. kurulan yerde chrome güncellenmemeli
+114. sadece api çalışan steplerde chrome başlamasın
+115. süreç isimlerini standart hale getir. 
+116. build sonrası kodları makineden silmesi lazım. Zaten bir süre sonra build scriptini serverden kaldır. Sadece JAR deploy ederiz. 
+117. Sadece dosya no değil, yıl parametresi de alınsın yıllık ödeme süreçlerinde. Yoksa önümüzdeki yıl ödeme yapmaz. 
+119. getRumuzEslemeByIslemAdimi funcitondaki daki test amacli bilgileri silmeyi unurma
+
+118. islemAdimiİ'ni parametrelere koy. Buradan okusun stepler. Ödeme yapılacak rumuzları da bu kodla çeksin yine. 
+119. discovery adımında oluşan hataların da görülmesini sağlayalım. Statüsü fail olsun mesela ve hataları loglayalım vs... 
 
 //--------------------------------------
 1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
@@ -180,3 +174,6 @@ TAMAMLANANLAR
 110. queue yi dolduran proses, maxthread count<=0 lari doldurmasın boşuna. Diğer processlere de bir bakılabilir bu gözle. 
 113. SCREEN/EMAIL yerine INTERNAL/EXTERNAL link olsun isimlendirme. 
 120. Humaninteraction da email gönderilmeme opsiyonu olsun. 
+119. ERP den aldığın Token'i 10 dakikada bir yenilenecek şekilde yap. her seferinde token almasın. Singleton ile hallet 
+111. rumuz işlem eşleştirmelerindeki email kullanılacak
+118. ankarapatent.vergino parametresini de properties dosyasından kurtar

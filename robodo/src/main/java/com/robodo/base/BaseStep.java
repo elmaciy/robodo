@@ -13,6 +13,8 @@ public abstract class BaseStep {
 		 this.processInstanceStep=processInstanceStep;
 	 }
 	 
+	 
+	 
 	 public void setVariable(String key, String value) {
 		runnerUtil.logger("set variable %s=[%s]".formatted(key,value)); 
 		runnerUtil.setVariable(key,value);
@@ -22,7 +24,9 @@ public abstract class BaseStep {
 		 return runnerUtil.getVariable(key);
 	 }
 	 
-
+	 public String getEnvironmentParameter(String key) {
+		 return runnerUtil.getEnvironmentParameter(key);
+	 }
 	 
 	 
 	 public abstract void setup();

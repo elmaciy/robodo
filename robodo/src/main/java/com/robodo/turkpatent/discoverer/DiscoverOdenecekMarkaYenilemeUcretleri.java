@@ -9,6 +9,7 @@ import com.robodo.model.Discoverable;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
+import com.robodo.turkpatent.apimodel.DosyaResponse;
 import com.robodo.turkpatent.steps.BaseEpatsStep;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
@@ -22,53 +23,47 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseEpatsStep implem
 	}
 
 	@Override
-	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {
-		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
-		for (int i=0;i<1;i++) {
-			ProcessInstance instance =new ProcessInstance();
-			instance=new ProcessInstance();
-			//instance.setCode(processDefinition.getCode()+"_"+System.currentTimeMillis());
-			instance.setCode(processDefinition.getCode()+"_"+i);
-			instance.setDescription(processDefinition.getDescription());
-			instance.setCreated(LocalDateTime.now());
-			instance.setStarted(LocalDateTime.now());
-			instance.setFinished(null);
-			instance.setAttemptNo(0);
-			instance.setStatus(ProcessInstance.STATUS_NEW);
-			instance.setProcessDefinitionId(processDefinition.getId());
-			instance.setSteps(new ArrayList<ProcessInstanceStep>());
+	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {		
+		//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
+		int islemAdimi=Integer.valueOf(runnerUtil.getEnvironmentParameter("MarkaYenileme.islemAdimi")); 		
+
+		List<DosyaResponse> dosyalar = getTaslakDosyalarByIslemAdimi(islemAdimi);
+		
+		var instances = createEpatsInstances(
+				processDefinition,
+				dosyalar, 
+				(dosya)->"%s.%s".formatted(processDefinition.getCode(), dosya.getBasvuruno()),
+				(dosya)->"%s dosyası için Marka 2nci İtiraz Başvurusu".formatted(dosya.getBasvuruno())
+				);
+		
+		instances.stream().forEach(p->{
+			HashMap<String, String> hmVars = HelperUtil.String2HashMap(p.getInstanceVariables());
 			
-			HashMap<String, String> hmVars=new HashMap<String, String>();
-			hmVars.put("processInstance.code", instance.getCode());
-			hmVars.put("dosyaNumarasi", "2013/62638");
-			hmVars.put("markaAdi", "patrades");
-			hmVars.put("takipNumarasi", "TKP_%s".formatted(String.valueOf(System.currentTimeMillis())));
+			DosyaResponse dosya = json2Object(hmVars.get("dosyaResponse.JSON"), DosyaResponse.class);
+			
+
+			///yeni
+			//hmVars.put("dosyaNumarasi", "2013/62638");
+			hmVars.put("dosyaNumarasi", dosya.getBasvuruno());
+			hmVars.put("takipNumarasi", dosya.getReferansno());
 			hmVars.put("basvuruTuru", "MARKA");
 			hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
 			hmVars.put("islemAdi", "Marka Yenileme");
-			hmVars.put("eposta", "ipmaintenance.epats@ankarapatent.com");
+			hmVars.put("eposta", getRumuzEmailByIslemAdimi(islemAdimi));
+			hmVars.put("telefonNumarasi", getRumuzTelefonByIslemAdimi(islemAdimi));
+			
 			hmVars.put("talepTuru", "Tam");
 			
+			hmVars.put("islemAdimi", String.valueOf(islemAdimi));
 			
-			instance.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
-			instance.setInitialInstanceVariables(instance.getInstanceVariables());
-
-			for (var definitedSteps : processDefinition.getSteps()) {
-				ProcessInstanceStep instanceStep = new ProcessInstanceStep();
-				instanceStep.setStepCode(definitedSteps.getCode());
-				instanceStep.setProcessInstance(instance);
-				instanceStep.setStatus(ProcessInstanceStep.STATUS_NEW);
-				instanceStep.setCommands(definitedSteps.getCommands());
-				instanceStep.setCreated(LocalDateTime.now());
-				instanceStep.setOrderNo(definitedSteps.getOrderNo());
-
-				instance.getSteps().add(instanceStep);
-			}
-			
-			instances.add(instance);
-		}
+			p.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
+			p.setInitialInstanceVariables(p.getInstanceVariables());
+		});
 		
 		return instances;
+		
 	}
+
+	
 
 }
