@@ -92,7 +92,9 @@ public class UIInstance extends UIBase {
 
 		btnRunDiscoverer.addThemeVariants(ButtonVariant.LUMO_SMALL);
 		btnRunDiscoverer.setDisableOnClick(true);
-		btnRunDiscoverer.setEnabled(comboForProcessDefinition.getValue()!=null && isAdmin());
+		btnRunDiscoverer.setEnabled(comboForProcessDefinition.getValue()!=null);
+		btnRunDiscoverer.setVisible(isAdmin());
+		
 		btnRunDiscoverer.addClickListener(e -> {
 			
 			runProcessDiscoverer(comboForProcessDefinition.getValue());

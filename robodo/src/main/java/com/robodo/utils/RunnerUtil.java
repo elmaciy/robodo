@@ -176,8 +176,10 @@ public class RunnerUtil {
 			return result.succeeded();
 		} else if (arg0.equalsIgnoreCase("waitHumanInteraction")) {
 			boolean isValidEmailTemplate=validateEmailTemplate(arg1);
-			if (isValidEmailTemplate && !step.isNotificationSent()) {
-				sendEmailNotificationForApproval(step, arg1);
+			if (!step.isNotificationSent()) {
+				if (isValidEmailTemplate) {
+					sendEmailNotificationForApproval(step, arg1);
+				}
 				step.setNotificationSent(true);
 				
 			}
