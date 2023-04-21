@@ -1,4 +1,4 @@
-package com.robodo.turkpatent.discoverer;
+package com.robodo.turkpatent.steps;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,7 +9,6 @@ import com.robodo.model.Discoverable;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
-import com.robodo.turkpatent.steps.BaseEpatsStep;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 

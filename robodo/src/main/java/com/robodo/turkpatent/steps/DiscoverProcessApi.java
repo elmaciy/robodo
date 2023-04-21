@@ -1,4 +1,4 @@
-package com.robodo.turkpatent.discoverer;
+package com.robodo.turkpatent.steps;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

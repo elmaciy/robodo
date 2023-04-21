@@ -113,7 +113,7 @@ public class RobodoApplication {
 			stepPatentTahakkukOlustur.setDescription("Patent yıllık ücreti tahakkuk oluşturma");
 			stepPatentTahakkukOlustur.setOrderNo("01");
 			stepPatentTahakkukOlustur.setSingleAtATime(false);
-			stepPatentTahakkukOlustur.setCommands("runStepClass YillikPatentUcretiTahakkukOlusturStep");
+			stepPatentTahakkukOlustur.setCommands("runStepClass EpatsYillikPatentTahakkukOlusturStep");
 			stepPatentTahakkukOlustur.setProcessDefinition(yillikPatentUcretiProcess);
 			
 			ProcessDefinitionStep stepOnay=new ProcessDefinitionStep();
@@ -163,7 +163,7 @@ public class RobodoApplication {
 			stepMarkeYenilemeTahakkukOlustur.setDescription("Marka yenileme tahakkuk oluşturma");
 			stepMarkeYenilemeTahakkukOlustur.setOrderNo("01");
 			stepMarkeYenilemeTahakkukOlustur.setSingleAtATime(false);
-			stepMarkeYenilemeTahakkukOlustur.setCommands("runStepClass MarkaYenilemeTahakkukOlusturStep");
+			stepMarkeYenilemeTahakkukOlustur.setCommands("runStepClass EpatsMarkaYenilemeTahakkukOlusturStep");
 			stepMarkeYenilemeTahakkukOlustur.setProcessDefinition(markaYenilemeProcess);
 			
 			ProcessDefinitionStep stepMarkaYenilemeOnay=new ProcessDefinitionStep();
@@ -209,7 +209,7 @@ public class RobodoApplication {
 			stepMarka2nciItirazOlustur.setDescription("Marka yayınına itirazın yeniden inceleneceği kayıtlar için tahakkuk oluşturma");
 			stepMarka2nciItirazOlustur.setOrderNo("01");
 			stepMarka2nciItirazOlustur.setSingleAtATime(false);
-			stepMarka2nciItirazOlustur.setCommands("runStepClass Marka2nciItirazOlusturStep");
+			stepMarka2nciItirazOlustur.setCommands("runStepClass EpatsMarka2nciItirazOlusturStep");
 			stepMarka2nciItirazOlustur.setProcessDefinition(markaItiraz2);
 			
 			ProcessDefinitionStep stepMarka2nciItirazOnay=new ProcessDefinitionStep();

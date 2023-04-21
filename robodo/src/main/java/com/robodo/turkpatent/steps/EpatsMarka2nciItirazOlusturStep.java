@@ -3,11 +3,11 @@ package com.robodo.turkpatent.steps;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.utils.RunnerUtil;
 
-public class Marka2nciItirazOlusturStep extends BaseEpatsStep {
+public class EpatsMarka2nciItirazOlusturStep extends BaseEpatsStep {
 
 
 	
-	public Marka2nciItirazOlusturStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+	public EpatsMarka2nciItirazOlusturStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
 	
 	}

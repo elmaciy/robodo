@@ -63,15 +63,9 @@
 115. süreç isimlerini standart hale getir. 
 116. build sonrası kodları makineden silmesi lazım. Zaten bir süre sonra build scriptini serverden kaldır. Sadece JAR deploy ederiz. 
 117. Sadece dosya no değil, yıl parametresi de alınsın yıllık ödeme süreçlerinde. Yoksa önümüzdeki yıl ödeme yapmaz. 
-119. getRumuzEslemeByIslemAdimi funcitondaki daki test amacli bilgileri silmeyi unurma
 125. application daki default kaydetme işlerini artık sil. 
 126. tüm stepleri tek pakette topla. ayrı paketlere gerek yok. sonuçta hepsi step
 
-
-113. 2nci adımda geri almada hata çıktı. Backward işlemi garip çalışıyor. Bunu belki silip adım adım geri alma yerine direk retry ettiririz. 
-86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
-41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
-	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
 42. Step generate ederken step adına parametre geçirebilmeliyiz. 
 	Örneğin kredi kartı aynı anda tek kullanılabilir. 
 	Ama ya farklı işlemler için farklı kredi kartları olursa? Bu durumda step adını generate ederken STEP_KODU_${KK_NO} seklinde verirsek, 
@@ -79,9 +73,16 @@
 	Örnek 3 kredi kartı varsa aynı anda her bir kart için 1 er , toplamda 3 kredi karti stepi çalışabilir. 
 
 
+113. 2nci adımda geri almada hata çıktı. Backward işlemi garip çalışıyor. Bunu belki silip adım adım geri alma yerine direk retry ettiririz. 
+86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
+41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
+	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
+
+
 118. Marka tescil ücreti işini de yap. 
 
 200. ödemesi yapılan işlemin tekrar ödenmemesi için sigorta olarak yapabileceğimiz bir kontrol var mı? 
+
 -------------------
 TAMAMLANANLAR 
 -------------------
@@ -162,3 +163,5 @@ TAMAMLANANLAR
 109. kredi kartı ve edevlet servislerini de implemente et. headerde token alacak bunlar da 
 	Aktif edevlet sifreleri ---> post getEdevletRumuz
  	Aktif kredi kartlari ---> post getKrediKartRumuz
+119. getRumuzEslemeByIslemAdimi funcitondaki daki test amacli bilgileri silmeyi unurma
+ 	

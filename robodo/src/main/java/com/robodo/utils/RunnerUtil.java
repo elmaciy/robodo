@@ -304,7 +304,7 @@ public class RunnerUtil {
 
 	public List<ProcessInstance> runProcessDiscovery(ProcessDefinition processDefinition) {
 		try {
-			String packageName = processService.getEnvProperty("discovery.package");
+			String packageName = processService.getEnvProperty("steps.package");
 			Class<?> clazz = Class.forName(packageName + "." + processDefinition.getDiscovererClass());
 			java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(RunnerUtil.class, ProcessInstanceStep.class);
 			BaseStep discovererInstance = (BaseStep) constructor.newInstance(this, null);

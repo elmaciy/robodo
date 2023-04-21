@@ -1,20 +1,16 @@
 package com.robodo.turkpatent.steps;
 
-import java.util.List;
-
 import com.robodo.model.ProcessInstanceStep;
-import com.robodo.turkpatent.apimodel.RumuzEsleme;
 import com.robodo.utils.RunnerUtil;
 
-public class YillikPatentUcretiTahakkukOlusturStep extends BaseEpatsStep {
+public class EpatsMarkaYenilemeTahakkukOlusturStep extends BaseEpatsStep {
 
 
 	
-	public YillikPatentUcretiTahakkukOlusturStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+	public EpatsMarkaYenilemeTahakkukOlusturStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
 	
 	}
-
 
 	
 	@Override
@@ -23,23 +19,30 @@ public class YillikPatentUcretiTahakkukOlusturStep extends BaseEpatsStep {
 		dosyaLinkSifirla();
 		dosyaLinkleriGuncelle(this.processInstanceStep.getProcessInstance());
 		
+		
 		sistemeGiris();
 		dosyaAra();
 		islemSec();
 		basvuruYap();
 		dosyaBilgisiDogrulaDevamEt();
+		talepTuruTamSecVeDevamEt();
 		hizmetDokumuDevamEt();
 		onizlemeKontrolveTahakkukOlustur();
 		tahakkukNumarasiAl();
 		anaSayfayaDon();
 		epatsMenu.cikis();
 		
-		dosyaTahakkukKaydet();
-
-		
+		//selenium.stopDriver();
 	}
 
 
+	
 
+
+	
+
+
+
+	
 
 }
