@@ -1,20 +1,30 @@
 package com.robodo.turkpatent.apimodel;
 
+import java.util.Date;
+
 public class RumuzEsleme {
-	int islemAdimi;
-	String eposta;
-	String telefon;
-	Rumuz krediKartiRumuz;
-	Rumuz edevletRumuz;
-	int statu;
-	
-	
-	
-	public int getIslemAdimi() {
-		return islemAdimi;
+    public int id;
+    public int islemadimi;
+    public String eposta;
+    public String telefon;
+    public Rumuz rumuz;
+    public int statu;
+    public Personel personel;
+    public Date islemTarihi;
+    
+    
+    
+	public int getId() {
+		return id;
 	}
-	public void setIslemAdimi(int islemAdimi) {
-		this.islemAdimi = islemAdimi;
+	public void setId(int id) {
+		this.id = id;
+	}
+	public int getIslemadimi() {
+		return islemadimi;
+	}
+	public void setIslemadimi(int islemadimi) {
+		this.islemadimi = islemadimi;
 	}
 	public String getEposta() {
 		return eposta;
@@ -28,17 +38,11 @@ public class RumuzEsleme {
 	public void setTelefon(String telefon) {
 		this.telefon = telefon;
 	}
-	public Rumuz getKrediKartiRumuz() {
-		return krediKartiRumuz;
+	public Rumuz getRumuz() {
+		return rumuz;
 	}
-	public void setKrediKartiRumuz(Rumuz krediKartiRumuz) {
-		this.krediKartiRumuz = krediKartiRumuz;
-	}
-	public Rumuz getEdevletRumuz() {
-		return edevletRumuz;
-	}
-	public void setEdevletRumuz(Rumuz edevletRumuz) {
-		this.edevletRumuz = edevletRumuz;
+	public void setRumuz(Rumuz rumuz) {
+		this.rumuz = rumuz;
 	}
 	public int getStatu() {
 		return statu;
@@ -46,7 +50,24 @@ public class RumuzEsleme {
 	public void setStatu(int statu) {
 		this.statu = statu;
 	}
+	public Personel getPersonel() {
+		return personel;
+	}
+	public void setPersonel(Personel personel) {
+		this.personel = personel;
+	}
+	public Date getIslemTarihi() {
+		return islemTarihi;
+	}
+	public void setIslemTarihi(Date islemTarihi) {
+		this.islemTarihi = islemTarihi;
+	}
+    
+    
+
 	
+	
+
 	
 
 }

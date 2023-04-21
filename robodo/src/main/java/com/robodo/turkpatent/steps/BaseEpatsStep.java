@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -23,7 +22,7 @@ import com.robodo.turkpatent.apimodel.DosyaRequest;
 import com.robodo.turkpatent.apimodel.DosyaResponse;
 import com.robodo.turkpatent.apimodel.Rumuz;
 import com.robodo.turkpatent.apimodel.RumuzEsleme;
-import com.robodo.turkpatent.apimodel.RumuzResponse;
+import com.robodo.turkpatent.apimodel.RumuzEslemeResponse;
 import com.robodo.turkpatent.apimodel.SingletonForTokenManager;
 import com.robodo.turkpatent.pages.PageEdevletLogin;
 import com.robodo.turkpatent.pages.PageEpatsBasvuruYapan;
@@ -384,7 +383,7 @@ public class BaseEpatsStep extends BaseWebStep {
 				new KeyValue("Content-type","application/json")
 				);
 		
-		ApiResponse response = httpRequest(Method.PATCH, endPoint, headers, dosyaRequest);
+		ApiResponse response = httpRequest(Method.PATCH, endPoint, headers, null, dosyaRequest);
 
 		if (response.getResponseCode()!=200) {
 			throw new RuntimeException("Güncelleme başarısız : ".formatted(description));
@@ -396,7 +395,7 @@ public class BaseEpatsStep extends BaseWebStep {
 		String endPoint="%s/rpaservisleriController/listRpadosyalar".formatted(apiHostname );
 		String token=SingletonForTokenManager.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(new KeyValue("Authorization","Bearer %s".formatted(token)));
-		ApiResponse response = httpRequest(Method.GET, endPoint, headers, null);
+		ApiResponse response = httpRequest(Method.GET, endPoint, headers, null, null);
 		
 		
 		if (response.getResponseCode()!=200) {
@@ -505,133 +504,48 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 
 
-	private Rumuz getAnyEdevletRumuzSilinecek() {
+
+	public RumuzEslemeResponse getRumuzEslemeByIslemAdimi(int islemAdimi) {
+
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
-		String endPoint="%s/rpaservisleriController/getEdevletRumuz".formatted(apiHostname );
+		String endPoint="%s/rpaservisleriController/islemAdminagoreIslemEslestirmeleriniGetir?islemadimi=%d".formatted(apiHostname, islemAdimi);
 		String token=SingletonForTokenManager.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(
 				new KeyValue("Authorization","Bearer %s".formatted(token)),
 				new KeyValue("Content-type","application/json")
 				);
 		
-		ApiResponse response = httpRequest(Method.POST, endPoint, headers, null);
+		ApiResponse response = httpRequest(Method.POST, endPoint, headers,null,  null);
 		
 
 		if (response.getResponseCode()!=200) {
-			throw new RuntimeException("getEdevletRumuz başarısız : %d".formatted(response.getResponseCode()));
+			throw new RuntimeException("getRumuzEslemeByIslemAdimi başarısız : %d".formatted(response.getResponseCode()));
 		}
 
-		RumuzResponse rumuzResponse = json2Object(response.getBody(), RumuzResponse.class);
+		var rumuzEslemeleriResponse= json2Object(response.getBody(), RumuzEslemeResponse.class);
 		
-		if (!rumuzResponse.getMessage().equals("Success")) {
-			throw new RuntimeException("getEdevletRumuz response!=Success : %d".formatted(rumuzResponse.getMessage()));			
+		if (!rumuzEslemeleriResponse.getMessage().equals("Success")) {
+			throw new RuntimeException("getRumuzEslemeByIslemAdimi başarısız : %d".formatted(response.getResponseCode()));			
 		}
 		
-		Optional<Rumuz> anyRumuz = rumuzResponse.getData().stream().filter(p->
-			p.parametreturu==1
-			&& p.statu==1 
-			&& p.tckimlik!=null  
-			&& p.sifre!=null
-		).findAny();
+		rumuzEslemeleriResponse.print();
+		
+		return rumuzEslemeleriResponse;
 
-		if (anyRumuz.isEmpty()) {
-			throw new RuntimeException("getEdevletRumuz listede uygun rumuz yok");
-		}
-		
-		
-		return anyRumuz.get();
-	}
-
-	private Rumuz getAnyKrediKartiRumuzSilinecek() {
-		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
-		String endPoint="%s/rpaservisleriController/getKrediKartRumuz".formatted(apiHostname );
-		String token=SingletonForTokenManager.getInstance().getJwtToken(this);
-		List<KeyValue> headers=List.of(
-				new KeyValue("Authorization","Bearer %s".formatted(token)),
-				new KeyValue("Content-type","application/json")
-				);
-		
-		ApiResponse response = httpRequest(Method.POST, endPoint, headers, null);
-		
-
-		if (response.getResponseCode()!=200) {
-			throw new RuntimeException("getKrediKartiRumuz başarısız : %d".formatted(response.getResponseCode()));
-		}
-
-
-		RumuzResponse rumuzResponse = json2Object(response.getBody(), RumuzResponse.class);
-		
-		if (!rumuzResponse.getMessage().equals("Success")) {
-			throw new RuntimeException("getKrediKartiRumuz response!=Success : %d".formatted(rumuzResponse.getMessage()));			
-		}
-		
-		Optional<Rumuz> anyRumuz = rumuzResponse.getData().stream().filter(p->
-			p.parametreturu==2
-			&& p.statu==1 
-			&& p.kredikartino!=null  
-			&& p.sonkullanimtarihi!=null
-			&& p.ccv!=null
-		).findAny();
-
-		if (anyRumuz.isEmpty()) {
-			throw new RuntimeException("getKrediKartiRumuz listede uygun rumuz yok");
-		}
-		
-		
-		return anyRumuz.get();
-		
-	}
-	
-	private List<RumuzEsleme> getRumuzEslemeByIslemAdimi(int islemAdimi) {
-		List<RumuzEsleme> rumuzlar=new ArrayList<RumuzEsleme>();
-		
-		
-		RumuzEsleme rumuzEslemeKrediKarti=new RumuzEsleme();
-		//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
-		rumuzEslemeKrediKarti.setIslemAdimi(islemAdimi);
-		rumuzEslemeKrediKarti.setEposta("elmaciy@hotmail.com");
-		rumuzEslemeKrediKarti.setTelefon("5423871425");
-		rumuzEslemeKrediKarti.setStatu(1);
-		Rumuz krediKartiRumuz = getAnyKrediKartiRumuzSilinecek();
-		
-		//test amacli veriler. servis gelince silinsin
-		//krediKartiRumuz.setKredikartino("2212929200009993");
-		//krediKartiRumuz.setSonkullanimtarihi("2033-07*09");
-		//krediKartiRumuz.setCcv("123");
-		rumuzEslemeKrediKarti.setKrediKartiRumuz(krediKartiRumuz);
-		
-		rumuzlar.add(rumuzEslemeKrediKarti);
-		
-		//-----------------------------------------------
-		RumuzEsleme rumuzEslemeEdevlet=new RumuzEsleme();
-		//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
-		rumuzEslemeEdevlet.setIslemAdimi(islemAdimi);
-		rumuzEslemeEdevlet.setEposta("yildirayelmaci@gmail.com");
-		rumuzEslemeEdevlet.setTelefon("5327833533");
-		rumuzEslemeEdevlet.setStatu(1);
-		
-		Rumuz edevletRumuz = getAnyEdevletRumuzSilinecek();
-		//test amacli veriler. servis gelince silinsin
-		edevletRumuz.setTckimlik("50053246498");
-		edevletRumuz.setSifre("k7e6s3k9");
-		rumuzEslemeEdevlet.setEdevletRumuz(edevletRumuz);
-		
-		rumuzlar.add(rumuzEslemeEdevlet);
-		
-		
-		
-		return rumuzlar;
 	}
 	
 	public Rumuz getRumuzEdevletByIslemAdimi(int islemAdimi) {
-		List<RumuzEsleme> eslemeler = getRumuzEslemeByIslemAdimi(islemAdimi);
+		RumuzEslemeResponse rumuzEslemeResponse= getRumuzEslemeByIslemAdimi(islemAdimi);
+		List<RumuzEsleme> eslemeler = rumuzEslemeResponse.getData();
 		
 		var opt = eslemeler.stream().filter(
 				p-> p.getStatu()==1 
-				&& p.getEdevletRumuz()!=null 
-				&& p.getEdevletRumuz().getStatu()==1
-				&& p.getEdevletRumuz().getTckimlik()!=null 
-				&& p.getEdevletRumuz().getSifre()!=null
+				&& p.getRumuz()!=null
+				&& p.getRumuz().getStatu()==1
+				&& p.getRumuz().getEdevletrumuz()!=null
+				&& p.getRumuz().getTckimlik()!=null
+				&& p.getRumuz().getTckimlik().length()==11
+				&& p.getRumuz().getSifre()!=null
 				)
 			.findAny();
 		
@@ -639,55 +553,34 @@ public class BaseEpatsStep extends BaseWebStep {
 			throw new RuntimeException("% islemi icin uygun edevlet rumuzu bulunamadi. ".formatted(islemAdimi));
 		}
 		
-		return opt.get().getEdevletRumuz();
+		return opt.get().getRumuz();
 		
 	}
 	
 	public Rumuz getRumuzKrediKartiByIslemAdimi(int islemAdimi) {
-		List<RumuzEsleme> eslemeler = getRumuzEslemeByIslemAdimi(islemAdimi);
+		RumuzEslemeResponse rumuzEslemeResponse= getRumuzEslemeByIslemAdimi(islemAdimi);
+		List<RumuzEsleme> eslemeler = rumuzEslemeResponse.getData();
 		
 		var opt = eslemeler.stream().filter(
 				p-> p.getStatu()==1 
-				&& p.getKrediKartiRumuz()!=null
-				&& p.getKrediKartiRumuz().getStatu()==1
-				&& p.getKrediKartiRumuz().getKredikartino()!=null
-				&& p.getKrediKartiRumuz().getIslemTarihi()!=null
-				&& p.getKrediKartiRumuz().getCcv()!=null)
+				&& p.getRumuz()!=null
+				&& p.getRumuz().getStatu()==1
+				&& p.getRumuz().getKredikartirumuz()!=null
+				&& p.getRumuz().getKredikartino()!=null
+				&& p.getRumuz().getKredikartino().trim().replace(" ", "").length()==16
+				&& p.getRumuz().getSonkullanimtarihi()!=null
+				&& p.getRumuz().getCcv()!=null
+				)
 			.findAny();
 		
 		if (opt.isEmpty()) {
 			throw new RuntimeException("% islemi icin uygun kredi karti rumuzu bulunamadi. ".formatted(islemAdimi));
 		}
 		
-		return opt.get().getKrediKartiRumuz();
+		return opt.get().getRumuz();
 		
 	}
 	
-	
-	public String getRumuzEmailByIslemAdimi(int islemAdimi) {
-		List<RumuzEsleme> eslemeler = getRumuzEslemeByIslemAdimi(islemAdimi);
-		String email =eslemeler.stream().filter(p-> p.getStatu()==1 && p.getEdevletRumuz()!=null && p.getEposta()!=null && HelperUtil.isValidEmailAddress(p.getEposta()))
-				.map(p->p.getEposta()).findAny().orElse(null);
-		
-		if (email==null) {
-			throw new RuntimeException("%d islem adimi icin başvuruda kullanılacak uygun email adresi bulunamadi".formatted(islemAdimi));
-		}
-		
-		return email;
-	}
-	
-	public String getRumuzTelefonByIslemAdimi(int islemAdimi) {
-		List<RumuzEsleme> eslemeler = getRumuzEslemeByIslemAdimi(islemAdimi);
-		//email adresi dogru olan kaydi aldik genede
-		String telefon  =eslemeler.stream().filter(p-> p.getStatu()==1 && p.getEdevletRumuz()!=null && p.getTelefon()!=null && HelperUtil.isValidEmailAddress(p.getEposta()))
-				.map(p->p.getTelefon()).findAny().orElse(null);
-		
-		if (telefon==null) {
-			throw new RuntimeException("%d islem adimi icin başvuruda kullanılacak uygun telefon numarası bulunamadi".formatted(islemAdimi));
-		}
-		
-		return telefon;
-	}
 
 	
 }

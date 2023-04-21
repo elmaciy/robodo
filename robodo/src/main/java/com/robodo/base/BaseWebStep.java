@@ -78,12 +78,18 @@ public abstract class BaseWebStep extends BaseStep {
 	 
 
 	 
-	 public ApiResponse httpRequest(Method method, String endPoint, List<KeyValue> headers, Object body)  {
+	 public ApiResponse httpRequest(Method method, String endPoint, List<KeyValue> headers, List<KeyValue> parameters, Object body)  {
 		 RequestSpecification given = given();
 		 given.contentType("application/json; charset=UTF-16");
 		 
 		 runnerUtil.logger("Request: %s %s".formatted(method.toString(),endPoint));
 
+		 if (parameters!=null && !parameters.isEmpty()) {
+			 for (KeyValue parameter : parameters) {
+				 runnerUtil.logger("add parameter=> %s : %s".formatted(parameter.getKey(), parameter.getValue()));
+				 given.param(parameter.getKey(), parameter.getValue());
+			 } 
+		 }
 		 
 		 if (headers!=null && !headers.isEmpty()) {
 			 for (KeyValue header : headers) {

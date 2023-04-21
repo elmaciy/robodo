@@ -14,7 +14,8 @@ public class Rumuz {
     public String sifre;
     public int statu;
     public Personel personel;
-    public Date islemTarihi;
+    public Date islem_tarihi;
+    
     
 	public int getId() {
 		return id;
@@ -82,12 +83,26 @@ public class Rumuz {
 	public void setPersonel(Personel personel) {
 		this.personel = personel;
 	}
-	public Date getIslemTarihi() {
-		return islemTarihi;
+	public Date getIslem_tarihi() {
+		return islem_tarihi;
 	}
-	public void setIslemTarihi(Date islemTarihi) {
-		this.islemTarihi = islemTarihi;
+	public void setIslem_tarihi(Date islem_tarihi) {
+		this.islem_tarihi = islem_tarihi;
 	}
+	
+	
+	public void print() {
+		
+		if (this.getParametreturu()==1) {
+			System.err.println("Edevlet Rumuz [%d] : tckn : %s, sifre : ********".formatted(this.getId(), this.getTckimlik()));
+			
+		} else {
+			System.err.println("KK Rumuz [%d] : no : %s, sonkul. : ***, cvv : ***".formatted(this.getId(), this.getKredikartino()));
+		}
+		
+	}
+	
+
     
     
 }

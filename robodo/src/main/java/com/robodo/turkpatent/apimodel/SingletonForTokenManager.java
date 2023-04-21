@@ -54,7 +54,7 @@ public class SingletonForTokenManager {
 		tokenRequest.setKullaniciadi(tokenUsername);
 		tokenRequest.setSifre(tokenPassword);
 		
-		ApiResponse response = baseEpatsStep.httpRequest(Method.POST, endPoint, null, tokenRequest);
+		ApiResponse response = baseEpatsStep.httpRequest(Method.POST, endPoint, null, null,  tokenRequest);
 		
 		if (response.getResponseCode()!=200) {
 			throw new RuntimeException("token request başarısız");
