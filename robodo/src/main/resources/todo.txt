@@ -10,11 +10,13 @@
 	- işlemlerdeki ortalama süreler
 	- genel rakamlar. (günlük işlenen) saatlik işlenen haftalık işlenen falan... 
 
+130. elmaciy ile girince yetkisiz menüler de çıkıyor, yetkisiz menülere tıklayınca ise atıyor. 
 
 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
 	
 	
+129.  processDef ekranına variable gridini ekle. ayrıca variable editorune variable ekleme butonu da konulsun. 
 71. process definitions a bunu görebileceklerin listesini mi eklesek? sadece o kişiler ya da o roldekiler bu işlemi  görebilecek böylece. 
 117. process stepte bir değişiklik olduğunda ya da processdef de, bunu tüm instancelere uygula gibi bir seçenek olabilir mi? 
 100. process definition ekranındaki class name ler verify edilmeli. parametreler de oyle. Command builder yapılabilir elle yazılmak yerine. 
@@ -35,9 +37,7 @@
 	
 83. thread windowundaki kuyruk ve thread lar sıfırlanabilmelidir. ???
 
-
 87. tanım ekranlarındaki boxlara maxlength falan koy  - db yi aşmasın 
-		
 
 129. discoverer çalışırken de max thread count u dikkate alsın. 
 
@@ -45,17 +45,15 @@
 98. Parametre ekranında sifre türü parametreler bir sekilde sifre olarak görünsün. Açık görünmesin. Ya da ayrı bir gizli parametre alanı yapaım. 
 
 			
-113. 2nci adımda geri almada hata çıktı. Backward işlemi garip çalışıyor. Bunu belki silip adım adım geri alma yerine direk retry ettiririz. 
-
-
-115. onay ve redde /CALLBACK i entegre et. Bazı durumlarda gerekebilir. 
-
 126. ilk açılıştaki Default admin şifresi rastgele oluşturulsun ve console a yazılsın. 
 		Sorna değiştirilir. 
 
 
 111. onay adımına süreci baştan başlatama seçeneği ekle. RESTART action
 114. EXTERNAL approve aşamasında bize onaylayan kullanıcıyı da göndermelerine olanak sağlanabilir. 
+115. onay ve redde /CALLBACK i entegre et. Bazı durumlarda gerekebilir. 
+
+
 
 120. arada sırada webdriverlerin temizlenmesi mümkün olsun. 
 101. chrome headless çalıştırılmalı. Browser biraz daha esnek olabilir mi? Farklı browserlere de geçilebilmeşli. driver e de. 
@@ -69,9 +67,7 @@
 125. application daki default kaydetme işlerini artık sil. 
 
 
-130. elmaciy ile girince yetkisiz menüler de çıkıyor, yetkisiz menülere tıklayınca ise atıyor. 
-121. Kredi kartı tek sefer çalışsından emin ol. kodları buna göre ayarla. kontrolü iyi yap. 
-129.  processDef ekranına variable gridini ekle. ayrıca variable editorune variable ekleme butonu da konulsun. 
+113. 2nci adımda geri almada hata çıktı. Backward işlemi garip çalışıyor. Bunu belki silip adım adım geri alma yerine direk retry ettiririz. 
 86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
 109. kredi kartı ve edevlet servislerini de implemente et. headerde token alacak bunlar da 
 	Aktif edevlet sifreleri ---> post getEdevletRumuz
@@ -86,7 +82,7 @@
 
 118. Marka tescil ücreti işini de yap. 
 
-
+200. ödemesi yapılan işlemin tekrar ödenmemesi için sigorta olarak yapabileceğimiz bir kontrol var mı? 
 -------------------
 TAMAMLANANLAR 
 -------------------
