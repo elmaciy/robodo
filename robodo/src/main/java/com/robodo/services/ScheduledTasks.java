@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.robodo.threads.ThreadForDiscoverers;
+import com.robodo.threads.ThreadForDiscoveryStarter;
 import com.robodo.threads.ThreadForInstanceStarter;
 import com.robodo.threads.ThreadForQueueManager;
 import com.robodo.threads.ThreadForRetryFailed;
@@ -17,7 +17,7 @@ public class ScheduledTasks {
 	
 	@Scheduled(fixedRate = 30000, initialDelay = 0)
 	public void runDiscoverers() {
-		Thread th=new Thread(new ThreadForDiscoverers(processService));
+		Thread th=new Thread(new ThreadForDiscoveryStarter(processService));
 		th.start();
 	}
 

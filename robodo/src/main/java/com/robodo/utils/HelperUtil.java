@@ -94,7 +94,7 @@ public class HelperUtil {
 		return jsonStr;
 	}
 	
-	public static HashMap<String,String>  String2HashMap(String data) {
+	public static HashMap<String,String>  str2HashMap(String data) {
 		HashMap<String,String> hm= new HashMap<String,String>();
 		if (data==null) {
 			return hm;
@@ -126,7 +126,7 @@ public class HelperUtil {
 
 	public static void sendEmailByTemplate(EmailTemplate emailTemplate, ProcessInstanceStep step, RunnerUtil runnerUtil) {
 		String instanceVariables = step.getProcessInstance().getInstanceVariables();
-		HashMap<String, String> hmVars=String2HashMap(instanceVariables);
+		HashMap<String, String> hmVars=str2HashMap(instanceVariables);
 		hmVars.put("LINK.APPROVE", generateInstanceApprovalLink(runnerUtil, step.getProcessInstance(), "APPROVE", "EXTERNAL"));
 		hmVars.put("LINK.DECLINE", generateInstanceApprovalLink(runnerUtil, step.getProcessInstance(), "DECLINE", "EXTERNAL"));
 		hmVars.put("LINK.VIEW", generateInstanceApprovalLink(runnerUtil, step.getProcessInstance(), "VIEW", "EXTERNAL"));

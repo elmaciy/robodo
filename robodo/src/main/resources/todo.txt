@@ -57,7 +57,6 @@
 111. onay adımına süreci baştan başlatama seçeneği ekle. RESTART action
 114. EXTERNAL approve aşamasında bize onaylayan kullanıcıyı da göndermelerine olanak sağlanabilir. 
 
-118. Marka tescil ücreti işini de yap. 
 120. arada sırada webdriverlerin temizlenmesi mümkün olsun. 
 101. chrome headless çalıştırılmalı. Browser biraz daha esnek olabilir mi? Farklı browserlere de geçilebilmeşli. driver e de. 
 107. serverde sistemi backup a eklettir. 
@@ -68,41 +67,18 @@
 116. build sonrası kodları makineden silmesi lazım. Zaten bir süre sonra build scriptini serverden kaldır. Sadece JAR deploy ederiz. 
 117. Sadece dosya no değil, yıl parametresi de alınsın yıllık ödeme süreçlerinde. Yoksa önümüzdeki yıl ödeme yapmaz. 
 119. getRumuzEslemeByIslemAdimi funcitondaki daki test amacli bilgileri silmeyi unurma
+125. application daki default kaydetme işlerini artık sil. 
+126. ilk açılıştaki Default admin şifresi rastgele oluşturulsun ve console a yazılsın. 
+		Sorna değiştirilir. 
 
 
-119. discovery adımında oluşan hataların da görülmesini sağlayalım. Statüsü fail olsun mesela ve hataları loglayalım vs... 
-120. Ekrandaki discover butonları sadee admine acik olsun ve senkron çalışmasın thread başlatsın. 
 121. Kredi kartı tek sefer çalışsından emin ol. kodları buna göre ayarla. kontrolü iyi yap. 
-122. Ödeme ile dekont kaydetmeyi birleştirsek mi? 
-
-//--------------------------------------
-1. Sistemden "Taslak" statüsündekileri RPA sistemi liste olarak çekecek. RPA  Listedeki id ler üzerinden tek tek dosya detayları servisini çekecek ve dosyaları RPA tarafında başlatacak. 
-2. RPA işlemi aldıktan sonra statüyü "RPA işlemde" olarak güncelleyecek. bu aşamada kontrol linki direk paylaşılacak ki ekrandan durum görülebilsin. 
-3. Tahakkuk oluşturulduktan sonra statü "RPA Tahakkuk" olarak güncellencek ve yanısıra a) tahakkukno, b) onay/red/kontrol linkleri sağlanacak
-4. Onay alınıp işlem devam bittikten sonra statü "RPA ödeme"  olarak güncellenecek ve yanısıra a) dekont no sağlanacak. 
-5. Admin ekranı tamamlanınca, işlem tipine göre kredi kartı bilgilerini sağlayan servis geliştirilecek. Bu servisteki kredi kartı ödeme aşamasında çekilip kullanılacak. 
-Not : her işlem tipi için farklı kredi kartı kullanılacak. 
+123. Onaylamalar düzgün çalışmamaya başladı. 
+129. discoverer çalışırken de max thread count u dikkate alsın. 
+129.  processDef ekranına variable gridini ekle. ayrıca variable editorune ekleme de konulsın. 
 
 
-islemTuru
-Marka : 1 
-Patent:2  
-Tasarım:3
-
-IslemKategorisi 
-Başvuru Öncesi : 1
-Başvuru : 2
-
-IslemAdimi 
-Yıllık Ücret Yenileme : 1
-Tescil Sonuçlandırma: 2
-Tam Marka Yenileme : 3
-
-rumuz
-E-devlet Rumuz : 1
-Kredi Kartı Rumuz : 2
-
-
+118. Marka tescil ücreti işini de yap. 
 
 
 -------------------
@@ -180,3 +156,5 @@ TAMAMLANANLAR
 119. benim gmail hesabımdan kurtul, firma kendisi gmail alsın bir tane. Şimdilik mail atılmadığı için gerek yok. 
 	Email şifresini silelim application.properties den. Gerekirse corporate parametrelere tanımlarız
 114. sadece api çalışan steplerde chrome başlamasın
+119. discovery adımında oluşan hataların da görülmesini sağlayalım. Statüsü fail olsun mesela ve hataları loglayalım vs... 
+120. Ekrandaki discover butonları sadee admine acik olsun ve senkron çalışmasın thread başlatsın. 

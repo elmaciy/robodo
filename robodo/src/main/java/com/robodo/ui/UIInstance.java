@@ -92,7 +92,7 @@ public class UIInstance extends UIBase {
 
 		btnRunDiscoverer.addThemeVariants(ButtonVariant.LUMO_SMALL);
 		btnRunDiscoverer.setDisableOnClick(true);
-		btnRunDiscoverer.setEnabled(comboForProcessDefinition.getValue()!=null);
+		btnRunDiscoverer.setEnabled(comboForProcessDefinition.getValue()!=null && isAdmin());
 		btnRunDiscoverer.addClickListener(e -> {
 			
 			runProcessDiscoverer(comboForProcessDefinition.getValue());
@@ -215,6 +215,8 @@ public class UIInstance extends UIBase {
 
 		fillGrid();
 	}
+
+	
 
 	boolean instanceFilterNew = true;
 	boolean instanceFilterCompleted = false;
@@ -733,7 +735,7 @@ public class UIInstance extends UIBase {
 	private Grid<KeyValue> makeVariableGrid(ProcessInstance processInstance, ProcessInstanceStep processInstanceStep) {
 		
 		String variablesStr = processInstanceStep == null ? processInstance.getInstanceVariables() : processInstanceStep.getInstanceVariables(); 
-		HashMap<String, String> hmVars = HelperUtil.String2HashMap(variablesStr);
+		HashMap<String, String> hmVars = HelperUtil.str2HashMap(variablesStr);
 		Grid<KeyValue> gridVars = new Grid<>(KeyValue.class, false);
 		gridVars.addColumn(p -> p.getKey()).setHeader("Variable Name").setWidth("30%");
 		gridVars.addComponentColumn(p -> {

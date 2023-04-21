@@ -35,7 +35,7 @@ public class DiscoverMarka2nciItiraz extends BaseEpatsStep implements Discoverab
 				);
 		
 		instances.stream().forEach(p->{
-			HashMap<String, String> hmVars = HelperUtil.String2HashMap(p.getInstanceVariables());
+			HashMap<String, String> hmVars = HelperUtil.str2HashMap(p.getInstanceVariables());
 			
 			DosyaResponse dosya = json2Object(hmVars.get("dosyaResponse.JSON"), DosyaResponse.class);
 			

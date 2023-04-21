@@ -3,7 +3,6 @@ package com.robodo.base;
 import static io.restassured.RestAssured.given;
 
 import java.sql.Blob;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.sql.rowset.serial.SerialBlob;
@@ -11,7 +10,6 @@ import javax.sql.rowset.serial.SerialBlob;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.robodo.model.ApiResponse;
 import com.robodo.model.KeyValue;
-import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.utils.HelperUtil;
@@ -123,13 +121,7 @@ public abstract class BaseWebStep extends BaseStep {
 		 for (var header : r.headers()) {
 			apiResponse = apiResponse.withHeaderEntity(header.getName(), header.getValue()); 
 		 }
-		 
-		 Iterator<String> itCookies = r.cookies().keySet().iterator();
-		 while(itCookies.hasNext()) {
-			 String key = itCookies.next();
-			 String value = r.cookies().get(key);
-			 apiResponse = apiResponse.withCookieEntity(key, value);
-		 }
+
 		 apiResponse.print(runnerUtil);
 		 
 		 return apiResponse;

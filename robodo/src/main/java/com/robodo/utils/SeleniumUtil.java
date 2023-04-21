@@ -174,7 +174,7 @@ public class SeleniumUtil {
 		JavascriptExecutor executor = (JavascriptExecutor) webDriver;
 		
 		Object[] valuesExtracted =Splitter.on(",").trimResults().splitToList(arguments).stream().filter(p->p!=null && !p.isBlank()).map(p->{
-			return this.runnerUtil.hmExtractedValues.get(p);
+			return this.runnerUtil.hmValues.get(p);
 		}).toArray();
 		runnerUtil.logger("execjs : %s for element %s".formatted(javaScript,el2Str(el)));
 

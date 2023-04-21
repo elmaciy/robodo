@@ -17,10 +17,12 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.model.RunningProcess;
+import com.robodo.model.UserRole;
 import com.robodo.security.SecurityService;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
+import com.robodo.threads.ThreadForDiscoveryRunner;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 import com.vaadin.flow.component.ClickEvent;
@@ -44,6 +46,7 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -124,7 +127,15 @@ public class UIBase extends AppLayout {
 		return authenticatedUser.getUsername();
 		 
 	}
-	
+
+	public boolean isAdmin() {
+		 UserDetails authenticatedUser = securityService.getAuthenticatedUser();
+		 if (authenticatedUser==null) {
+			 return false;
+		 }
+		 
+		return authenticatedUser.getAuthorities().stream().anyMatch(p->p.getAuthority().equals(UserRole.ROLE_ADMIN));
+	}
 
 	private VerticalLayout  getRoterLinks() {
 		
@@ -241,6 +252,26 @@ public class UIBase extends AppLayout {
 		dialog.setConfirmText("OK");
 		dialog.open();
 	}	
+
+	
+	public void showLogs(String header, String logs) {
+		ConfirmDialog dialog = new ConfirmDialog();
+		dialog.setHeader(header);
+		TextArea logArea=new TextArea();
+		logArea.setValue(logs ==null  ? "" : logs);
+		logArea.setReadOnly(true);
+		logArea.setSizeFull();
+		
+		dialog.add(logArea);
+		dialog.setCancelable(false);
+		
+		dialog.setRejectable(false);
+		dialog.setConfirmText("OK");
+		dialog.setWidth("80%");
+		dialog.setHeight("80%");
+		dialog.open();
+	}	
+
 	
 	public Image getImage(ProcessInstanceStep step, ProcessInstanceStepFile file) {
 		byte[] imageBytes=HelperUtil.byteArr2Blob(file.getBinarycontent());
@@ -400,32 +431,14 @@ public class UIBase extends AppLayout {
 		String processId = "DISCOVERY.%s".formatted(processDefinition.getCode());
 		boolean isRunning = RunnerSingleton.getInstance().hasRunningInstance(processId);
 		if (isRunning) {
-			notifyError("Discovery is already running");
+			notifyError("Discovery thread is already running");
 			return;
 		}
+		
+		Thread th=new Thread(new ThreadForDiscoveryRunner(processService, processDefinition));
+		th.start();
 
-		RunnerUtil runner = new RunnerUtil(processService);
-
-		RunnerSingleton.getInstance().start(processId);
-		List<ProcessInstance> discoveredInstances = runner.runProcessDiscovery(processDefinition);
-		int discovered = 0;
-		for (ProcessInstance discoveredInstance : discoveredInstances) {
-			runner.logger("discovered : new instance [%s] of process [%s]".formatted(processDefinition.getCode(),
-					discoveredInstance.getCode()));
-			boolean isExists = processService.isProcessInstanceAlreadyExists(discoveredInstance);
-			if (isExists) {
-				runner.logger("skip process [%s]/%s".formatted(processDefinition.getCode(),
-						discoveredInstance.getCode(), processDefinition.getCode()));
-				continue;
-			}
-
-			processService.saveProcessInstance(discoveredInstance);
-			discovered++;
-		}
-
-		RunnerSingleton.getInstance().stop(processId);
-		notifyInfo(discovered == 0 ? "no new instance is discovered "
-				: "%d new instance discovered".formatted(discovered));
+		notifySuccess("dicovery started for class %s, running thread id : %d".formatted(processDefinition.getDiscovererClass(), th.getId()));
 
 	}
 

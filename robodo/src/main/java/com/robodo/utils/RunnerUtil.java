@@ -25,7 +25,7 @@ public class RunnerUtil {
 	public ProcessService processService;
 	WebElement locatedWebElement;
 	String valueExtracted;
-	HashMap<String, String> hmExtractedValues = new HashMap<>();
+	HashMap<String, String> hmValues = new HashMap<>();
 	StringBuilder logs = new StringBuilder();
 
 	public RunnerUtil(ProcessService processService) {
@@ -37,7 +37,7 @@ public class RunnerUtil {
 
 		RunnerSingleton.getInstance().start(processInstance.getCode(), processDefinition.getCode());
 				
-		hmExtractedValues = HelperUtil.String2HashMap(processInstance.getInstanceVariables());
+		hmValues = HelperUtil.str2HashMap(processInstance.getInstanceVariables());
 
 		List<ProcessInstanceStep> steps = processInstance.getSteps();
 		
@@ -81,7 +81,7 @@ public class RunnerUtil {
 				if (step.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)) {
 					logger("stopped at step [%s] at command [%s]".formatted(step.getStepCode(), step.getCommands()));
 					step.setLogs(logs.toString());
-					step.setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
+					step.setInstanceVariables(HelperUtil.hashMap2String(hmValues));
 					RunnerSingleton.getInstance().stop(stepRunningKey);
 					break;
 				}
@@ -95,7 +95,7 @@ public class RunnerUtil {
 					break;
 				}
 				
-				step.setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
+				step.setInstanceVariables(HelperUtil.hashMap2String(hmValues));
 				
 			} catch (Exception e) {
 				String message = e.getMessage();
@@ -115,7 +115,7 @@ public class RunnerUtil {
 			RunnerSingleton.getInstance().stop(stepRunningKey);
 			step.setLogs(logs.toString());
 			
-			processInstance.setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
+			processInstance.setInstanceVariables(HelperUtil.hashMap2String(hmValues));
 			processService.saveProcessInstance(processInstance);
 
 		} //for
@@ -145,7 +145,7 @@ public class RunnerUtil {
 			processInstance.setError(isLastStepFailed ? latestProcessedStep.getError() : null);
 		} 
 		
-		processInstance.setInstanceVariables(HelperUtil.hashMap2String(hmExtractedValues));
+		processInstance.setInstanceVariables(HelperUtil.hashMap2String(hmValues));
 		processService.saveProcessInstance(processInstance);
 		RunnerSingleton.getInstance().stop(processInstance.getCode(), processDefinition.getCode());
 
@@ -309,8 +309,8 @@ public class RunnerUtil {
 			return ((Discoverable) discovererInstance).discover(processDefinition);
 			//return discovererInstance.discover(processDefinition);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new ArrayList<ProcessInstance>();
+			//e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 	}
@@ -320,11 +320,32 @@ public class RunnerUtil {
 	}
 
 	public void setVariable(String key, String value) {
-		hmExtractedValues.put(key, value);
+		hmValues.put(key, value);
 	}
 	
 	public String getVariable(String key) {
-		return hmExtractedValues.get(key);
+		return hmValues.get(key);
+	}
+
+	public void clearLogs() {
+		this.logs.setLength(0);
+		
+	}
+
+	public void clearVariables() {
+		this.hmValues.clear();
+		
+	}
+
+	public void appendVariables(HashMap<String, String> hm) {
+		hm.entrySet().stream().forEach(e->{
+			this.hmValues.put(e.getKey(), e.getValue());
+		});
+		
+	}
+
+	public String getLogs() {
+		return this.logs.toString();
 	}
 
 }

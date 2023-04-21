@@ -4,11 +4,11 @@ import com.robodo.model.ProcessInstanceStep;
 import com.robodo.turkpatent.apimodel.Rumuz;
 import com.robodo.utils.RunnerUtil;
 
-public class GenelTahakkukOdemeStep extends BaseEpatsStep {
+public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 
 
 	
-	public GenelTahakkukOdemeStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+	public OrtakTahakkukOdemeVeDekontKaydetmeStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
 	
 	}
@@ -53,7 +53,7 @@ public class GenelTahakkukOdemeStep extends BaseEpatsStep {
 		selenium.switchToMainFrame();
 		
 		setVariable("dekontNo", dekontNo);
-		
+		dosyaDekontKaydet();
 	}
 	
 	

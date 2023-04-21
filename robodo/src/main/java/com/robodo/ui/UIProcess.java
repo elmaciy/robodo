@@ -125,6 +125,27 @@ public class UIProcess extends UIBase {
 			});
 			return fld;
 		}).setHeader("Thread").setWidth("2em");
+		
+		gridProcessDefinition.addColumn(p->dateFormat(p.getStarted()))
+		.setHeader("Started").setWidth("2em");
+
+		gridProcessDefinition.addColumn(p->dateFormat(p.getFinished()))
+		.setHeader("Finished").setWidth("2em");
+
+		gridProcessDefinition.addColumn(p->p.getStatus())
+		.setHeader("Status").setWidth("2em");
+		
+		gridProcessDefinition.addComponentColumn(p-> {
+			Button btnShowError=new Button("", new Icon(VaadinIcon.LIST));
+			btnShowError.addThemeVariants(ButtonVariant.LUMO_SMALL);
+			btnShowError.addClickListener(e->{
+				showLogs("Logs", p.getLogs());
+			});
+			return btnShowError;
+		})
+		.setHeader("Logs").setWidth("2em").setTooltipGenerator(p-> HelperUtil.limitString(p.getLogs(), 1000));
+		
+
 
 		gridProcessDefinition.addComponentColumn(p -> {
 			Button btnRun = new Button("", new Icon(VaadinIcon.SEARCH));
@@ -137,7 +158,7 @@ public class UIProcess extends UIBase {
 				btnRun.setEnabled(true);
 			});
 			return btnRun;
-		}).setHeader("Discover").setWidth("3em").setTextAlign(ColumnTextAlign.CENTER);
+		}).setHeader("Discover").setWidth("3em").setTextAlign(ColumnTextAlign.CENTER).setFrozenToEnd(true);
 		
 		gridProcessDefinition.addComponentColumn(p -> {
 			Button btnDelete = new Button("", new Icon(VaadinIcon.TRASH));
@@ -147,7 +168,8 @@ public class UIProcess extends UIBase {
 			});
 			btnDelete.setEnabled(!hasAnyInstance(p));
 			return btnDelete;
-		}).setHeader("Steps").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
+		}).setHeader("Remove").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
+		
 		
 		
 		gridProcessDefinition.addSelectionListener(e->{

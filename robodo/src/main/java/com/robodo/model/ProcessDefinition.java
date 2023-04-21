@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +23,11 @@ import jakarta.persistence.Table;
 @Table(name = "process_definition")
 public class ProcessDefinition {
 		
+	public static final String STATUS_NEW="NEW";
+	public static final String STATUS_RUNNING="RUNNING";
+	public static final String STATUS_COMPLETED ="COMPLETED";
+	public static final String STATUS_FAILED="FAILED";
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	Long id;
@@ -35,6 +41,16 @@ public class ProcessDefinition {
 	boolean isActive;
 	LocalDateTime created;
 	LocalDateTime updated;
+	
+	LocalDateTime started;
+	LocalDateTime finished;
+	String status=ProcessDefinition.STATUS_NEW;
+	@Column(columnDefinition = "mediumtext")
+	String logs;
+	@Column(columnDefinition = "mediumtext")
+	String initialInstanceVariables;
+
+	
 	
 	public Long getId() {
 		return id;
@@ -107,7 +123,37 @@ public class ProcessDefinition {
 	public void setUpdated(LocalDateTime updated) {
 		this.updated = updated;
 	}
+	public LocalDateTime getStarted() {
+		return started;
+	}
+	public void setStarted(LocalDateTime started) {
+		this.started = started;
+	}
+	public LocalDateTime getFinished() {
+		return finished;
+	}
+	public void setFinished(LocalDateTime finished) {
+		this.finished = finished;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getLogs() {
+		return logs;
+	}
+	public void setLogs(String logs) {
+		this.logs= logs;
+	}
 	
+	public String getInitialInstanceVariables() {
+		return initialInstanceVariables;
+	}
+	public void setInitialInstanceVariables(String initialInstanceVariables) {
+		this.initialInstanceVariables = initialInstanceVariables;
+	}
 	@PrePersist
 	protected void onCreate() {
 		this.created = LocalDateTime.now();

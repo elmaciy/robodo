@@ -24,7 +24,6 @@ public class DummyApiSteps extends BaseWebStep {
 		
 		setVariable("response.statusCode", "%d".formatted(response.getResponseCode()));
 		setVariable("response.headers", "\n%s".formatted(response.getHeadersPrintable()));
-		setVariable("response.cookies", "\n%s".formatted(response.getCookiesPrintable()));
 		setVariable("response.body", "\n%s".formatted(response.getBody()));
 		
 	}

@@ -2,7 +2,6 @@ package com.robodo.turkpatent.discoverer;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Predicate;
 
 import com.robodo.model.Discoverable;
 import com.robodo.model.ProcessDefinition;
@@ -37,7 +36,7 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 				);
 		
 		instances.stream().forEach(p->{
-			HashMap<String, String> hmVars = HelperUtil.String2HashMap(p.getInstanceVariables());
+			HashMap<String, String> hmVars = HelperUtil.str2HashMap(p.getInstanceVariables());
 			
 			DosyaResponse dosya = json2Object(hmVars.get("dosyaResponse.JSON"), DosyaResponse.class);
 			
@@ -51,7 +50,6 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 			hmVars.put("islemAdi", "Yıllık Ücret Ödeme");
 			hmVars.put("eposta", getRumuzEmailByIslemAdimi(islemAdimi));
 			hmVars.put("telefonNumarasi", getRumuzTelefonByIslemAdimi(islemAdimi));
-			
 			
 			hmVars.put("islemAdimi", String.valueOf(islemAdimi));
 			
