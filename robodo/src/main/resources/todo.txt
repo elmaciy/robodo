@@ -79,11 +79,18 @@
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
 
 
+119. CRM ekranladındaki işlem adımları ile stepleri ve discovererleri, descriptionları falan eşitle. 
+
 118. Marka tescil ücreti işini de yap. 
 
 200. ödemesi yapılan işlemin tekrar ödenmemesi için sigorta olarak yapabileceğimiz bir kontrol var mı? 
 
--------------------
+201. Rumuz eşleme ekranlarında sıkıntılar var. Model değiştirilmeli. bir işlem adımı için aktif olan 1 adet eşleme olmalıdır. 
+	Bu eşlemede hem kk hem de edevlet dolu olmalıdır. iki rumuz için ayrı kayıt girmemelidir. 
+	by konu takip edeilecek ve servis düzelince ona göre tekrar yazılacak. 
+	Ayrıca ekranda başkalarının girdiği kayıtlar çalışmıyor. 
+
+-------------------.
 TAMAMLANANLAR 
 -------------------
 2. discovery ikincisinde aynı taskı gene discover ediyor

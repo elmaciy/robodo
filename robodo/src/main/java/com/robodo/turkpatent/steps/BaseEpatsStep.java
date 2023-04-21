@@ -505,7 +505,7 @@ public class BaseEpatsStep extends BaseWebStep {
 
 
 
-	public RumuzEslemeResponse getRumuzEslemeByIslemAdimi(int islemAdimi) {
+	public RumuzEslemeResponse getRumuzEslemeResponseByIslemAdimi(int islemAdimi) {
 
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
 		String endPoint="%s/rpaservisleriController/islemAdminagoreIslemEslestirmeleriniGetir?islemadimi=%d".formatted(apiHostname, islemAdimi);
@@ -535,7 +535,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	}
 	
 	public Rumuz getRumuzEdevletByIslemAdimi(int islemAdimi) {
-		RumuzEslemeResponse rumuzEslemeResponse= getRumuzEslemeByIslemAdimi(islemAdimi);
+		RumuzEslemeResponse rumuzEslemeResponse= getRumuzEslemeResponseByIslemAdimi(islemAdimi);
 		List<RumuzEsleme> eslemeler = rumuzEslemeResponse.getData();
 		
 		var opt = eslemeler.stream().filter(
@@ -558,7 +558,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	}
 	
 	public Rumuz getRumuzKrediKartiByIslemAdimi(int islemAdimi) {
-		RumuzEslemeResponse rumuzEslemeResponse= getRumuzEslemeByIslemAdimi(islemAdimi);
+		RumuzEslemeResponse rumuzEslemeResponse= getRumuzEslemeResponseByIslemAdimi(islemAdimi);
 		List<RumuzEsleme> eslemeler = rumuzEslemeResponse.getData();
 		
 		var opt = eslemeler.stream().filter(

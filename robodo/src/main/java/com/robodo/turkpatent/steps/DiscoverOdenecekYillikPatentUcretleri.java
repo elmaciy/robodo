@@ -25,7 +25,7 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 		//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
 		int islemAdimi=Integer.valueOf(runnerUtil.getEnvironmentParameter("PatentYenileme.islemAdimi")); 		
 
-		RumuzEsleme rumuzEsleme =  getRumuzEslemeByIslemAdimi(islemAdimi).getData().stream().filter(r->r.getTelefon()!=null && r.getEposta()!=null).findAny().get();
+		RumuzEsleme rumuzEsleme =  getRumuzEslemeResponseByIslemAdimi(islemAdimi).getData().stream().filter(r->r.getTelefon()!=null && r.getEposta()!=null).findAny().get();
 
 		List<DosyaResponse> dosyalar = getTaslakDosyalarByIslemAdimi(islemAdimi);
 		

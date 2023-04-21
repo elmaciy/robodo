@@ -144,6 +144,54 @@ public class RobodoApplication {
 			}
 			
 			
+			//----------------------------------------------------------------------
+
+			
+			ProcessDefinition markaTescilUcretiProcess=new ProcessDefinition();
+			markaTescilUcretiProcess.setCode("MARKA_TESCIL_UCRET");
+			markaTescilUcretiProcess.setDescription("Marka tescil ücreti ödeme süreci");
+			markaTescilUcretiProcess.setMaxAttemptCount(1);
+			markaTescilUcretiProcess.setMaxThreadCount(2);
+			markaTescilUcretiProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
+			markaTescilUcretiProcess.setDiscovererClass("DiscoverOdenecekMarkaTescilUcretleri");
+			markaTescilUcretiProcess.setActive(false);
+			
+			
+
+			ProcessDefinitionStep stepMarkaTescilTahakkukOlustur=new ProcessDefinitionStep();
+			stepMarkaTescilTahakkukOlustur.setCode("MARKA_TESCIL_UCRET_TAHAKKUK");
+			stepMarkaTescilTahakkukOlustur.setDescription("Marka tescil ücreti tahakkuk oluşturma");
+			stepMarkaTescilTahakkukOlustur.setOrderNo("01");
+			stepMarkaTescilTahakkukOlustur.setSingleAtATime(false);
+			stepMarkaTescilTahakkukOlustur.setCommands("runStepClass EpatsMarkaTescilTahakkukOlusturStep");
+			stepMarkaTescilTahakkukOlustur.setProcessDefinition(markaTescilUcretiProcess);
+			
+			ProcessDefinitionStep stepMarkaTescilOnay=new ProcessDefinitionStep();
+			stepMarkaTescilOnay.setCode("MARKA_TESCIL_ONAY_BEKLE");
+			stepMarkaTescilOnay.setDescription("Marka tescil ücreti ödeme için onay bekle");
+			stepMarkaTescilOnay.setOrderNo("02");
+			stepMarkaTescilOnay.setSingleAtATime(false);
+			stepMarkaTescilOnay.setCommands("waitHumanInteraction ");
+			stepMarkaTescilOnay.setProcessDefinition(markaTescilUcretiProcess);
+			
+			ProcessDefinitionStep stepMarkaTescilOde=new ProcessDefinitionStep();
+			stepMarkaTescilOde.setCode("TAHAKKUK_ODE");
+			stepMarkaTescilOde.setDescription("Tahakkuk ödeme");
+			stepMarkaTescilOde.setOrderNo("03");
+			stepMarkaTescilOde.setSingleAtATime(true);  //bu ödeme için true olacak
+			stepMarkaTescilOde.setCommands("runStepClass OrtakTahakkukOdemeVeDekontKaydetmeStep");
+			stepMarkaTescilOde.setProcessDefinition(markaTescilUcretiProcess);
+			
+
+
+			markaTescilUcretiProcess.getSteps().add(stepMarkaTescilTahakkukOlustur);
+			markaTescilUcretiProcess.getSteps().add(stepMarkaTescilOnay);
+			markaTescilUcretiProcess.getSteps().add(stepMarkaTescilOde);
+			
+			if (processDefinitionRepo.findByCode(markaTescilUcretiProcess.getCode()).isEmpty()) {
+				processDefinitionRepo.save(markaTescilUcretiProcess);
+			}
+			
 			
 			//--------------------------------------------
 			

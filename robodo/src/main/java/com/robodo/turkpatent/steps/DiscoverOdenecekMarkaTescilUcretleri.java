@@ -14,10 +14,10 @@ import com.robodo.turkpatent.apimodel.RumuzEsleme;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
 
-public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseEpatsStep implements Discoverable {
+public class DiscoverOdenecekMarkaTescilUcretleri extends BaseEpatsStep implements Discoverable {
 
 	
-	public DiscoverOdenecekMarkaYenilemeUcretleri(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+	public DiscoverOdenecekMarkaTescilUcretleri(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
 		// TODO Auto-generated constructor stub
 	}
@@ -25,7 +25,7 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseEpatsStep implem
 	@Override
 	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {		
 		//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
-		int islemAdimi=Integer.valueOf(runnerUtil.getEnvironmentParameter("MarkaYenileme.islemAdimi")); 		
+		int islemAdimi=Integer.valueOf(runnerUtil.getEnvironmentParameter("MarkaTescil.islemAdimi")); 		
 		RumuzEsleme rumuzEsleme =  getRumuzEslemeResponseByIslemAdimi(islemAdimi).getData().stream().filter(r->r.getTelefon()!=null && r.getEposta()!=null).findAny().get();
 
 		
@@ -35,7 +35,7 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseEpatsStep implem
 				processDefinition,
 				dosyalar, 
 				(dosya)->"%s.%s".formatted(processDefinition.getCode(), dosya.getBasvuruno()),
-				(dosya)->"%s dosyası için Marka Yenileme Ücreti".formatted(dosya.getBasvuruno())
+				(dosya)->"%s dosyası için Marka Tescil Ücreti".formatted(dosya.getBasvuruno())
 				);
 		
 		instances.stream().forEach(p->{
@@ -45,18 +45,16 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseEpatsStep implem
 			
 
 			///yeni
-			//hmVars.put("dosyaNumarasi", "2013/62638");
+			//hmVars.put("dosyaNumarasi", "2022/162488");
 			hmVars.put("dosyaNumarasi", dosya.getBasvuruno());
 			hmVars.put("takipNumarasi", dosya.getReferansno());
 			hmVars.put("basvuruTuru", "MARKA");
 			hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
-			hmVars.put("islemAdi", "Marka Yenileme");
+			hmVars.put("islemAdi", "Marka Tescil Ücreti Ödeme Talebi");
 			
 			
 			hmVars.put("eposta", rumuzEsleme.getEposta());
 			hmVars.put("telefonNumarasi", rumuzEsleme.getTelefon());
-			
-			hmVars.put("talepTuru", "Tam");
 			
 			hmVars.put("islemAdimi", String.valueOf(islemAdimi));
 			
