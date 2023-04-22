@@ -10,13 +10,9 @@
 	- işlemlerdeki ortalama süreler
 	- genel rakamlar. (günlük işlenen) saatlik işlenen haftalık işlenen falan... 
 
-130. elmaciy ile girince yetkisiz menüler de çıkıyor, yetkisiz menülere tıklayınca ise atıyor. 
-
-
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
 	
 	
-129.  processDef ekranına variable gridini ekle. ayrıca variable editorune variable ekleme butonu da konulsun. 
 71. process definitions a bunu görebileceklerin listesini mi eklesek? sadece o kişiler ya da o roldekiler bu işlemi  görebilecek böylece. 
 117. process stepte bir değişiklik olduğunda ya da processdef de, bunu tüm instancelere uygula gibi bir seçenek olabilir mi? 
 100. process definition ekranındaki class name ler verify edilmeli. parametreler de oyle. Command builder yapılabilir elle yazılmak yerine. 
@@ -49,7 +45,6 @@
 		Sorna değiştirilir. 
 
 
-111. onay adımına süreci baştan başlatama seçeneği ekle. RESTART action
 114. EXTERNAL approve aşamasında bize onaylayan kullanıcıyı da göndermelerine olanak sağlanabilir. 
 115. onay ve redde /CALLBACK i entegre et. Bazı durumlarda gerekebilir. 
 
@@ -60,11 +55,9 @@
 107. serverde sistemi backup a eklettir. 
 108. serverde mysql i servis halinde çalıştır mümkünse. 
 16. kurulan yerde chrome güncellenmemeli
-115. süreç isimlerini standart hale getir. 
 116. build sonrası kodları makineden silmesi lazım. Zaten bir süre sonra build scriptini serverden kaldır. Sadece JAR deploy ederiz. 
 117. Sadece dosya no değil, yıl parametresi de alınsın yıllık ödeme süreçlerinde. Yoksa önümüzdeki yıl ödeme yapmaz. 
-125. application daki default kaydetme işlerini artık sil. 
-126. tüm stepleri tek pakette topla. ayrı paketlere gerek yok. sonuçta hepsi step
+125. application console rundaki default kaydetme işlerini artık sil. 
 
 42. Step generate ederken step adına parametre geçirebilmeliyiz. 
 	Örneğin kredi kartı aynı anda tek kullanılabilir. 
@@ -73,15 +66,10 @@
 	Örnek 3 kredi kartı varsa aynı anda her bir kart için 1 er , toplamda 3 kredi karti stepi çalışabilir. 
 
 
-113. 2nci adımda geri almada hata çıktı. Backward işlemi garip çalışıyor. Bunu belki silip adım adım geri alma yerine direk retry ettiririz. 
-86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
-41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
-	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
-
 
 119. CRM ekranladındaki işlem adımları ile stepleri ve discovererleri, descriptionları falan eşitle. 
 
-118. Marka tescil ücreti işini de yap. 
+118. Marka tescil ücreti işini tamamla, rumuzla ilgili sorun çözülünce. 
 
 200. ödemesi yapılan işlemin tekrar ödenmemesi için sigorta olarak yapabileceğimiz bir kontrol var mı? 
 
@@ -92,6 +80,13 @@
 	
 202. discover butonuna basılınca, process aktif değilse hiçbirşey olmuyor. 
 	Bu durumda ya buton disable edilsin, ya uyarı verilsin ya da ekrandan çalışyırıldığında process disable de olsa çalıştırılabilsin. 
+111. onay adımına süreci baştan başlatama seçeneği ekle. RESTART action
+
+113. 2nci adımda geri almada hata çıktı. Backward işlemi garip çalışıyor. Bunu belki silip adım adım geri alma yerine direk retry ettiririz. 
+86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
+41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
+	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
+
 
 -------------------.
 TAMAMLANANLAR 
@@ -174,4 +169,5 @@ TAMAMLANANLAR
 	Aktif edevlet sifreleri ---> post getEdevletRumuz
  	Aktif kredi kartlari ---> post getKrediKartRumuz
 119. getRumuzEslemeByIslemAdimi funcitondaki daki test amacli bilgileri silmeyi unurma
+129.  processDef ekranına variable gridini ekle. ayrıca variable editorune variable ekleme butonu da konulsun. 
  	

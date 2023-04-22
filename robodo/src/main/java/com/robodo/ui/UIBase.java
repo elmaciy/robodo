@@ -137,8 +137,8 @@ public class UIBase extends AppLayout {
 		 if (authenticatedUser==null) {
 			 return false;
 		 }
-		 
-		return authenticatedUser.getAuthorities().stream().anyMatch(p->p.getAuthority().equals(UserRole.ROLE_ADMIN));
+		 		 
+		return authenticatedUser.getAuthorities().stream().anyMatch(p->p.getAuthority().equals("ROLE_%s".formatted(UserRole.ROLE_ADMIN)));
 	}
 
 	private VerticalLayout  getRoterLinks() {
@@ -158,14 +158,21 @@ public class UIBase extends AppLayout {
 		String accountUsername=authenticatedUser==null ? "" : authenticatedUser.getUsername();
 		Button btLogout =  makeMenuOption("Logout [%s]".formatted(accountUsername),VaadinIcon.EXIT.create(),(p)->confirmAndRun("Logout", "Sure to logout", ()->securityService.logout()));
 		
-		lay.add(linkInstance);
-		lay.add(lnkShowThread);
-		lay.add(linkProcess);
-		lay.add(lnkEmailTemplate);
-		lay.add(linkParameter);
-		lay.add(linkUser);
-		lay.add(linkDashboard);
-		lay.add(btLogout);
+		if (isAdmin()) {
+			lay.add(linkInstance);
+			lay.add(lnkShowThread);
+			lay.add(linkProcess);
+			lay.add(lnkEmailTemplate);
+			lay.add(linkParameter);
+			lay.add(linkUser);
+			lay.add(linkDashboard);
+		} else {
+			lay.add(linkInstance);
+			lay.add(lnkShowThread);
+			lay.add(linkDashboard);
+		}
+
+		lay.add(btLogout);			
 		
 		lay.setSpacing(false);
 		
