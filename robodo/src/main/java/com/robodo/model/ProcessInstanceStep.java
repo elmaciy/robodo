@@ -186,6 +186,10 @@ public class ProcessInstanceStep {
 	public void setInstanceVariables(String instanceVariables) {
 		this.instanceVariables = instanceVariables;
 	}
+
+	public boolean isFinished() {
+		return this.getStatus().equals(STATUS_COMPLETED) || this.getStatus().equals(STATUS_FAILED);
+	}
 	
 	
 	

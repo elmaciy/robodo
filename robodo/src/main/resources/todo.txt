@@ -89,6 +89,9 @@
 	Bu eşlemede hem kk hem de edevlet dolu olmalıdır. iki rumuz için ayrı kayıt girmemelidir. 
 	by konu takip edeilecek ve servis düzelince ona göre tekrar yazılacak. 
 	Ayrıca ekranda başkalarının girdiği kayıtlar çalışmıyor. 
+	
+202. discover butonuna basılınca, process aktif değilse hiçbirşey olmuyor. 
+	Bu durumda ya buton disable edilsin, ya uyarı verilsin ya da ekrandan çalışyırıldığında process disable de olsa çalıştırılabilsin. 
 
 -------------------.
 TAMAMLANANLAR 

@@ -269,5 +269,9 @@ public class ProcessInstance {
 		return latestProcessedStep.getStepCode().equals(step.getStepCode());
 	}
 
+	public boolean isFinished() {
+		return this.getStatus().equals(STATUS_COMPLETED);
+	}
+
 
 }

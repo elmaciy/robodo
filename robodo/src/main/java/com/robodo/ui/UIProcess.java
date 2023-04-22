@@ -136,6 +136,24 @@ public class UIProcess extends UIBase {
 		.setHeader("Status").setWidth("2em");
 		
 		gridProcessDefinition.addComponentColumn(p-> {
+			Button btnShowVariables=new Button("", new Icon(VaadinIcon.LIST_OL));
+			btnShowVariables.addThemeVariants(ButtonVariant.LUMO_SMALL);
+			btnShowVariables.addClickListener(e -> {
+				showVariableEditor(
+						p.getInitialInstanceVariables(), 
+						"variables for %s [%s]".formatted(p.getCode(), p.getDescription()), 
+						false, 
+						(hmUpdated)->{
+							p.setInitialInstanceVariables(HelperUtil.hashMap2String(hmUpdated));
+							processService.saveProcessDefinition(p);
+						});
+				btnShowVariables.setEnabled(true);
+			});
+			return btnShowVariables;
+		})
+		.setHeader("Vars").setWidth("2em").setTextAlign(ColumnTextAlign.CENTER);
+		
+		gridProcessDefinition.addComponentColumn(p-> {
 			Button btnShowError=new Button("", new Icon(VaadinIcon.LIST));
 			btnShowError.addThemeVariants(ButtonVariant.LUMO_SMALL);
 			btnShowError.addClickListener(e->{
@@ -346,9 +364,6 @@ public class UIProcess extends UIBase {
 		
 	}
 	
-
-	
-
 	private HorizontalLayout makeReorderingComponent(ProcessDefinition processDefinition,  ProcessDefinitionStep step) {
 		HorizontalLayout lay=new HorizontalLayout();
 		lay.setMargin(false);

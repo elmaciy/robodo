@@ -2,8 +2,6 @@ package com.robodo.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +9,6 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
@@ -143,7 +140,14 @@ public class UIInstance extends UIBase {
 			btnShowVars.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL);
 			btnShowVars.setDisableOnClick(true);
 			btnShowVars.addClickListener(e -> {
-				showVariables(p);
+				showVariableEditor(
+						p.getInstanceVariables(), 
+						"variables for %s [%s]".formatted(p.getCode(), p.getDescription()), 
+						p.isFinished(), 
+						(hmUpdated)->{
+							p.setInstanceVariables(HelperUtil.hashMap2String(hmUpdated));
+							processService.saveProcessInstance(p);
+						});
 				btnShowVars.setEnabled(true);
 			});
 			return btnShowVars;
@@ -491,9 +495,8 @@ public class UIInstance extends UIBase {
 		btnRefresh.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 		btnRefresh.addClickListener(e->fillStepsGrid(grid, processInstance.getCode(), null));
 
-		grid.addColumn(p -> p.getId()).setHeader(btnRefresh).setWidth("2em");
-		grid.addColumn(p -> p.getStepCode()).setHeader("Code").setAutoWidth(true);
-		grid.addColumn(p -> p.getOrderNo()).setHeader("Order").setWidth("3em").setVisible(false);
+		grid.addColumn(p -> p.getId()).setHeader(btnRefresh).setWidth("2em").setFrozen(true);
+		grid.addColumn(p -> p.getStepCode()).setHeader("Code").setAutoWidth(true).setFrozen(true);
 		grid.addColumn(p -> p.getStatus()).setHeader("Status").setWidth("5em");
 		grid.addColumn(p -> p.getError()).setHeader("Error").setWidth("5em");
 		grid.addColumn(p -> p.getCommands()).setHeader("Command Executed").setAutoWidth(true);
@@ -529,6 +532,20 @@ public class UIInstance extends UIBase {
 		grid.addColumn(p -> dateFormat(p.getStarted())).setHeader("Started").setAutoWidth(true);
 		grid.addColumn(p -> dateFormat(p.getFinished())).setHeader("Finished").setAutoWidth(true);
 		grid.addComponentColumn(p -> {
+			Button btnShowVariables = new Button("", new Icon(VaadinIcon.LIST_OL));
+			btnShowVariables.addThemeVariants(ButtonVariant.LUMO_SMALL);
+			btnShowVariables.setEnabled(processInstance.isTheLatestStep(p));
+			btnShowVariables.addClickListener(e -> {
+				showVariableEditor(
+						p.getInstanceVariables(), 
+						"variables for step %s / [%s]".formatted(p.getStepCode(), p.getProcessInstance().getCode()), 
+						true, 
+						(hm)->{});
+				btnShowVariables.setEnabled(true);
+			});
+			return btnShowVariables;
+		}).setHeader("Vars").setWidth("2em").setTextAlign(ColumnTextAlign.CENTER).setFrozenToEnd(true);
+		grid.addComponentColumn(p -> {
 			Button btnBackward = new Button("", new Icon(VaadinIcon.BACKWARDS));
 			btnBackward.addThemeVariants( ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
 			btnBackward.setEnabled(processInstance.isTheLatestStep(p));
@@ -536,7 +553,7 @@ public class UIInstance extends UIBase {
 				confirmAndRun("Backward", "Sure to backward the step : %s?".formatted(p.getStepCode()), ()->setBackward(grid, p));
 			});
 			return btnBackward;
-		}).setHeader("Rollback").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
+		}).setHeader("Rollback").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER).setFrozenToEnd(true);
 
 		grid.getColumns().forEach(col -> {
 			col.setResizable(true);
@@ -555,9 +572,8 @@ public class UIInstance extends UIBase {
 
 		Tab tabLogs = new Tab(VaadinIcon.NOTEBOOK.create(), new Span("Logs"));
 		Tab tabFiles = new Tab(VaadinIcon.PICTURE.create(), new Span("Files"));
-		Tab tabVariables = new Tab(VaadinIcon.PICTURE.create(), new Span("Variables"));
 
-		Tabs tabs = new Tabs(tabLogs, tabFiles, tabVariables);
+		Tabs tabs = new Tabs(tabLogs, tabFiles);
 		tabs.setSelectedTab(tabLogs);
 		tabs.setWidth("100%");
 
@@ -576,9 +592,7 @@ public class UIInstance extends UIBase {
 				tabContent.add(logMemo);
 			} else if (event.getSelectedTab().equals(tabFiles)) {
 				tabContent.add(generateTabForFiles(step));
-			} else if (event.getSelectedTab().equals(tabVariables)) {
-				tabContent.add(makeVariableGrid(processInstance, step));
-			}
+			} 
 		});
 
 		grid.addSelectionListener(p -> {
@@ -592,9 +606,7 @@ public class UIInstance extends UIBase {
 					tabContent.add(logMemo);
 				} else if (tabs.getSelectedTab().equals(tabFiles)) {
 					tabContent.add(generateTabForFiles(selection.get()));
-				} else if (tabs.getSelectedTab().equals(tabVariables)) {
-					tabContent.add(makeVariableGrid(processInstance, selection.get()));
-				} 
+				}  
 
 			}
 		});
@@ -711,134 +723,7 @@ public class UIInstance extends UIBase {
 		return lay;
 	}
 
-	private void showVariables(ProcessInstance processInstance) {
-		Dialog dialog = new Dialog();
-		String title = "instance variable for %s (%s)".formatted(processInstance.getCode(),
-				processInstance.getDescription());
-		dialog.setHeaderTitle(title);
-
-		VerticalLayout dialogLayout = new VerticalLayout();
-		dialogLayout.setSizeFull();
-
-		dialogLayout.add(makeVariableGrid(processInstance, null));
-
-		dialog.add(dialogLayout);
-		Button cancelButton = new Button("Close", e -> dialog.close());
-		dialog.getFooter().add(cancelButton);
-		dialog.setWidth("80%");
-		dialog.setHeight("80%");
-		dialog.setResizable(true);
-		dialog.setCloseOnEsc(true);
-		dialog.setCloseOnOutsideClick(true);
-		dialog.open();
-
-	}
-
-	private Grid<KeyValue> makeVariableGrid(ProcessInstance processInstance, ProcessInstanceStep processInstanceStep) {
-		
-		String variablesStr = processInstanceStep == null ? processInstance.getInstanceVariables() : processInstanceStep.getInstanceVariables(); 
-		HashMap<String, String> hmVars = HelperUtil.str2HashMap(variablesStr);
-		Grid<KeyValue> gridVars = new Grid<>(KeyValue.class, false);
-		gridVars.addColumn(p -> p.getKey()).setHeader("Variable Name").setWidth("30%");
-		gridVars.addComponentColumn(p -> {
-			boolean isMultiline=p.getValue()!=null && p.getValue().split("\n|\r").length>1;
-			if (isMultiline) {
-				TextArea textArea=new TextArea();
-				textArea.setWidthFull();
-				textArea.setValue(p.getValue() == null ? "" : p.getValue());
-				textArea.setHeight("10em");
-				textArea.addValueChangeListener(e -> {
-					p.setValue(e.getValue());
-				});
-				return textArea;
-			} 
-			TextField textField = new TextField();
-			textField.setWidthFull();
-			textField.setValue(p.getValue() == null ? "" : p.getValue());
-			textField.addValueChangeListener(e -> {
-				p.setValue(e.getValue());
-			});
-			return textField;
-			
-			
-		}).setHeader("Value").setWidth("55%");
-
-		gridVars.addComponentColumn(p -> {
-			Button btnUpdate = new Button("", new Icon(VaadinIcon.DOWNLOAD));
-			btnUpdate.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-			btnUpdate.setDisableOnClick(true);
-			btnUpdate.addClickListener(e -> {
-				hmVars.put(p.getKey(), p.getValue());
-				String changedVariables = HelperUtil.hashMap2String(hmVars);
-				if (processInstanceStep==null) {
-					processInstance.setInstanceVariables(changedVariables);
-					
-				} else {
-					processInstanceStep.setInstanceVariables(changedVariables);
-				}
-				
-				processService.saveProcessInstance(processInstance);
-				notifyInfo("variable changed");
-				btnUpdate.setEnabled(true);
-			});
-			return btnUpdate;
-		}).setHeader("Update").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
-
-		gridVars.addComponentColumn(p -> {
-			Button btnRemove = new Button("", new Icon(VaadinIcon.TRASH));
-			btnRemove.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
-			btnRemove.addClickListener(e -> {
-				
-				confirmAndRun("Remove", "Sure to remove this parameter : %s=%s?".formatted(p.getKey(),HelperUtil.limitString(p.getValue(),500)), ()->{
-					hmVars.remove(p.getKey());
-					String changedVariables = HelperUtil.hashMap2String(hmVars);
-					
-					if (processInstanceStep==null) {
-						processInstance.setInstanceVariables(changedVariables);
-						
-					} else {
-						processInstanceStep.setInstanceVariables(changedVariables);
-					}
-					
-					processService.saveProcessInstance(processInstance);
-					notifyInfo("variable removed");
-					setVariableGridItems(gridVars, hmVars);
-				});
-				
-			});
-			return btnRemove;
-		}).setHeader("Remove").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
-
-		gridVars.getColumns().forEach(col -> {
-			col.setResizable(true);
-		});
-		gridVars.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,
-				GridVariant.LUMO_ROW_STRIPES);
-		gridVars.setSizeFull();
-
-		setVariableGridItems(gridVars, hmVars);
-		
-		return gridVars;
-	}
-
-	private void setVariableGridItems(Grid<KeyValue> gridVars, HashMap<String, String> hmVars) {
-		List<KeyValue> items = new ArrayList<KeyValue>();
-		hmVars.keySet().stream().forEach(key -> {
-			items.add(new KeyValue(key, (String) hmVars.get(key)));
-		});
-
-		Collections.sort(items, new Comparator<KeyValue>() {
-
-			@Override
-			public int compare(KeyValue o1, KeyValue o2) {
-				return o1.getKey().compareTo(o2.getKey());
-			}
-
-		});
-
-		gridVars.setItems(items);
-
-	}
+	
 
 
 

@@ -5,7 +5,12 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -13,7 +18,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessDefinition;
-import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
 import com.robodo.model.RunningProcess;
@@ -24,7 +28,6 @@ import com.robodo.singleton.QueueSingleton;
 import com.robodo.singleton.RunnerSingleton;
 import com.robodo.threads.ThreadForDiscoveryRunner;
 import com.robodo.utils.HelperUtil;
-import com.robodo.utils.RunnerUtil;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -35,6 +38,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Image;
@@ -253,6 +257,42 @@ public class UIBase extends AppLayout {
 		dialog.open();
 	}	
 
+
+	public void acceptInput(String header, String caption, String initialValue, Predicate<String> validator, BiConsumer<String, Boolean> dataConsumer) {
+		ConfirmDialog dialog = new ConfirmDialog();
+		dialog.setHeader(header);
+		dialog.setText(caption);
+		dialog.setCancelable(true);
+		dialog.setCancelText("Cancel");
+		dialog.setRejectable(false);
+		dialog.setConfirmText("OK");
+		
+		TextField tf=new TextField();
+		tf.setValue(initialValue==null ? "" : initialValue);
+		tf.setWidth("100%");
+		tf.setAutoselect(true);
+		tf.setAutofocus(true);
+		dialog.add(tf);
+
+		tf.focus();
+		
+		dialog.addConfirmListener(event -> {
+			boolean isValid = validator.test(tf.getValue());
+
+			if (!isValid) {
+				notifyError("invalid entry");
+			}
+			
+			dataConsumer.accept(tf.getValue(), isValid);
+		});
+		
+		dialog.addCancelListener(event->{
+			dataConsumer.accept(null, Boolean.FALSE);
+		});
+		
+		dialog.open();
+	}	
+
 	
 	public void showLogs(String header, String logs) {
 		ConfirmDialog dialog = new ConfirmDialog();
@@ -444,6 +484,147 @@ public class UIBase extends AppLayout {
 
 
 
+	private void setVariableGridItems(Grid<KeyValue> gridVars, HashMap<String, String> hmVars) {
+		List<KeyValue> items = new ArrayList<KeyValue>();
+		hmVars.keySet().stream().forEach(key -> {
+			items.add(new KeyValue(key, (String) hmVars.get(key)));
+		});
+
+		Collections.sort(items, new Comparator<KeyValue>() {
+
+			@Override
+			public int compare(KeyValue o1, KeyValue o2) {
+				return o1.getKey().compareTo(o2.getKey());
+			}
+
+		});
+
+		gridVars.setItems(items);
+
+	}
+
+
 	
+	public void showVariableEditor(
+			String instanceVariables, String title, 
+			boolean readonly,
+			Consumer<HashMap<String, String>> action) {
+		Dialog dialog = new Dialog();
+
+		dialog.setHeaderTitle(title);
+
+		String variablesStr = instanceVariables; 
+		HashMap<String, String> hmVars = HelperUtil.str2HashMap(variablesStr);
+		Grid<KeyValue> gridVars = new Grid<>(KeyValue.class, false);
+
+		//------------------------------------
+		Button btnAddNewVariable = new Button("Add New Variable", new Icon(VaadinIcon.PLUS));
+		btnAddNewVariable.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+		btnAddNewVariable.setWidthFull();
+		btnAddNewVariable.setEnabled(!readonly);
+		btnAddNewVariable.addClickListener(e->{
+			
+			String initialValue="NEW_%s".formatted(String.valueOf(System.currentTimeMillis()));
+			
+			acceptInput("Variable", "Enter variable name", initialValue, (p)->HelperUtil.isValidCode(p), (parameteName, confirmed)->{
+				if (confirmed) {
+					hmVars.put(parameteName,"-");
+					setVariableGridItems(gridVars, hmVars);
+					action.accept(hmVars);
+					notifySuccess("%s is added!".formatted(parameteName));
+				}
+			});
+
+		});
+
+		gridVars.addColumn(p->p.getKey()).setKey("key").setHeader(btnAddNewVariable).setWidth("30%");
+				
+		gridVars.addComponentColumn(p -> {
+			boolean isMultiline=p.getValue()!=null && p.getValue().split("\n|\r").length>1;
+			if (isMultiline) {
+				TextArea textArea=new TextArea();
+				textArea.setWidthFull();
+				textArea.setValue(p.getValue() == null ? "" : p.getValue());
+				textArea.setHeight("10em");
+				textArea.setReadOnly(readonly);
+				textArea.addValueChangeListener(e -> {
+					p.setValue(e.getValue());
+				});
+				return textArea;
+			} 
+			TextField textField = new TextField();
+			textField.setWidthFull();
+			textField.setValue(p.getValue() == null ? "" : p.getValue());
+			textField.setReadOnly(readonly);
+			textField.addValueChangeListener(e -> {
+				p.setValue(e.getValue());
+			});
+			return textField;
+			
+			
+		}).setHeader("Value").setWidth("55%");
+
+		gridVars.addComponentColumn(p -> {
+			Button btnUpdate = new Button("", new Icon(VaadinIcon.DOWNLOAD));
+			btnUpdate.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+			btnUpdate.setDisableOnClick(true);
+			btnUpdate.setEnabled(!readonly);
+			btnUpdate.addClickListener(e -> {
+				hmVars.put(p.getKey(), p.getValue());
+				setVariableGridItems(gridVars, hmVars);
+				action.accept(hmVars);
+				
+				notifySuccess("%s is updated!");
+
+			});
+			return btnUpdate;
+		}).setHeader("Update").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
+
+		gridVars.addComponentColumn(p -> {
+			Button btnRemove = new Button("", new Icon(VaadinIcon.TRASH));
+			btnRemove.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+			btnRemove.setEnabled(!readonly);
+			btnRemove.addClickListener(e -> {
+								
+				confirmAndRun("Remove", "Sure to remove parameter [%s] ?".formatted(p.getKey()), ()->{
+					hmVars.remove(p.getKey());
+					setVariableGridItems(gridVars, hmVars);
+					action.accept(hmVars);
+					notifySuccess("%s is removed!".formatted(p.getKey()));
+
+				});
+				
+			});
+			return btnRemove;
+		}).setHeader("Remove").setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER);
+
+		gridVars.getColumns().forEach(col -> {
+			col.setResizable(true);
+		});
+		gridVars.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,
+				GridVariant.LUMO_ROW_STRIPES);
+		gridVars.setSizeFull();
+
+		setVariableGridItems(gridVars, hmVars);
+		
+		//return gridVars;
+		
+		dialog.add(gridVars);
+
+		dialog.add(gridVars);
+		Button cancelButton = new Button("Close", e -> dialog.close());
+		dialog.getFooter().add(cancelButton);
+		dialog.setWidth("80%");
+		dialog.setHeight("80%");
+		dialog.setResizable(true);
+		dialog.setCloseOnEsc(true);
+		dialog.setCloseOnOutsideClick(true);
+		dialog.open();
+
+	}
+
+
+
+
 
 }
