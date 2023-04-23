@@ -45,8 +45,7 @@ public class ThreadForDiscoveryRunner implements Runnable {
 		processService.saveProcessDefinition(processDefinition);
 		
 		boolean hasError=false;
-		HashMap<String, String> hmForProcessDefinition = HelperUtil.str2HashMap(processDefinition.getInitialInstanceVariables());
-		runner.appendVariables(hmForProcessDefinition);
+		
 		
 		int discovered=0;
 		try {

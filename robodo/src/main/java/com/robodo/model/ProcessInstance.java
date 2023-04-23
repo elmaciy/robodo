@@ -273,5 +273,9 @@ public class ProcessInstance {
 		return this.getStatus().equals(STATUS_COMPLETED);
 	}
 
+	public boolean isInitialStatus() {
+		return this.getStatus().equals(STATUS_NEW) || this.getStatus().equals(STATUS_RETRY);
+	}
+
 
 }

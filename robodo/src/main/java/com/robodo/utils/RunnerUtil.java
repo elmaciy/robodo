@@ -34,10 +34,17 @@ public class RunnerUtil {
 
 	public void runProcessInstance(ProcessInstance processInstance) {
 		ProcessDefinition processDefinition=processService.getProcessDefinitionById(processInstance.getProcessDefinitionId());
-
+		
 		RunnerSingleton.getInstance().start(processInstance.getCode(), processDefinition.getCode());
 				
 		hmValues = HelperUtil.str2HashMap(processInstance.getInstanceVariables());
+		
+		if (processInstance.isInitialStatus()) {
+			HashMap<String, String> hmForProcessDefinition = HelperUtil.str2HashMap(processDefinition.getInitialInstanceVariables());
+			hmForProcessDefinition.entrySet().forEach(kv->{
+				hmValues.put(kv.getKey(), kv.getValue());
+			});
+		}
 
 		List<ProcessInstanceStep> steps = processInstance.getSteps();
 		
@@ -336,13 +343,6 @@ public class RunnerUtil {
 
 	public void clearVariables() {
 		this.hmValues.clear();
-		
-	}
-
-	public void appendVariables(HashMap<String, String> hm) {
-		hm.entrySet().stream().forEach(e->{
-			this.hmValues.put(e.getKey(), e.getValue());
-		});
 		
 	}
 

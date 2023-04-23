@@ -43,13 +43,14 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 			
 			//hmVars.put("dosyaNumarasi", "2019/06601");
 			hmVars.put("dosyaNumarasi", dosya.getBasvuruno());
-			//hmVars.put("bulusAdi", "HİYALURONİK ASİT/KİTOSAN/KARBOKSİMETİL SELÜLOZ İÇEREN BİYOUYUMLU, BİYOBOZUNUR VE BİYOEMİLEBİLİR BİR ADEZYON MEMBRAN VE ÜRETİM YÖNTEMİ");
 			hmVars.put("bulusAdi", "TBD");
 			hmVars.put("takipNumarasi", dosya.getReferansno());
+		
+			//bunlar process initial variables den alınabilir. 
 			hmVars.put("basvuruTuru", "PATENT");
 			hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
 			hmVars.put("islemAdi", "Yıllık Ücret Ödeme");
-
+			
 
 			
 			hmVars.put("eposta", rumuzEsleme.getEposta());
