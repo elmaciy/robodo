@@ -13,6 +13,7 @@
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
 	
 	
+	
 71. process definitions a bunu görebileceklerin listesini mi eklesek? sadece o kişiler ya da o roldekiler bu işlemi  görebilecek böylece. 
 117. process stepte bir değişiklik olduğunda ya da processdef de, bunu tüm instancelere uygula gibi bir seçenek olabilir mi? 
 100. process definition ekranındaki class name ler verify edilmeli. parametreler de oyle. Command builder yapılabilir elle yazılmak yerine. 
