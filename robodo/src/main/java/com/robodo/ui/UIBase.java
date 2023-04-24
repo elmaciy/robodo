@@ -342,7 +342,10 @@ public class UIBase extends AppLayout {
 		return integerField;
 	}
 	
-	
+	Grid<RunningProcess> gridRunningProcessKeys = new Grid<>(RunningProcess.class, false);
+	Grid<KeyValue> gridRunningThreadGroup = new Grid<>(KeyValue.class, false);
+	Grid<KeyValue> gridQueue = new Grid<>(KeyValue.class, false);
+
 	public void showThreads() {
 		Dialog dialog = new Dialog();
 		String title="Threads";
@@ -352,11 +355,21 @@ public class UIBase extends AppLayout {
 		dialogLayout.setSizeFull();
 		
 		//--------------------------------------------------------------------
-		Grid<RunningProcess> gridRunningProcessKeys = new Grid<>(RunningProcess.class, false);
-		gridRunningProcessKeys.addColumn(p -> p.getName()).setHeader("Name").setAutoWidth(true);
+		gridRunningProcessKeys.addColumn(p -> p.getName()).setHeader("Name").setWidth("40%").setFrozen(true);
 		gridRunningProcessKeys.addColumn(p -> p.getGroup()).setHeader("Group").setAutoWidth(true);
 		gridRunningProcessKeys.addColumn(p -> dateFormat(LocalDateTime.ofInstant(Instant.ofEpochMilli(p.getStartTs()), ZoneId.systemDefault()))).setHeader("Started").setAutoWidth(true);
-
+		gridRunningProcessKeys.addComponentColumn(p -> {
+			Button btRemove= new Button("", new Icon(VaadinIcon.TRASH));
+			btRemove.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+			btRemove.addClickListener(e -> {
+				confirmAndRun("Delete", "Sure to remove %s?".formatted(p.getName()), ()->{
+					//QueueSingleton.getInstance().removeByCode(p.getKey());
+					RunnerSingleton.getInstance().remove(p.getName(), p.getGroup());
+					refreshThreadGrids();
+				});	
+			});
+			return btRemove;
+		}).setHeader("Remove").setWidth("20%").setFrozenToEnd(true);
 		gridRunningProcessKeys.setWidthFull();
 		gridRunningProcessKeys.getColumns().forEach(col->{col.setResizable(true);});
 		gridRunningProcessKeys.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
@@ -365,10 +378,9 @@ public class UIBase extends AppLayout {
 		
 	
 		//--------------------------------------------------------------------
-		Grid<KeyValue> gridRunningThreadGroup = new Grid<>(KeyValue.class, false);
-		gridRunningThreadGroup.addColumn(p -> p.getKey()).setHeader("Thread group").setAutoWidth(true);
-		gridRunningThreadGroup.addColumn(p -> p.getValue()).setHeader("Active Thread Count").setAutoWidth(true);
-
+		gridRunningThreadGroup.addColumn(p -> p.getKey()).setHeader("Thread group").setWidth("%70").setFrozen(true);
+		gridRunningThreadGroup.addColumn(p -> p.getValue()).setHeader("Active Thread Count").setWidth("%30");
+		
 		gridRunningThreadGroup.setWidthFull();
 		gridRunningThreadGroup.getColumns().forEach(col->{col.setResizable(true);});
 		gridRunningThreadGroup.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
@@ -376,9 +388,19 @@ public class UIBase extends AppLayout {
 		gridRunningThreadGroup.setItems(RunnerSingleton.getInstance().getThreadGroupsAsKeyValue());
 
 		//--------------------------------------------------------------------
-		Grid<KeyValue> gridQueue = new Grid<>(KeyValue.class, false);
-		gridQueue.addColumn(p -> p.getKey()).setHeader("Queue Instance Code").setAutoWidth(true);
-		gridQueue.addColumn(p -> p.getValue()).setHeader("Status").setAutoWidth(true);
+		gridQueue.addColumn(p -> p.getKey()).setHeader("Queue Instance Code").setWidth("60%").setFrozen(true);
+		gridQueue.addColumn(p -> p.getValue()).setHeader("Status").setWidth("20%").setFrozen(false);
+		gridQueue.addComponentColumn(p -> {
+			Button btRemove= new Button("", new Icon(VaadinIcon.TRASH));
+			btRemove.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+			btRemove.addClickListener(e -> {
+				confirmAndRun("Delete", "Sure to remove %s?".formatted(p.getKey()), ()->{
+					QueueSingleton.getInstance().removeByCode(p.getKey());
+					refreshThreadGrids();
+				});	
+			});
+			return btRemove;
+		}).setHeader("Remove").setWidth("20%").setFrozenToEnd(true);
 
 		gridQueue.setWidthFull();
 		gridQueue.getColumns().forEach(col->{col.setResizable(true);});
@@ -390,9 +412,7 @@ public class UIBase extends AppLayout {
 		Button btRefresh = new Button("Refresh all", new Icon(VaadinIcon.REFRESH));
 		btRefresh.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
 		btRefresh.addClickListener(e -> {
-			gridRunningProcessKeys.setItems(RunnerSingleton.getInstance().getProcesses());
-			gridRunningThreadGroup.setItems(RunnerSingleton.getInstance().getThreadGroupsAsKeyValue());
-			gridQueue.setItems(QueueSingleton.getInstance().getAllAsKeyValue());
+			refreshThreadGrids();
 		});
 		
 		gridQueue.setMaxWidth("30%");
@@ -424,6 +444,13 @@ public class UIBase extends AppLayout {
 		
 	}
 	
+	private void refreshThreadGrids() {
+		gridRunningProcessKeys.setItems(RunnerSingleton.getInstance().getProcesses());
+		gridRunningThreadGroup.setItems(RunnerSingleton.getInstance().getThreadGroupsAsKeyValue());
+		gridQueue.setItems(QueueSingleton.getInstance().getAllAsKeyValue());
+		
+	}
+
 	static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
 

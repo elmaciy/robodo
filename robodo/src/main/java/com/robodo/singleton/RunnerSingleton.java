@@ -112,5 +112,14 @@ public class RunnerSingleton {
 		return (int) getProcesses().stream().filter(p->p.getGroup().equals(group)).count();
 	}
 
+	public void remove(String name, String group) {
+		var itemToRemove = 
+			this.hmRunningInstances.entrySet().stream()
+					.filter(p->p.getKey().getName().equals(name) && p.getKey().getGroup().equals(group)).findAny().orElse(null);
+		if (itemToRemove!=null) {
+			this.hmRunningInstances.remove(itemToRemove);
+		}
+	}
+
 
 }

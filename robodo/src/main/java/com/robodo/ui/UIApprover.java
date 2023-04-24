@@ -143,6 +143,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		buttonsLayout.setWidthFull();
 		buttonsLayout.setAlignItems(Alignment.CENTER);
 		
+		
 		VerticalLayout instanceLay= makeInstanceLayout(processInstance);
 
 		Scroller scroller=new Scroller(instanceLay);
@@ -209,6 +210,23 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	
 	private VerticalLayout makeInstanceLayout(ProcessInstance processInstance) {
 		VerticalLayout layout=new VerticalLayout();
+		
+		if (processInstance.isFailed()) {
+			Button labelErr=new Button("Error : %s".formatted(HelperUtil.limitString(processInstance.getError(), 200)));
+			labelErr.addThemeVariants(ButtonVariant.LUMO_ERROR);
+			labelErr.setWidthFull();
+			labelErr.addClickListener(p->{
+				ProcessInstanceStep latestStep = processInstance.getLatestProcessedStep();
+				if (latestStep==null) {
+					notifyInfo("no last step found");
+					return;
+				}
+				
+				showLogs(processInstance.getCode()+ " " + processInstance.getDescription(), latestStep.getLogs());
+			});
+			layout.add(labelErr);
+		}
+		
 		processInstance.getSteps().forEach(step->{
 			List<ProcessInstanceStepFile> files= processService.getProcessInstanceStepFilesByStepId(step);
 			

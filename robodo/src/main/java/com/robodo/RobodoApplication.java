@@ -334,32 +334,6 @@ public class RobodoApplication {
 			}
 			
 			
-			//--------------------------------------------
-			
-			ProcessDefinition apiProcess=new ProcessDefinition();
-			apiProcess.setCode("APIPROCESS");
-			apiProcess.setDescription("Sample Api Process");
-			apiProcess.setMaxAttemptCount(2);
-			apiProcess.setMaxThreadCount(4);
-			apiProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
-			apiProcess.setDiscovererClass("DiscoverProcessApi");
-			apiProcess.setActive(false);
-
-			ProcessDefinitionStep apiSampleStep=new ProcessDefinitionStep();
-			apiSampleStep.setCode("DummyApiSteps");
-			apiSampleStep.setDescription("api test steps");
-			apiSampleStep.setOrderNo("01");
-			apiSampleStep.setSingleAtATime(false);
-			apiSampleStep.setCommands("runStepClass DummyApiSteps");
-			apiSampleStep.setProcessDefinition(apiProcess);
-			
-
-			apiProcess.getSteps().add(apiSampleStep);
-			
-			if (processDefinitionRepo.findByCode(apiProcess.getCode()).isEmpty()) {
-				processDefinitionRepo.save(apiProcess);
-			}
-			
 			
 			//---------------------------------------------------
 			EmailTemplate emailForYillikPatentUcreti=new EmailTemplate();

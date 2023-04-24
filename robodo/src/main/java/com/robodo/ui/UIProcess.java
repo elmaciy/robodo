@@ -171,6 +171,11 @@ public class UIProcess extends UIBase {
 			btnRun.setDisableOnClick(true);
 			btnRun.setEnabled(!p.getSteps().isEmpty());
 			btnRun.addClickListener(e -> {
+				if (!p.isActive()) {
+					notifyError("process definition is not active. No discoverer will be started.");
+					return;
+				}
+				
 				runProcessDiscoverer(p);
 				gridProcessDefinition.select(p);
 				btnRun.setEnabled(true);

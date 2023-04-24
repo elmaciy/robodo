@@ -56,4 +56,9 @@ public class QueueSingleton {
 		return this.queue.size();
 	}
 
+	public void removeByCode(String code) {
+		this.queue.removeIf(p->p.getCode().equals(code));
+		
+	}
+
 }

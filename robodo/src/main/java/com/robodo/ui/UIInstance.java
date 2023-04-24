@@ -82,6 +82,7 @@ public class UIInstance extends UIBase {
 		}
 		comboForProcessDefinition.addValueChangeListener(e->{
 			ProcessDefinition processDefinition = e.getValue();
+			
 			fillProcessInstanceGrid(processDefinition);
 			btnRunDiscoverer.setEnabled(e.getValue()!=null);
 			UI.getCurrent().getSession().setAttribute("selectedProcessDefinition", e.getValue());
