@@ -49,7 +49,8 @@ public class DiscoverOdenecekMarkaTescilUcretleri extends BaseEpatsStep implemen
 			hmVars.put("dosyaNumarasi", dosya.getBasvuruno());
 			hmVars.put("takipNumarasi", dosya.getReferansno());
 			hmVars.put("basvuruTuru", "MARKA");
-			hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
+			//hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
+			hmVars.put("islemGrubu", "Sahip/Ücret/Diğer İşlemler");
 			hmVars.put("islemAdi", "Marka Tescil Ücreti Ödeme Talebi");
 			
 			

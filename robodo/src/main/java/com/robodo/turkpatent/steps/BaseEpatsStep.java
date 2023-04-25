@@ -28,6 +28,7 @@ import com.robodo.turkpatent.pages.PageEdevletLogin;
 import com.robodo.turkpatent.pages.PageEpatsBasvuruYapan;
 import com.robodo.turkpatent.pages.PageEpatsBenimSayfam;
 import com.robodo.turkpatent.pages.PageEpatsDosyaBilgisi;
+import com.robodo.turkpatent.pages.PageEpatsDosyaBilgisiDigerIslemler;
 import com.robodo.turkpatent.pages.PageEpatsHizmetDokumu;
 import com.robodo.turkpatent.pages.PageEpatsHome;
 import com.robodo.turkpatent.pages.PageEpatsIslemSonucu;
@@ -64,6 +65,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	PageEpatsTahakkuklarim epatsTahakkuklarim;
 	PageEpatsBasvuruYapan epatsBasvuruYapan;
 	PageEpatsDosyaBilgisi epatsDosyaBilgisi;
+	PageEpatsDosyaBilgisiDigerIslemler epatsDosyaBilgisiDigerIslemler;
 	PageEpatsHizmetDokumu epatsHizmetDokumu;
 	PageEpatsOnIzleme epatsOnIzleme;
 	PageEpatsIslemSonucu epatsIslemSonucu;
@@ -93,6 +95,7 @@ public class BaseEpatsStep extends BaseWebStep {
 		this.epatsTahakkuklarim=new PageEpatsTahakkuklarim(selenium);
 		this.epatsBasvuruYapan=new PageEpatsBasvuruYapan(selenium);
 		this.epatsDosyaBilgisi=new PageEpatsDosyaBilgisi(selenium);
+		this.epatsDosyaBilgisiDigerIslemler=new PageEpatsDosyaBilgisiDigerIslemler(selenium);
 		this.epatsHizmetDokumu=new PageEpatsHizmetDokumu(selenium);
 		this.epatsOnIzleme = new PageEpatsOnIzleme(selenium);
 		this.epatsIslemSonucu=new PageEpatsIslemSonucu(selenium);
@@ -163,6 +166,8 @@ public class BaseEpatsStep extends BaseWebStep {
 		epatsBasvuruYapan.devamEt();
 	}
 	
+	
+	
 	boolean isPatent() {
 		return "PATENT".contains(getVariable("basvuruTuru"));
 	}
@@ -173,6 +178,15 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 	public void dosyaBilgisiAra() {
 		epatsDosyaBilgisi.basvuruNumarasiAra(getVariable("dosyaNumarasi"));
+	}
+	
+	public void dosyaBilgisiDigerIslemler() {
+		epatsDosyaBilgisiDigerIslemler.basvuruNumarasiAra(getVariable("dosyaNumarasi"));
+		waitProcessorGone();
+		takeStepScreenShot(processInstanceStep, "dosya bilgisi sonucu", false);
+		selenium.sleep(3L);
+		epatsDosyaBilgisiDigerIslemler.devamEt();
+		
 	}
 	
 	public void dosyaBilgisiDogrulaDevamEt() {

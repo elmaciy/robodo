@@ -48,7 +48,8 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 		
 			//bunlar process initial variables den alınabilir. 
 			hmVars.put("basvuruTuru", "PATENT");
-			hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
+			//hmVars.put("islemGrubu", "Başvuru Sonrası İşlemler");
+			hmVars.put("islemGrubu", "Sahip/Ücret/Diğer İşlemler");
 			hmVars.put("islemAdi", "Yıllık Ücret Ödeme");
 			
 

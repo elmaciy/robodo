@@ -21,7 +21,8 @@ public class EpatsMarkaYenilemeTahakkukOlusturStep extends BaseEpatsStep {
 		
 		
 		sistemeGiris();
-		dosyaAra();
+		//bu kısımı iptal ettik çünkü işlem adımı Patentteki gibi olacak 
+		//dosyaAra();
 		islemSec();
 		basvuruYap();
 		dosyaBilgisiDogrulaDevamEt();

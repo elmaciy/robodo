@@ -84,6 +84,7 @@
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
 
+52. 2 süreci de Patent gibi yeni menü akışına uyarla
 
 -------------------.
 TAMAMLANANLAR 

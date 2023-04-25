@@ -1,9 +1,6 @@
 package com.robodo.turkpatent.steps;
 
-import java.util.List;
-
 import com.robodo.model.ProcessInstanceStep;
-import com.robodo.turkpatent.apimodel.RumuzEsleme;
 import com.robodo.utils.RunnerUtil;
 
 public class EpatsYillikPatentTahakkukOlusturStep extends BaseEpatsStep {
@@ -24,10 +21,11 @@ public class EpatsYillikPatentTahakkukOlusturStep extends BaseEpatsStep {
 		dosyaLinkleriGuncelle(this.processInstanceStep.getProcessInstance());
 		
 		sistemeGiris();
-		dosyaAra();
+		//dosyaAra();
 		islemSec();
 		basvuruYap();
-		dosyaBilgisiDogrulaDevamEt();
+		dosyaBilgisiDigerIslemler();
+		//dosyaBilgisiDogrulaDevamEt();
 		hizmetDokumuDevamEt();
 		onizlemeKontrolveTahakkukOlustur();
 		tahakkukNumarasiAl();
@@ -38,6 +36,10 @@ public class EpatsYillikPatentTahakkukOlusturStep extends BaseEpatsStep {
 
 		
 	}
+
+
+
+	
 
 
 
