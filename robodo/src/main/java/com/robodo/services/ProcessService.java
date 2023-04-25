@@ -8,10 +8,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
+import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.robodo.base.BaseStep;
 import com.robodo.model.CorporateParameter;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
@@ -358,15 +361,15 @@ public class ProcessService {
 
 	public List<String> getStepClasses() {
 		String packageName=getEnvProperty("steps.package");
+
+		List<String> classes = new ArrayList<String>();
+				
+		Reflections reflections = new Reflections(packageName);    
+		Set<Class<? extends BaseStep>> classes2 = reflections.getSubTypesOf(BaseStep.class);
+		classes2.forEach(clz->{
+			classes.add(clz.getSimpleName());
+		});
 		
-		InputStream stream = ClassLoader.getSystemClassLoader()
-		          .getResourceAsStream(packageName.replaceAll("[.]", "/"));
-		        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-		        
-        var classes = reader.lines().filter(p->p.endsWith(".class"))
-        		.map(p->StringUtils.substringBeforeLast(p, ".class"))
-        		.collect(Collectors.toList());
-        
         Collections.sort(classes, new Comparator<String>() {
 
 			@Override
