@@ -11,6 +11,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import javax.management.RuntimeErrorException;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,10 +40,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.nimbusds.jose.shaded.json.JSONArray;
 import com.robodo.model.EmailTemplate;
+import com.robodo.model.ExecutionResultsForCommand;
 import com.robodo.model.KeyValue;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
+import com.robodo.services.ProcessService;
 
 public class HelperUtil {
 	
@@ -447,6 +451,9 @@ public class HelperUtil {
 	public static boolean isValidCommand(String command) {
 		return command!=null && command.length()>3 &&  command.length()<=1000;
 	}
+
+
+
 
 
 

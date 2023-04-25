@@ -268,6 +268,10 @@ public class ProcessInstance {
 		}
 		return latestProcessedStep.getStepCode().equals(step.getStepCode());
 	}
+	
+	public ProcessInstanceStep getFirstStep() {
+		return this.getSteps().stream().findFirst().get();
+	}
 
 	public boolean isFinished() {
 		return this.getStatus().equals(STATUS_COMPLETED);
@@ -276,6 +280,12 @@ public class ProcessInstance {
 	public boolean isInitialStatus() {
 		return this.getStatus().equals(STATUS_NEW) || this.getStatus().equals(STATUS_RETRY);
 	}
+
+	public boolean toRetry() {
+		return this.getStatus().equals(STATUS_RETRY);
+	}
+
+	
 
 
 }

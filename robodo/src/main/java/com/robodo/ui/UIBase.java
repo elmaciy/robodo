@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.robodo.model.KeyValue;
@@ -658,7 +660,108 @@ public class UIBase extends AppLayout {
 	}
 
 
+	
+	public void showValueSelectionDialog(
+			String title, 
+			String selection, 
+			List<String> selectItems,
+			Consumer<String> stepConsumer,
+			TextField lovField) {
+		Dialog dialog = new Dialog();
 
+		dialog.setHeaderTitle(title);
+		
+		Grid<String> gridSteps = new Grid<>(String.class, false);
+		
+		TextField tfSearch=new TextField();
+		tfSearch.setWidthFull();
+		tfSearch.setValueChangeMode(ValueChangeMode.EAGER);
+		tfSearch.addValueChangeListener(e->{
+			List<String> filtered = selectItems.stream().filter(p->StringUtils.containsIgnoreCase(p, e.getValue())).toList();
+			gridSteps.setItems(filtered);
+		});
 
+		gridSteps.addColumn(p->p).setKey("item").setHeader(tfSearch).setWidth("80%");
+		gridSteps.addComponentColumn(p -> {
+			Button btnChoose = new Button("", new Icon(VaadinIcon.CHECK));
+			btnChoose.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+			btnChoose.setDisableOnClick(true);
+			btnChoose.addClickListener(e -> {
+				stepConsumer.accept(p);
+				lovField.setValue(p);
+				dialog.close();
+			});
+			return btnChoose;
+		}).setHeader("Select").setWidth("20%").setTextAlign(ColumnTextAlign.CENTER);
+		
+		gridSteps.addItemDoubleClickListener(e->{
+			if (e.getItem()==null) {
+				return;
+			}
+			stepConsumer.accept(e.getItem());
+			lovField.setValue(e.getItem());
+			dialog.close();
+		});
+		
+		gridSteps.setItems(selectItems);
+		if (selection!=null && selectItems.contains(selection) ) {
+			gridSteps.select(selection);
+		}
+		
+
+		gridSteps.getColumns().forEach(col -> {
+			col.setResizable(true);
+		});
+		
+		gridSteps.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT,GridVariant.LUMO_ROW_STRIPES);
+		gridSteps.setSizeFull();
+
+		dialog.add(gridSteps);
+
+		dialog.add(gridSteps);
+		Button cancelButton = new Button("Close", e -> dialog.close());
+		dialog.getFooter().add(cancelButton);
+		dialog.setWidth("40%");
+		dialog.setHeight("80%");
+		dialog.setResizable(true);
+		dialog.setCloseOnEsc(true);
+		dialog.setCloseOnOutsideClick(true);
+		dialog.open();
+
+	}
+
+	public TextField makeLovSelectionField(String title, String selection, List<String> values, boolean readonly, Consumer<String> consumer) {
+		Button btShowLov=new Button("",VaadinIcon.LIST.create());
+		Button btClear=new Button("",VaadinIcon.CLOSE_SMALL.create());
+		TextField lovField = new TextField();
+		
+		btShowLov.addThemeVariants(ButtonVariant.LUMO_SMALL);
+		btShowLov.setVisible(!readonly);
+		btShowLov.addClickListener(e->{
+			showValueSelectionDialog(title, selection, values, consumer, lovField);
+		});
+		
+		btClear.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE);
+		btClear.setVisible(!readonly);
+		btClear.addClickListener(e->{
+			if (lovField.getValue()==null || lovField.getValue().strip().isBlank()) {
+				return;
+			}
+			consumer.accept(null);
+		});
+		
+		
+		lovField.setReadOnly(true);
+		if (selection!=null) {
+			lovField.setValue(selection);
+		}
+		
+		lovField.setClearButtonVisible(false);
+		lovField.setSuffixComponent(btClear);
+		lovField.setPrefixComponent(btShowLov);
+		lovField.setWidthFull();
+		
+		return lovField;
+	}
 
 }

@@ -34,8 +34,9 @@ public class DummyGoogleSearchByKeywordStep extends BaseWebStep {
 		selenium.setValue(findElement, keyword);
 		selenium.enter();
 		takeStepScreenShot(this.processInstanceStep, "arama sonucu", true);
-
+		
 		setVariable("google.param", "set");
+		//throw new RuntimeException("dummy error occured. remove me. ");
 		
 	}
 	

@@ -8,6 +8,7 @@ import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.services.ProcessService;
 import com.robodo.singleton.RunnerSingleton;
+import com.robodo.utils.HelperUtil;
 
 public class ThreadForRetryFailed implements Runnable {
 	
@@ -51,6 +52,7 @@ public class ThreadForRetryFailed implements Runnable {
 		instance.setStarted(null);
 		instance.setFinished(null);
 		instance.setStatus(ProcessInstance.STATUS_RETRY);
+		
 		
 		for (var step : instance.getSteps()) {
 			step.setApprovalDate(null);

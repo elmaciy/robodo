@@ -542,7 +542,7 @@ public class BaseEpatsStep extends BaseWebStep {
 			throw new RuntimeException("getRumuzEslemeByIslemAdimi başarısız : %d".formatted(response.getResponseCode()));			
 		}
 		
-		rumuzEslemeleriResponse.print();
+		//rumuzEslemeleriResponse.print();
 		
 		return rumuzEslemeleriResponse;
 

@@ -36,6 +36,8 @@ public class ProcessDefinition {
 	@OneToMany(mappedBy = "processDefinition", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<ProcessDefinitionStep> steps;
 	String discovererClass;
+	String retryStep;
+	String failStep;
 	Integer maxAttemptCount;
 	Integer maxThreadCount;
 	boolean isActive;
@@ -153,6 +155,18 @@ public class ProcessDefinition {
 	}
 	public void setInitialInstanceVariables(String initialInstanceVariables) {
 		this.initialInstanceVariables = initialInstanceVariables;
+	}	
+	public String getRetryStep() {
+		return retryStep;
+	}
+	public void setRetryStep(String retryStep) {
+		this.retryStep = retryStep;
+	}
+	public String getFailStep() {
+		return failStep;
+	}
+	public void setFailStep(String failStep) {
+		this.failStep = failStep;
 	}
 	@PrePersist
 	protected void onCreate() {

@@ -1,5 +1,8 @@
 package com.robodo.services;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -351,6 +354,45 @@ public class ProcessService {
 
 	private String getCorporateParameterByCode(String parameterName) {
 		return getCorporateParametersAll().stream().filter(p->p.getCode().equals(parameterName)).map(p->p.getValue()).findAny().orElse(null);
+	}
+
+	public List<String> getStepClasses() {
+		String packageName=getEnvProperty("steps.package");
+		
+		InputStream stream = ClassLoader.getSystemClassLoader()
+		          .getResourceAsStream(packageName.replaceAll("[.]", "/"));
+		        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+		        
+        var classes = reader.lines().filter(p->p.endsWith(".class"))
+        		.map(p->StringUtils.substringBeforeLast(p, ".class"))
+        		.collect(Collectors.toList());
+        
+        Collections.sort(classes, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				return o1.compareTo(o2);
+			}
+		});
+        return classes;
+	}
+
+	public List<String> getCommandList() {
+		List<String> commands = getStepClasses().stream().filter(p->!p.startsWith("Discover")).map(p->"runStepClass %s".formatted(p))
+				.collect(Collectors.toList());
+		
+		commands.add("waitHumanInteraction");
+		List<EmailTemplate> emailTemplateAll = getEmailTemplateAll();
+		commands.addAll(emailTemplateAll.stream().map(p->"waitHumanInteraction %s".formatted(p.getCode())).toList());
+		
+		Collections.sort(commands, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				return o1.compareTo(o2);
+			}
+		});
+		return commands;
 	}
 
 

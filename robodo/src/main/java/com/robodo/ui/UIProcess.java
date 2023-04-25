@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,6 +27,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -77,16 +79,32 @@ public class UIProcess extends UIBase {
 		}).setHeader("Description").setAutoWidth(true);
 		
 		gridProcessDefinition.addComponentColumn(p ->{
-			return makeEditorTextField(
-					p.getDiscovererClass(),
-					(c)->{
-						p.setDiscovererClass(c);
-						processService.saveProcessDefinition(p);
-						notifySuccess("process definition saved");
-					}, 
-					(e)-> HelperUtil.isValidForFileName(e));
-		}).setHeader("Discoverer");
-
+			return makeDiscovererStepChooser(
+						"Discoverer step for process %s".formatted(p.getCode()), 
+						p.getDiscovererClass(), 
+						false,  
+						(step)->updateDiscovererStep(p,step)
+					);
+		}).setHeader("Discoverer Step");
+		
+		gridProcessDefinition.addComponentColumn(p ->{
+			return makeStepChooser(
+						"Retry step for process %s".formatted(p.getCode()), 
+						p.getRetryStep(), 
+						false,  
+						(step)->updateRetryStep(p,step)
+					);
+		}).setHeader("Retry Step");
+		
+		gridProcessDefinition.addComponentColumn(p ->{
+			return makeStepChooser(
+						"Fail step for process %s".formatted(p.getCode()), 
+						p.getFailStep(), 
+						false,  
+						(step)->updateFailStep(p,step)
+					);
+		}).setHeader("Fail Step");
+		
 		gridProcessDefinition.addComponentColumn(p -> {
 			var fld = makeIntegerMinMaxField(p.getMaxAttemptCount(), 0, 100);
 			fld.addValueChangeListener(e -> {
@@ -233,14 +251,15 @@ public class UIProcess extends UIBase {
 		}).setHeader("Description").setAutoWidth(true);
 		
 		gridProcessDefinitionSteps.addComponentColumn(p ->{
-			return makeEditorTextField(
-					p.getCommands(),
+			return makeCommandChooser(
+					"choose command for step %s".formatted(p.getCode()), 
+					p.getCommands(), 
+					hasAnyInstance(p.getProcessDefinition()),
 					(c)->{
 						p.setCommands(c);
 						processService.saveProcessDefinition(p.getProcessDefinition());
-						notifySuccess("step saved");
-					}, 
-					(e)-> HelperUtil.isValidCommand(e));
+						notifySuccess("step command updated");
+					});
 		}).setHeader("Command to run").setAutoWidth(true);
 		
 		gridProcessDefinitionSteps.addComponentColumn(p -> {
@@ -369,6 +388,43 @@ public class UIProcess extends UIBase {
 		
 	}
 	
+	private void updateDiscovererStep(ProcessDefinition processDefinition, String stepClassName) {
+		processDefinition.setDiscovererClass(stepClassName);
+		processService.saveProcessDefinition(processDefinition);
+		refreshProcessDefinitionGrid();
+		notifyInfo("discoverer step changed to %s".formatted(stepClassName));
+	}
+	
+	private void updateRetryStep(ProcessDefinition processDefinition, String stepClassName) {
+		processDefinition.setRetryStep(stepClassName);
+		processService.saveProcessDefinition(processDefinition);
+		refreshProcessDefinitionGrid();
+		notifyInfo("retry step changed to %s".formatted(stepClassName));
+	}
+	
+	private void updateFailStep(ProcessDefinition processDefinition, String stepClassName) {
+		processDefinition.setFailStep(stepClassName);
+		processService.saveProcessDefinition(processDefinition);
+		refreshProcessDefinitionGrid();
+		notifyInfo("fail step changed to %s".formatted(stepClassName));
+	}
+	
+	public TextField makeStepChooser(String title, String command, boolean readonly, Consumer<String> consumer) {
+		List<String> classes = processService.getStepClasses().stream().filter(p->!p.startsWith("Discover")).toList();
+		return makeLovSelectionField(title, command, classes, readonly, consumer);
+	}
+	
+	public TextField makeDiscovererStepChooser(String title, String command, boolean readonly, Consumer<String> consumer) {
+		List<String> classes = processService.getStepClasses().stream().filter(p->p.startsWith("Discover")).toList();
+		return makeLovSelectionField(title, command, classes, readonly, consumer);
+	}
+
+	public TextField makeCommandChooser(String title, String command, boolean readonly, Consumer<String> consumer) {
+		return makeLovSelectionField(title, command, processService.getCommandList(), readonly, consumer);
+	}
+	
+	
+
 	private HorizontalLayout makeReorderingComponent(ProcessDefinition processDefinition,  ProcessDefinitionStep step) {
 		HorizontalLayout lay=new HorizontalLayout();
 		lay.setMargin(false);

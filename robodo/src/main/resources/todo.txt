@@ -1,6 +1,5 @@
 105. AUTO IT yi ekle robodo ya https://www.autoitscript.com/site/autoit/
 
-
 17. dashboardda iş bazında bekleyenler, tamamlananlar vs görünsün. 
 	dashboard verileri bir job ile arada sırada güncellenmeli. anlık çekilmemeli. 
 	- uzun süre (süre parametrik) hareketsiz bekleyenlerin raporu. 
@@ -12,38 +11,25 @@
 
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
 	
-	
-	
-71. process definitions a bunu görebileceklerin listesini mi eklesek? sadece o kişiler ya da o roldekiler bu işlemi  görebilecek böylece. 
+71. process definitions a bunu görebileceklerin vs listesini mi eklesek? sadece o kişiler ya da o roldekiler bu işlemi  görebilecek böylece. 
 117. process stepte bir değişiklik olduğunda ya da processdef de, bunu tüm instancelere uygula gibi bir seçenek olabilir mi? 
-100. process definition ekranındaki class name ler verify edilmeli. parametreler de oyle. Command builder yapılabilir elle yazılmak yerine. 
 94. süreç duplikasyonu olabilmeli. yeni tanımlama yapmay kolaylaştırır. duplike edilen kayıt direk invalid başlasın. 
-64. işlemlerin çalışacağı / çalışmayacağı zaman aralıkları olmalı. 
-	Mesela bazı işlemler öğlene kadar yapılabilir gibi... 
-	hatta bazı günlerde hiç çalışma olmamalı falan...
-118. process definition a Retry step koyalım . zorunlu alan değil. Retry edilince bu step çalışsın. 
-99. Process tanımlama ekranında aynı anda aynı discoverer in birden fazla aktif olması engellenebilir mi? 
-	hem discoverer alanı hem aktif alanında trigger olmalıdır. 
+64. işlemlerin çalışacağı / çalışmayacağı zaman aralıkları olmalı. 	Mesela bazı işlemler öğlene kadar yapılabilir gibi... 	hatta bazı günlerde hiç çalışma olmamalı falan...
 
 
+99. Process tanımlama ekranında aynı anda aynı discoverer in birden fazla aktif olması engellenebilir mi? hem discoverer alanı hem aktif alanında trigger olmalıdır. 
 
 47. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
-81. instance silme yerine arşive taşıma yapalım. 
-	Aramaya arşivde ara seçeneği eklenirse arşivde de arama yapar. 
+81. instance silme yerine arşive taşıma yapalım. Aramaya arşivde ara seçeneği eklenirse arşivde de arama yapar. 
 	
-
 87. tanım ekranlarındaki boxlara maxlength falan koy  - db yi aşmasın 
 
 129. discoverer çalışırken de max thread count u dikkate alsın. 
 
-
-98. Parametre ekranında sifre türü parametreler bir sekilde sifre olarak görünsün. Açık görünmesin. Ya da ayrı bir gizli parametre alanı yapaım. 
-
-			
-126. ilk açılıştaki Default admin şifresi rastgele oluşturulsun ve console a yazılsın. 
-		Sorna değiştirilir. 
-
+98. Parametre ekranında sifre türü parametreler bir sekilde sifre olarak görünsün. Açık görünmesin. Ya da ayrı bir gizli parametre alanı yapalım. 
+		
+126. ilk açılıştaki Default admin şifresi rastgele oluşturulsun ve console a yazılsın. Sorna değiştirilir. 
 
 114. EXTERNAL approve aşamasında bize onaylayan kullanıcıyı da göndermelerine olanak sağlanabilir. 
 115. onay ve redde /CALLBACK i entegre et. Bazı durumlarda gerekebilir. 
@@ -56,6 +42,7 @@
 116. build sonrası kodları makineden silmesi lazım. Zaten bir süre sonra build scriptini serverden kaldır. Sadece JAR deploy ederiz. 
 117. Sadece dosya no değil, yıl parametresi de alınsın yıllık ödeme süreçlerinde. Yoksa önümüzdeki yıl ödeme yapmaz. 
 125. application console rundaki default kaydetme işlerini artık sil. 
+119. CRM ekranladındaki işlem adımları ile stepleri ve discovererleri, descriptionları falan eşitle. 
 
 42. Step generate ederken step adına parametre geçirebilmeliyiz. 
 	Örneğin kredi kartı aynı anda tek kullanılabilir. 
@@ -63,28 +50,20 @@
 	KK_NO parametresi replace olur ve böylece o step her bir kredi kartı için tekil olacak şekilde çalışabilir. 
 	Örnek 3 kredi kartı varsa aynı anda her bir kart için 1 er , toplamda 3 kredi karti stepi çalışabilir. 
 
-
-
-119. CRM ekranladındaki işlem adımları ile stepleri ve discovererleri, descriptionları falan eşitle. 
-
 118. Marka tescil ücreti işini tamamla, rumuzla ilgili sorun çözülünce. 
 
 200. ödemesi yapılan işlemin tekrar ödenmemesi için sigorta olarak yapabileceğimiz bir kontrol var mı? 
 
-201. Rumuz eşleme ekranlarında sıkıntılar var. Model değiştirilmeli. bir işlem adımı için aktif olan 1 adet eşleme olmalıdır. 
-	Bu eşlemede hem kk hem de edevlet dolu olmalıdır. iki rumuz için ayrı kayıt girmemelidir. 
-	by konu takip edeilecek ve servis düzelince ona göre tekrar yazılacak. 
-	Ayrıca ekranda başkalarının girdiği kayıtlar çalışmıyor. 
-	
-
 111. onay adımına süreci baştan başlatama seçeneği ekle. RESTART action
 
 113. 2nci adımda geri almada hata çıktı. Backward işlemi garip çalışıyor. Bunu belki silip adım adım geri alma yerine direk retry ettiririz. 
+
 86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
 
 52. 2 süreci de Patent gibi yeni menü akışına uyarla
+53. yeni statüleri uyarla => RPA Onayı Bekleniyor-->4, RPA Ödeme Tamamlandı --> 5, RPA hata aldı --6
 
 -------------------.
 TAMAMLANANLAR 
@@ -172,4 +151,5 @@ TAMAMLANANLAR
 202. discover butonuna basılınca, process aktif değilse hiçbirşey olmuyor. 
 	Bu durumda ya buton disable edilsin, ya uyarı verilsin ya da ekrandan çalışyırıldığında process disable de olsa çalıştırılabilsin. 
 42. gözlem linkinde eğer hata varsa bu hata gösterilmelidir. 
-	
+100. process definition ekranındaki class name ler verify edilmeli. parametreler de oyle. Command builder yapılabilir elle yazılmak yerine. 
+118. process definition a Retry ve failed step koyalım . zorunlu alan değil. Retry/fail edilince bu step çalışsın. 
