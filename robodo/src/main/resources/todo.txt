@@ -12,12 +12,9 @@
 34. onay için ikinci ya da 3ncü hatırlatma mailine gerek var mı? Zaman aşımı olacak mı? Olunca ne olacak?
 	
 71. process definitions a bunu görebileceklerin vs listesini mi eklesek? sadece o kişiler ya da o roldekiler bu işlemi  görebilecek böylece. 
-117. process stepte bir değişiklik olduğunda ya da processdef de, bunu tüm instancelere uygula gibi bir seçenek olabilir mi? 
 94. süreç duplikasyonu olabilmeli. yeni tanımlama yapmay kolaylaştırır. duplike edilen kayıt direk invalid başlasın. 
 64. işlemlerin çalışacağı / çalışmayacağı zaman aralıkları olmalı. 	Mesela bazı işlemler öğlene kadar yapılabilir gibi... 	hatta bazı günlerde hiç çalışma olmamalı falan...
 
-
-99. Process tanımlama ekranında aynı anda aynı discoverer in birden fazla aktif olması engellenebilir mi? hem discoverer alanı hem aktif alanında trigger olmalıdır. 
 
 47. instance gridi lazy loading li olmalı. filtreleri güçlü olmalı. 
 49. headerde son X gün içinde yaratılanlar diye bir filtre olsun, default 1 alsın
@@ -40,9 +37,7 @@
 107. serverde sistemi backup a eklettir. 
 108. serverde mysql i servis halinde çalıştır mümkünse. 
 116. build sonrası kodları makineden silmesi lazım. Zaten bir süre sonra build scriptini serverden kaldır. Sadece JAR deploy ederiz. 
-117. Sadece dosya no değil, yıl parametresi de alınsın yıllık ödeme süreçlerinde. Yoksa önümüzdeki yıl ödeme yapmaz. 
 125. application console rundaki default kaydetme işlerini artık sil. 
-119. CRM ekranladındaki işlem adımları ile stepleri ve discovererleri, descriptionları falan eşitle. 
 
 42. Step generate ederken step adına parametre geçirebilmeliyiz. 
 	Örneğin kredi kartı aynı anda tek kullanılabilir. 
@@ -54,17 +49,13 @@
 
 200. ödemesi yapılan işlemin tekrar ödenmemesi için sigorta olarak yapabileceğimiz bir kontrol var mı? 
 
-111. onay adımına süreci baştan başlatama seçeneği ekle. RESTART action
-
 113. 2nci adımda geri almada hata çıktı. Backward işlemi garip çalışıyor. Bunu belki silip adım adım geri alma yerine direk retry ettiririz. 
 
 86. business variable de örneğin smtp.host ezilince sonra bozuluyor ama eski haline getirince mail atma aşamasında düzelmiyor. 
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
-
-52. 2 süreci de Patent gibi yeni menü akışına uyarla
-53. yeni statüleri uyarla => RPA Onayı Bekleniyor-->4, RPA Ödeme Tamamlandı --> 5, RPA hata aldı --6
-
+	 
+	 
 -------------------.
 TAMAMLANANLAR 
 -------------------
@@ -153,3 +144,7 @@ TAMAMLANANLAR
 42. gözlem linkinde eğer hata varsa bu hata gösterilmelidir. 
 100. process definition ekranındaki class name ler verify edilmeli. parametreler de oyle. Command builder yapılabilir elle yazılmak yerine. 
 118. process definition a Retry ve failed step koyalım . zorunlu alan değil. Retry/fail edilince bu step çalışsın. 
+117. Sadece dosya no değil, yıl parametresi de alınsın yıllık ödeme süreçlerinde. Yoksa önümüzdeki yıl ödeme yapmaz. 
+52. 2 süreci de Patent gibi yeni menü akışına uyarla
+53. yeni statüleri uyarla => RPA Onayı Bekleniyor-->4, RPA Ödeme Tamamlandı --> 5, RPA hata aldı --6
+111. onay adımına süreci baştan başlatama seçeneği ekle. RESTART action
