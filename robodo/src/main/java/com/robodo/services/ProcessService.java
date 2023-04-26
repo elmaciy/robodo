@@ -1,10 +1,17 @@
 package com.robodo.services;
 
+import java.io.IOException;
+import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -38,6 +45,7 @@ import com.robodo.repo.ProcessInstanceStepFileRepo;
 import com.robodo.repo.UserRepo;
 import com.robodo.repo.UserRoleRepo;
 import com.robodo.utils.HelperUtil;
+import com.vaadin.flow.component.html.Main;
 
 @Service
 @Transactional
@@ -385,7 +393,17 @@ public class ProcessService {
 		
 		List<String> classes= new ArrayList<String>();
 		try {
-			List<String> collectedClasses = ClassPath.from(ClassLoader.getSystemClassLoader())
+			ClassPath.from(Main.class.getClassLoader())
+			.getAllClasses()
+			.stream().forEach(c->{
+				if (c.getPackageName().contains("robodo")) {
+					System.err.println("aaaaaaaaaaaaa  %s \t %s => %s".formatted(c.getPackageName(), c.getName(), c.getResourceName()));
+					
+				}
+			});
+			
+			
+			List<String> collectedClasses = ClassPath.from(Main.class.getClassLoader())
 			.getAllClasses()
 			.stream()
 			.filter(clz->clz.getPackageName().equals(packageName))
@@ -397,8 +415,8 @@ public class ProcessService {
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("class loader error to load classes in package : %s".formatted(packageName));
-		}
-			
+		} 
+	
 		for (String className : classes) {
 			System.err.println("xxxxxxxxxxxxxxxxx   Class name : %s".formatted(className));
 		}
