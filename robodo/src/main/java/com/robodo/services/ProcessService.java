@@ -1,8 +1,5 @@
 package com.robodo.services;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +11,7 @@ import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -355,20 +353,39 @@ public class ProcessService {
 		return this.env.getProperty(parameterName);
 	}
 
+	
+
 	private String getCorporateParameterByCode(String parameterName) {
 		return getCorporateParametersAll().stream().filter(p->p.getCode().equals(parameterName)).map(p->p.getValue()).findAny().orElse(null);
 	}
 
+	@Cacheable("stepClasses")
 	public List<String> getStepClasses() {
 		String packageName=getEnvProperty("steps.package");
 
+
+		/*
 		List<String> classes = new ArrayList<String>();
-				
-		Reflections reflections = new Reflections(packageName);    
+		
+		Reflections reflections = new Reflections(packageName);   
+
 		Set<Class<? extends BaseStep>> classes2 = reflections.getSubTypesOf(BaseStep.class);
 		classes2.forEach(clz->{
 			classes.add(clz.getSimpleName());
 		});
+		*/
+		
+
+
+		Reflections reflections = new Reflections(packageName);
+		List<String> classes= reflections.getSubTypesOf(BaseStep.class).stream()
+				.map(c->c.getSimpleName())
+				.collect(Collectors.toList());
+		
+		for (String className : classes) {
+			System.err.println("xxxxxxxxxxxxxxxxx   Class name : %s".formatted(className));
+		}
+		
 		
         Collections.sort(classes, new Comparator<String>() {
 
