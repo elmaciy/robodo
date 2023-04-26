@@ -393,6 +393,7 @@ public class ProcessService {
 		
 		List<String> classes= new ArrayList<String>();
 		try {
+			/*
 			ClassPath.from(Main.class.getClassLoader())
 			.getAllClasses()
 			.stream().forEach(c->{
@@ -401,12 +402,12 @@ public class ProcessService {
 					
 				}
 			});
-			
+			*/
 			
 			List<String> collectedClasses = ClassPath.from(Main.class.getClassLoader())
 			.getAllClasses()
 			.stream()
-			.filter(clz->clz.getPackageName().equals(packageName))
+			.filter(clz->clz.getPackageName().endsWith(packageName))
 			.map(clz->clz.getSimpleName())
 			.collect(Collectors.toList());
 			
