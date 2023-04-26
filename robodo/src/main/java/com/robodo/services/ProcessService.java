@@ -5,13 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.robodo.base.BaseStep;
+import com.google.common.reflect.ClassPath;
 import com.robodo.model.CorporateParameter;
 import com.robodo.model.EmailTemplate;
 import com.robodo.model.ProcessDefinition;
@@ -376,17 +373,37 @@ public class ProcessService {
 		*/
 		
 
-
+		/*
 		Reflections reflections = new Reflections(packageName);
 		List<String> classes= reflections.getSubTypesOf(BaseStep.class).stream()
 				.map(c->c.getSimpleName())
 				.collect(Collectors.toList());
 		
+		
+		*/
+		
+		
+		List<String> classes= new ArrayList<String>();
+		try {
+			List<String> collectedClasses = ClassPath.from(ClassLoader.getSystemClassLoader())
+			.getAllClasses()
+			.stream()
+			.filter(clz->clz.getPackageName().equals(packageName))
+			.map(clz->clz.getSimpleName())
+			.collect(Collectors.toList());
+			
+			classes.addAll(collectedClasses);
+	
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("class loader error to load classes in package : %s".formatted(packageName));
+		}
+			
 		for (String className : classes) {
 			System.err.println("xxxxxxxxxxxxxxxxx   Class name : %s".formatted(className));
 		}
-		
-		
+
+
         Collections.sort(classes, new Comparator<String>() {
 
 			@Override
