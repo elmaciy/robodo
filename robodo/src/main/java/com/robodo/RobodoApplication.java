@@ -105,6 +105,8 @@ public class RobodoApplication {
 			yillikPatentUcretiProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
 			yillikPatentUcretiProcess.setDiscovererClass("DiscoverOdenecekYillikPatentUcretleri");
 			yillikPatentUcretiProcess.setActive(false);
+			yillikPatentUcretiProcess.setRetryStep("OrtakRetryBildirmeStep");
+			yillikPatentUcretiProcess.setFailStep("OrtakFailBildirmeStep");
 			
 			
 
@@ -155,6 +157,8 @@ public class RobodoApplication {
 			markaTescilUcretiProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
 			markaTescilUcretiProcess.setDiscovererClass("DiscoverOdenecekMarkaTescilUcretleri");
 			markaTescilUcretiProcess.setActive(false);
+			markaTescilUcretiProcess.setRetryStep("OrtakRetryBildirmeStep");
+			markaTescilUcretiProcess.setFailStep("OrtakFailBildirmeStep");
 			
 			
 
@@ -204,7 +208,8 @@ public class RobodoApplication {
 			markaYenilemeProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
 			markaYenilemeProcess.setDiscovererClass("DiscoverOdenecekMarkaYenilemeUcretleri");
 			markaYenilemeProcess.setActive(false);
-
+			markaYenilemeProcess.setRetryStep("OrtakRetryBildirmeStep");
+			markaYenilemeProcess.setFailStep("OrtakFailBildirmeStep");
 
 			ProcessDefinitionStep stepMarkeYenilemeTahakkukOlustur=new ProcessDefinitionStep();
 			stepMarkeYenilemeTahakkukOlustur.setCode("MARKA_YENILEME_TAHAKKUK");
@@ -251,7 +256,9 @@ public class RobodoApplication {
 			markaItiraz2.setSteps(new ArrayList<ProcessDefinitionStep>());
 			markaItiraz2.setDiscovererClass("DiscoverMarka2nciItiraz");
 			markaItiraz2.setActive(false);
-
+			markaItiraz2.setRetryStep("OrtakRetryBildirmeStep");
+			markaItiraz2.setFailStep("OrtakFailBildirmeStep");
+			
 			ProcessDefinitionStep stepMarka2nciItirazOlustur=new ProcessDefinitionStep();
 			stepMarka2nciItirazOlustur.setCode("MARKA_2NCI_ITIRAZ_TAHAKKUK");
 			stepMarka2nciItirazOlustur.setDescription("Marka yayınına itirazın yeniden inceleneceği kayıtlar için tahakkuk oluşturma");

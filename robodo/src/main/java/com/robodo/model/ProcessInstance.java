@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.robodo.services.ProcessService;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -281,8 +283,34 @@ public class ProcessInstance {
 		return this.getStatus().equals(STATUS_NEW) || this.getStatus().equals(STATUS_RETRY);
 	}
 
-	public boolean toRetry() {
+	public boolean toBeRetried() {
 		return this.getStatus().equals(STATUS_RETRY);
+	}
+
+	public void retryProcessInstance(ProcessService processService) {
+
+		this.setError(null);
+		this.setFailed(false);
+		this.setStarted(null);
+		this.setFinished(null);
+		this.setStatus(ProcessInstance.STATUS_RETRY);
+		
+		
+		for (var step : this.getSteps()) {
+			step.setApprovalDate(null);
+			step.setApprovedBy(null);
+			step.setApproved(false);
+			step.setError(null);
+			step.setLogs(null);
+			step.setStarted(null);
+			step.setFinished(null);
+			step.setNotificationSent(false);
+			step.setStatus(ProcessInstanceStep.STATUS_NEW);
+			
+		}
+		
+	
+		
 	}
 
 	

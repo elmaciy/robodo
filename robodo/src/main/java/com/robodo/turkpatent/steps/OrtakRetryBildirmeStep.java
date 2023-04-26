@@ -26,6 +26,8 @@ public class OrtakRetryBildirmeStep extends BaseEpatsStep {
 	
 	@Override
 	public void run() {
+		dosyaTahakkukNoGuncelle("-");
+		dosyaDekontNoGuncelle("-");
 		dosyaLinkSifirla();
 	}
 

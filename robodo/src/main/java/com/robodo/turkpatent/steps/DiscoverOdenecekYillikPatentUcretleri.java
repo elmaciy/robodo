@@ -32,8 +32,8 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 		var instances = createEpatsInstances(
 				processDefinition,
 				dosyalar, 
-				(dosya)->"%s.%s".formatted(processDefinition.getCode(), dosya.getBasvuruno()),
-				(dosya)->"%s dosyası için Yıllık Ücret Ödeme".formatted(dosya.getBasvuruno())
+				(dosya)->"%s.%s (%d)".formatted(processDefinition.getCode(), dosya.getBasvuruno(), dosya.getYil()),
+				(dosya)->"%s (%d) dosyası için  Yıllık Ücret Ödeme".formatted(dosya.getBasvuruno(), dosya.getYil())
 				);
 		
 		instances.stream().forEach(p->{

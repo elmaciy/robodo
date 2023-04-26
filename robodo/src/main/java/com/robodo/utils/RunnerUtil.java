@@ -46,7 +46,7 @@ public class RunnerUtil {
 				hmValues.put(kv.getKey(), kv.getValue());
 			});
 			
-			if (processInstance.toRetry()) {
+			if (processInstance.toBeRetried()) {
 				if (processDefinition.getRetryStep()!=null && !processDefinition.getRetryStep().strip().isEmpty()) {
 					logger("Running retry class %s".formatted(processDefinition.getRetryStep()));
 					runStepClass(processInstance.getFirstStep(), processDefinition.getRetryStep());

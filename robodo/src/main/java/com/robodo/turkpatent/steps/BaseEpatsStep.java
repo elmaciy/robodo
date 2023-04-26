@@ -384,13 +384,13 @@ public class BaseEpatsStep extends BaseWebStep {
 				"dosya [%s] durum güncelle => %d".formatted(id, statu));
 	}
 	
-	public void dosyaLTahakkukNoGuncelle(String tahakkukNo) {
+	public void dosyaTahakkukNoGuncelle(String tahakkukNo) {
 		int id=Integer.valueOf(getVariable("dosya.id"));
 		dosyaGuncelle(DosyaRequest.create(id).withTahakkukNo(tahakkukNo),
 				"dosya [%s] tahakkuk no güncelle => %s".formatted(id, tahakkukNo));
 	}
 	
-	public void dosyaLDekontNoGuncelle(String dekontNo) {
+	public void dosyaDekontNoGuncelle(String dekontNo) {
 		int id=Integer.valueOf(getVariable("dosya.id"));
 		dosyaGuncelle(DosyaRequest.create(id).withDekontNo(dekontNo),
 				"dosya [%s] dekont no güncelle => %s".formatted(id, dekontNo));
@@ -504,20 +504,20 @@ public class BaseEpatsStep extends BaseWebStep {
 
 	public void dosyaTahakkukKaydet() {
 		String tahakkukNo=getVariable("tahakkukNo");
-		dosyaLTahakkukNoGuncelle(tahakkukNo);
+		dosyaTahakkukNoGuncelle(tahakkukNo);
 		dosyaDurumGuncelle(EPATS_STATU_ONAY_BEKLIYOR);
 	}
 
 
 	public void dosyaDekontKaydet() {
 		String dekontNo=getVariable("dekontNo");
-		dosyaLDekontNoGuncelle(dekontNo);
+		dosyaDekontNoGuncelle(dekontNo);
 	}
 	
 	public  void dosyaLinkSifirla() {
 		dosyaLinkleriGuncelle("-", "-", "-");
-		dosyaLTahakkukNoGuncelle("-");
-		dosyaLDekontNoGuncelle("-");
+		dosyaTahakkukNoGuncelle("-");
+		dosyaDekontNoGuncelle("-");
 	}
 	
 

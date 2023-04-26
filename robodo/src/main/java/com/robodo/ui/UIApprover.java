@@ -139,7 +139,19 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			decline(processInstance);
 		});
 		
-		HorizontalLayout buttonsLayout=new HorizontalLayout(btApprove, btDecline);
+		
+		Button btRetry = new Button("RETRY/REPLAY", new Icon(VaadinIcon.REFRESH));
+		btRetry.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
+		btRetry.setVisible(isRetriable(processInstance));
+		btRetry.addClickListener(e -> {
+			confirmAndRun("Retry", "Sure to retry/replay this instance from the beginning?", ()->{
+				retryInstance(processInstance);
+			});
+			
+		});
+		
+		
+		HorizontalLayout buttonsLayout=new HorizontalLayout(btApprove, btDecline, btRetry);
 		buttonsLayout.setWidthFull();
 		buttonsLayout.setAlignItems(Alignment.CENTER);
 		
@@ -178,6 +190,19 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		
 	}
 
+	private boolean isRetriable(ProcessInstance processInstance) {
+		return processInstance.getStatus().equals(ProcessInstance.STATUS_COMPLETED) 
+				|| processInstance.getStatus().equals(ProcessInstance.STATUS_RUNNING);
+	}
+
+	private void retryInstance(ProcessInstance processInstance) {
+		processInstance.retryProcessInstance(processService);
+		processService.saveProcessInstance(processInstance);
+		this.action="VIEW";
+		drawScreen();
+		
+	}
+
 	private boolean isApproveable(ProcessInstance processInstance) {
 		Optional<ProcessInstanceStep> opt = processInstance.getSteps().stream()
 				.filter(p-> p.isHumanInteractionStep())
@@ -212,10 +237,10 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		VerticalLayout layout=new VerticalLayout();
 		
 		if (processInstance.isFailed()) {
-			Button labelErr=new Button("Error : %s".formatted(HelperUtil.limitString(processInstance.getError(), 200)));
-			labelErr.addThemeVariants(ButtonVariant.LUMO_ERROR);
-			labelErr.setWidthFull();
-			labelErr.addClickListener(p->{
+			Button btnErr=new Button("Error : %s".formatted(HelperUtil.limitString(processInstance.getError(), 200)), VaadinIcon.WARNING.create());
+			btnErr.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
+			btnErr.setWidthFull();
+			btnErr.addClickListener(p->{
 				ProcessInstanceStep latestStep = processInstance.getLatestProcessedStep();
 				if (latestStep==null) {
 					notifyInfo("no last step found");
@@ -224,7 +249,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 				
 				showLogs(processInstance.getCode()+ " " + processInstance.getDescription(), latestStep.getLogs());
 			});
-			layout.add(labelErr);
+			layout.add(btnErr);
 		}
 		
 		processInstance.getSteps().forEach(step->{

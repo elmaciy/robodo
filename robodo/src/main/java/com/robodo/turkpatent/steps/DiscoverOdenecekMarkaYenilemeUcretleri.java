@@ -32,8 +32,8 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseEpatsStep implem
 		var instances = createEpatsInstances(
 				processDefinition,
 				dosyalar, 
-				(dosya)->"%s.%s".formatted(processDefinition.getCode(), dosya.getBasvuruno()),
-				(dosya)->"%s dosyası için Marka Yenileme Ücreti".formatted(dosya.getBasvuruno())
+				(dosya)->"%s.%s (%d)".formatted(processDefinition.getCode(), dosya.getBasvuruno(), dosya.getYil()),
+				(dosya)->"%s (%d) dosyası için  Marka Yenileme Ücreti Ödeme".formatted(dosya.getBasvuruno(), dosya.getYil())
 				);
 		
 		instances.stream().forEach(p->{

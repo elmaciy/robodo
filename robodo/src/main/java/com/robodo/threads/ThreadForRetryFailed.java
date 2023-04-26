@@ -36,7 +36,7 @@ public class ThreadForRetryFailed implements Runnable {
 			List<ProcessInstance> instances = processService.getProcessFailedAndToBeRetriedInstances(processDefinition, processDefinition.getMaxThreadCount());
 			instances.forEach(instance->{
 				processService.deleteAllFiles(instance);
-				retryInstance(instance);
+				instance.retryProcessInstance(processService);
 				//retryInstanceStep(instance);
 				processService.saveProcessInstance(instance);
 			});
@@ -46,55 +46,6 @@ public class ThreadForRetryFailed implements Runnable {
 
 	}
 
-	private void retryInstance(ProcessInstance instance) {
-		instance.setError(null);
-		instance.setFailed(false);
-		instance.setStarted(null);
-		instance.setFinished(null);
-		instance.setStatus(ProcessInstance.STATUS_RETRY);
-		
-		
-		for (var step : instance.getSteps()) {
-			step.setApprovalDate(null);
-			step.setApprovedBy(null);
-			step.setApproved(false);
-			step.setError(null);
-			step.setLogs(null);
-			step.setStarted(null);
-			step.setFinished(null);
-			step.setNotificationSent(false);
-			step.setStatus(ProcessInstanceStep.STATUS_NEW);
-			
-		}
-		
-	}
 	
-	/*
-	private void retryInstanceStep(ProcessInstance instance) {
-		
-		
-		ProcessInstanceStep latestProcessedStep = instance.getLatestProcessedStep();
-		if (latestProcessedStep==null) {
-			return;
-		}
-		
-		instance.setError(null);
-		instance.setFailed(false);
-		instance.setFinished(null);
-		instance.setStatus(ProcessInstance.STATUS_RUNNING);
-
-		latestProcessedStep.setApprovalDate(null);
-		latestProcessedStep.setApprovedBy(null);
-		latestProcessedStep.setApproved(false);
-		latestProcessedStep.setError(null);
-		latestProcessedStep.setLogs(null);
-		latestProcessedStep.setStarted(null);
-		latestProcessedStep.setFinished(null);
-		latestProcessedStep.setNotificationSent(false);
-		latestProcessedStep.setStatus(ProcessInstanceStep.STATUS_NEW);
-		
-		
-	}
-	*/
 
 }
