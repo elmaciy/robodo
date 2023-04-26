@@ -1,7 +1,5 @@
 package com.robodo.turkpatent.steps;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,7 +27,7 @@ public class DiscoverOdenecekMarkaYenilemeUcretleri extends BaseEpatsStep implem
 		RumuzEsleme rumuzEsleme =  getRumuzEslemeResponseByIslemAdimi(islemAdimi).getData().stream().filter(r->r.getTelefon()!=null && r.getEposta()!=null).findAny().get();
 
 		
-		List<DosyaResponse> dosyalar = getTaslakDosyalarByIslemAdimi(islemAdimi);
+		List<DosyaResponse> dosyalar = getRpaIslemdeDosyalarByIslemAdimi(islemAdimi);
 		
 		var instances = createEpatsInstances(
 				processDefinition,

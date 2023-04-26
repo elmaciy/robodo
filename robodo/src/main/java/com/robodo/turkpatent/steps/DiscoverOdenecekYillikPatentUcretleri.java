@@ -22,12 +22,12 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 
 	@Override
 	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {
-		//Yıllık Ücret Yenileme : 1, Tescil Sonuçlandırma: 2, Tam Marka Yenileme : 3
+		//1: Yıllık Ücret Yenileme,  2: Tescil Sonuçlandırma, 3: Tam Marka Yenileme
 		int islemAdimi=Integer.valueOf(runnerUtil.getEnvironmentParameter("PatentYenileme.islemAdimi")); 		
 
 		RumuzEsleme rumuzEsleme =  getRumuzEslemeResponseByIslemAdimi(islemAdimi).getData().stream().filter(r->r.getTelefon()!=null && r.getEposta()!=null).findAny().get();
 
-		List<DosyaResponse> dosyalar = getTaslakDosyalarByIslemAdimi(islemAdimi);
+		List<DosyaResponse> dosyalar = getRpaIslemdeDosyalarByIslemAdimi(islemAdimi);
 		
 		var instances = createEpatsInstances(
 				processDefinition,
@@ -61,6 +61,8 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 			
 			p.setInstanceVariables(HelperUtil.hashMap2String(hmVars));
 			p.setInitialInstanceVariables(p.getInstanceVariables());
+
+
 		});
 		
 		return instances;

@@ -16,8 +16,8 @@ public class EpatsMarka2nciItirazOlusturStep extends BaseEpatsStep {
 	@Override
 	public void run() {
 		
-		dosyaLinkSifirla();
 		dosyaLinkleriGuncelle(this.processInstanceStep.getProcessInstance());
+		dosyaDurumGuncelle(EPATS_STATU_TAHAKKUK);
 		
 		sistemeGiris();
 		islemSec();

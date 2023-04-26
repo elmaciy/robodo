@@ -21,7 +21,7 @@ public class DosyaResponse {
     public String linkkontrol;
     public String linkonayla;
     public String linkreddet;
-    
+    public int yil;
     
     
 	public int getId() {
@@ -131,6 +131,12 @@ public class DosyaResponse {
 	}
 	public void setLinkreddet(String linkreddet) {
 		this.linkreddet = linkreddet;
+	}
+	public int getYil() {
+		return yil;
+	}
+	public void setYil(int yil) {
+		this.yil = yil;
 	}
     
     

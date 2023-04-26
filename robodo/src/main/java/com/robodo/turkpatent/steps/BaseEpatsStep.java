@@ -51,12 +51,13 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 
 	public final static Integer EPATS_STATU_TASLAK=531; //????
-	public final static Integer EPATS_STATU_ISLEMDE=1; // "RPA işlemde";
+	public final static Integer EPATS_STATU_RPA_ISLEMDE=1; // "RPA işlemde";
 	public final static Integer EPATS_STATU_TAHAKKUK=2; // "RPA Tahakkuk";
-	public final static Integer EPATS_STATU_ODEME=3; //"RPA ödeme";
+	public final static Integer EPATS_STATU_ODEME_YAPILIYOR=3; //"RPA ödeme";
+	public final static Integer EPATS_STATU_ONAY_BEKLIYOR=4; //"RPA Onayı Bekleniyor";
+	public final static Integer EPATS_STATU_ODEME_TAMAMLANDI=5; //"RPA Ödeme Tamamlandı";
+	public final static Integer EPATS_STATU_HATA_ALDI=6; //"RPA Hata Aldı";
 	
-	
-
 	
 	PageEpatsHome home;
 	PageEdevletLogin edevletLogin;
@@ -365,24 +366,32 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 	
 	
-	public void dosyaLinkleriGuncelle(int id, String linkKontrol, String linkOnayla, String linkReddet) {
+	public void dosyaLinkleriGuncelle(String linkKontrol, String linkOnayla, String linkReddet) {
+		int id=Integer.valueOf(getVariable("dosya.id"));
 		dosyaGuncelle(DosyaRequest.create(id).withLinks(linkKontrol, linkOnayla, linkReddet),
 				"dosya [%s] linkleri güncelle => kontrol : <%s>, onay : <%s>, red : <%s>".formatted(id, linkKontrol, linkOnayla, linkReddet));
 	}
 	
 	
 	
+	public void dosyaDurumGuncelle(int statu) {
+		int id=Integer.valueOf(getVariable("dosya.id"));
+		dosyaDurumGuncelle(id, statu);
+	}
+	
 	public void dosyaDurumGuncelle(int id, int statu) {
 		dosyaGuncelle(DosyaRequest.create(id).withStatu(statu),
 				"dosya [%s] durum güncelle => %d".formatted(id, statu));
 	}
 	
-	public void dosyaLTahakkukNoGuncelle(int id, String tahakkukNo) {
+	public void dosyaLTahakkukNoGuncelle(String tahakkukNo) {
+		int id=Integer.valueOf(getVariable("dosya.id"));
 		dosyaGuncelle(DosyaRequest.create(id).withTahakkukNo(tahakkukNo),
 				"dosya [%s] tahakkuk no güncelle => %s".formatted(id, tahakkukNo));
 	}
 	
-	public void dosyaLDekontNoGuncelle(int id, String dekontNo) {
+	public void dosyaLDekontNoGuncelle(String dekontNo) {
+		int id=Integer.valueOf(getVariable("dosya.id"));
 		dosyaGuncelle(DosyaRequest.create(id).withDekontNo(dekontNo),
 				"dosya [%s] dekont no güncelle => %s".formatted(id, dekontNo));
 	}
@@ -404,9 +413,10 @@ public class BaseEpatsStep extends BaseWebStep {
 		}
 	}
 	
-	public List<DosyaResponse> getTaslakDosyalarByIslemAdimi(int islemAdimi) {
+	public List<DosyaResponse> getRpaIslemdeDosyalarByIslemAdimi(int islemAdimi) {
 		String apiHostname = runnerUtil.getEnvironmentParameter("ankarapatent.api.base.url");
-		String endPoint="%s/rpaservisleriController/listRpadosyalar".formatted(apiHostname );
+		int statu=BaseEpatsStep.EPATS_STATU_RPA_ISLEMDE; 
+		String endPoint="%s/rpaservisleriController/listRpadosyalarByStatu?statu=%d&islemadimi=%d".formatted(apiHostname, statu, islemAdimi);
 		String token=SingletonForTokenManager.getInstance().getJwtToken(this);
 		List<KeyValue> headers=List.of(new KeyValue("Authorization","Bearer %s".formatted(token)));
 		ApiResponse response = httpRequest(Method.GET, endPoint, headers, null, null);
@@ -417,7 +427,8 @@ public class BaseEpatsStep extends BaseWebStep {
 		}
 		
 		var dosyaListeleri = json2Object(response.getBody(), DosyaListeleri.class);
-		Predicate<? super DosyaResponse> filter=p->p.getIslemadimi()==islemAdimi && p.getStatu()==BaseEpatsStep.EPATS_STATU_TASLAK;
+		//Predicate<? super DosyaResponse> filter=p->p.getIslemadimi()==islemAdimi && p.getStatu()==BaseEpatsStep.EPATS_STATU_RPA_ISLEMDE;
+		Predicate<? super DosyaResponse> filter=p->p.getIslemadimi()==islemAdimi && p.getDurum()==1 && p.getReferansno()!=null && !p.getReferansno().isBlank();
 		return dosyaListeleri.getData().stream().filter(filter).collect(Collectors.toList());
 	}
 	
@@ -480,14 +491,11 @@ public class BaseEpatsStep extends BaseWebStep {
 	}
 	
 	protected void dosyaLinkleriGuncelle(ProcessInstance processInstance) {
-		int id=Integer.valueOf(getVariable("dosya.id"));
 		String lnkKontrol = HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance,  "VIEW", "EXTERNAL");
 		String lnkOnay=HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance, "APPROVE", "EXTERNAL");
 		String lnkRed=HelperUtil.generateInstanceApprovalLink(this.runnerUtil, processInstance, "DECLINE", "EXTERNAL");
 		
-		dosyaLinkleriGuncelle(id, lnkKontrol, lnkOnay, lnkRed);
-		dosyaDurumGuncelle(id, EPATS_STATU_ISLEMDE);
-		
+		dosyaLinkleriGuncelle(lnkKontrol, lnkOnay, lnkRed);		
 	}
 	
 	
@@ -495,25 +503,21 @@ public class BaseEpatsStep extends BaseWebStep {
 
 
 	public void dosyaTahakkukKaydet() {
-		int id=Integer.valueOf(getVariable("dosya.id"));
 		String tahakkukNo=getVariable("tahakkukNo");
-		dosyaLTahakkukNoGuncelle(id, tahakkukNo);
-		dosyaDurumGuncelle(id, EPATS_STATU_TAHAKKUK);
+		dosyaLTahakkukNoGuncelle(tahakkukNo);
+		dosyaDurumGuncelle(EPATS_STATU_ONAY_BEKLIYOR);
 	}
 
 
 	public void dosyaDekontKaydet() {
-		int id=Integer.valueOf(getVariable("dosya.id"));
 		String dekontNo=getVariable("dekontNo");
-		dosyaLDekontNoGuncelle(id, dekontNo);
-		dosyaDurumGuncelle(id, EPATS_STATU_ODEME);
+		dosyaLDekontNoGuncelle(dekontNo);
 	}
 	
 	public  void dosyaLinkSifirla() {
-		int id=Integer.valueOf(getVariable("dosya.id"));
-		dosyaLinkleriGuncelle(id, "-", "-", "-");
-		dosyaLTahakkukNoGuncelle(id, "-");
-		dosyaLDekontNoGuncelle(id, "-");
+		dosyaLinkleriGuncelle("-", "-", "-");
+		dosyaLTahakkukNoGuncelle("-");
+		dosyaLDekontNoGuncelle("-");
 	}
 	
 

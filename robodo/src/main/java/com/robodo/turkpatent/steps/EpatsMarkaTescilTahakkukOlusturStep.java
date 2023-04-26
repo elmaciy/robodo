@@ -15,10 +15,8 @@ public class EpatsMarkaTescilTahakkukOlusturStep extends BaseEpatsStep {
 	
 	@Override
 	public void run() {
-		
-		dosyaLinkSifirla();
 		dosyaLinkleriGuncelle(this.processInstanceStep.getProcessInstance());
-		
+		dosyaDurumGuncelle(EPATS_STATU_TAHAKKUK);
 		
 		sistemeGiris();
 		//bu kısımı iptal ettik çünkü işlem adımı Patentteki gibi olacak 

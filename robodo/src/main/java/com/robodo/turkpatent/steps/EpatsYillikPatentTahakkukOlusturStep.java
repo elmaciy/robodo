@@ -17,8 +17,8 @@ public class EpatsYillikPatentTahakkukOlusturStep extends BaseEpatsStep {
 	@Override
 	public void run() {
 		
-		dosyaLinkSifirla();
 		dosyaLinkleriGuncelle(this.processInstanceStep.getProcessInstance());
+		dosyaDurumGuncelle(EPATS_STATU_TAHAKKUK);
 		
 		sistemeGiris();
 		//dosyaAra();

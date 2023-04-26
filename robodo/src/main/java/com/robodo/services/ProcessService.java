@@ -367,43 +367,8 @@ public class ProcessService {
 	@Cacheable("stepClasses")
 	public List<String> getStepClasses() {
 		String packageName=getEnvProperty("steps.package");
-
-
-		/*
-		List<String> classes = new ArrayList<String>();
-		
-		Reflections reflections = new Reflections(packageName);   
-
-		Set<Class<? extends BaseStep>> classes2 = reflections.getSubTypesOf(BaseStep.class);
-		classes2.forEach(clz->{
-			classes.add(clz.getSimpleName());
-		});
-		*/
-		
-
-		/*
-		Reflections reflections = new Reflections(packageName);
-		List<String> classes= reflections.getSubTypesOf(BaseStep.class).stream()
-				.map(c->c.getSimpleName())
-				.collect(Collectors.toList());
-		
-		
-		*/
-		
-		
 		List<String> classes= new ArrayList<String>();
 		try {
-			/*
-			ClassPath.from(Main.class.getClassLoader())
-			.getAllClasses()
-			.stream().forEach(c->{
-				if (c.getPackageName().contains("robodo")) {
-					System.err.println("aaaaaaaaaaaaa  %s \t %s => %s".formatted(c.getPackageName(), c.getName(), c.getResourceName()));
-					
-				}
-			});
-			*/
-			
 			List<String> collectedClasses = ClassPath.from(Main.class.getClassLoader())
 			.getAllClasses()
 			.stream()
@@ -417,11 +382,6 @@ public class ProcessService {
 			e.printStackTrace();
 			throw new RuntimeException("class loader error to load classes in package : %s".formatted(packageName));
 		} 
-	
-		for (String className : classes) {
-			System.err.println("xxxxxxxxxxxxxxxxx   Class name : %s".formatted(className));
-		}
-
 
         Collections.sort(classes, new Comparator<String>() {
 

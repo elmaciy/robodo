@@ -24,7 +24,7 @@ public class DiscoverMarka2nciItiraz extends BaseEpatsStep implements Discoverab
 		//bu id ler degisebilir. Bu durumda asagidaki parametre ezilerek halledilir. 
 		int islemAdimi=Integer.valueOf(runnerUtil.getEnvironmentParameter("Marka2nciItiraz.islemAdimi")); 		
 			
-		List<DosyaResponse> dosyalar = getTaslakDosyalarByIslemAdimi(islemAdimi);
+		List<DosyaResponse> dosyalar = getRpaIslemdeDosyalarByIslemAdimi(islemAdimi);
 		
 		var instances =  createEpatsInstances(
 				processDefinition,

@@ -17,10 +17,13 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 	
 	@Override
 	public void run() {
+		dosyaDurumGuncelle(EPATS_STATU_ODEME_YAPILIYOR);
 		sistemeGiris();
 		epatsMenu.gotoTahakkuklarim();
 		tahakkukSecVeOdemeyeGit();
 		kartGirVeOde();
+		dosyaDekontKaydet();
+		dosyaDurumGuncelle(EPATS_STATU_ODEME_TAMAMLANDI);
 		epatsMenu.cikis();
 		
 		//selenium.stopDriver();
@@ -53,7 +56,6 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 		selenium.switchToMainFrame();
 		
 		setVariable("dekontNo", dekontNo);
-		dosyaDekontKaydet();
 	}
 	
 	
