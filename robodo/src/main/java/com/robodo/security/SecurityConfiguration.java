@@ -28,7 +28,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 	@Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.authorizeHttpRequests().requestMatchers(new AntPathRequestMatcher("/public/**"))
+        http.authorizeHttpRequests().requestMatchers(new AntPathRequestMatcher("/public/**"), new AntPathRequestMatcher("/authenticate"))
             .permitAll();
 
         super.configure(http); 
