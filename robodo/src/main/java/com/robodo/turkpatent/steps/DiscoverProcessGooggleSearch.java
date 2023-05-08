@@ -23,7 +23,7 @@ public class DiscoverProcessGooggleSearch extends BaseEpatsStep implements Disco
 	@Override
 	public List<ProcessInstance> discover(ProcessDefinition processDefinition) {
 		//List<String> keywords = List.of("Yildiray","Elmacı","Eidhoven","Sevgi","Saygı","Hürmet");
-		List<String> keywords = List.of("Yildiray");
+		List<String> keywords = List.of("Yildiray Elmacı");
 		List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
 		
 		for (String keyword : keywords) {
