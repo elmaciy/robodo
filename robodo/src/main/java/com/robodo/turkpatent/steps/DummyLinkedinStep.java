@@ -32,7 +32,7 @@ public class DummyLinkedinStep extends BaseWebStep {
 	public void run() {
 		selenium.navigate("https://www.linkedin.com");
 		selenium.sendKeys(selenium.getWebDriver().findElement(By.id("session_key")), "elmaciy@hotmail.com");
-		selenium.sendKeys(selenium.getWebDriver().findElement(By.id("session_password")), "Zey!1323");
+		selenium.sendKeys(selenium.getWebDriver().findElement(By.id("session_password")), "Passw");
 		selenium.click(selenium.getWebDriver().findElement(By.cssSelector("button[type=submit]")));
 		String keyword=getVariable("keyword");
 		
