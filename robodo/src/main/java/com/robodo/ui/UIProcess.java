@@ -281,7 +281,7 @@ public class UIProcess extends UIBase {
 			});	
 			btnDelete.setEnabled(!hasAnyInstance(p.getProcessDefinition()));
 			return btnDelete;
-		}).setHeader("Steps").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
+		}).setHeader("Remove").setWidth("2em").setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
 		
 		
 		

@@ -482,7 +482,7 @@ public class UIBase extends AppLayout {
 		tf.setValue(initialValue);
 		tf.setWidthFull();
 		tf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-		tf.setValueChangeMode(ValueChangeMode.LAZY);
+		tf.setValueChangeMode(ValueChangeMode.ON_BLUR);
 		tf.addValueChangeListener(e->{
 			String value=e.getValue();
 			
