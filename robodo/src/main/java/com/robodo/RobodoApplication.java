@@ -61,6 +61,18 @@ public class RobodoApplication {
 			}
 			
 			
+			CorporateParameter paramApiBaseUrl=new CorporateParameter("ankarapatent.api.base.url","http://10.0.6.7:8080");
+			CorporateParameter paramApiLang=new CorporateParameter("ankarapatent.api.token.lang","tr");
+			CorporateParameter paramApiUsername=new CorporateParameter("ankarapatent.api.token.username","rpaislemleri");
+			CorporateParameter paramApiPassword=new CorporateParameter("ankarapatent.api.token.password","yildiray1524elmaci");
+			
+			if (corporateParameterRepo.findAllByCode(paramApiBaseUrl.getCode()).isEmpty()) {
+				corporateParameterRepo.save(paramApiBaseUrl);
+				corporateParameterRepo.save(paramApiLang);
+				corporateParameterRepo.save(paramApiUsername);
+				corporateParameterRepo.save(paramApiPassword);
+			}
+			
 			User admin=new User();
 			admin.setEmail("admin@hotmail.com");
 			admin.setUsername("admin");
