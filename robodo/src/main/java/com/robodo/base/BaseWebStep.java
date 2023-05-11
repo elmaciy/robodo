@@ -153,7 +153,10 @@ public abstract class BaseWebStep extends BaseStep {
 	 
 
 
-
+	 public boolean isProduction() {
+		String pProduction = getEnvironmentParameter("is.production");
+		return pProduction!=null && pProduction.equals("true");
+	}
 
 
 }

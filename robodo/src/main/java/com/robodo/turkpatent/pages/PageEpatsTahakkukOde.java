@@ -28,25 +28,33 @@ public class PageEpatsTahakkukOde extends PageEpatsBase {
 	
 	@FindBy(css="div.btn.btn-default i.fa.fa-times")
 	WebElement btClose;
-
+	
+	@FindBy(xpath = "//div[contains(text(),'Provizyon Numaras')]")
+	WebElement lblOdemeOnayProvizyon;
 
 	public PageEpatsTahakkukOde(SeleniumUtil selenium) {
 		super(selenium);
 	}
 	
 	public void kartBilgileriniGir(String kartNo, String sonKullanma, String cvv) {
-		
-		
 		selenium.setValue(elKartNo, kartNo);
 		selenium.setValue(elKartExpire, sonKullanma);
 		selenium.setValue(elKartCVV, cvv);
-		
-		
 	}
 	
 	public String getDekontNo() {
-		//todo : buraya gerçek kod eklenecek. 
-		return "DEK"+String.valueOf(System.currentTimeMillis());
+		try {
+			selenium.switchToMainFrame();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		String onayIcerik = lblOdemeOnayProvizyon.getText();
+		String dekontNo = StringUtils.substringAfter(onayIcerik, "Provizyon Numarası : ");
+		if (dekontNo.contains(" ")) {
+			dekontNo=StringUtils.substringBefore(dekontNo, " ");
+		}
+		return dekontNo.strip();
 	}
 	
 	private void close() {

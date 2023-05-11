@@ -50,8 +50,14 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 		epatsTahakkukOde.kartBilgileriniGir(kartNo, kartGecerlilik, kartCVV);
 		//bu kisim guvenlik sebebiyle kapatildi. kerdi karti bilgisi icermektedir. 
 		//akeStepScreenShot(this.processInstanceStep, "Kart bilgileri girildi", false);
-		epatsTahakkukOde.odemeYap();
-		String dekontNo=epatsTahakkukOde.getDekontNo();
+		
+		
+		String dekontNo="DEK_TEST_%s".formatted(String.valueOf(System.currentTimeMillis()));
+		if (isProduction()) {
+			epatsTahakkukOde.odemeYap();
+			dekontNo=epatsTahakkukOde.getDekontNo();
+		}
+ 		
 		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
 		selenium.switchToMainFrame();
 		
@@ -59,6 +65,10 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 	}
 	
 	
+
+
+
+
 	private String convert2SonKullanmaTarihi(String sonkullanimtarihi) {
 		if (sonkullanimtarihi==null) {
 			return null;
