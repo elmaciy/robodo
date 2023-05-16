@@ -68,7 +68,10 @@ public class PageEpatsTahakkukOde extends PageEpatsBase {
 	public void odemeYap() {
 		selenium.click(btOde);
 		selenium.sleep(10L);
-		close();
+	}
+
+	public void odemeVazgec() {
+		close();		
 	}
 
 }

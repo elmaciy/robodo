@@ -53,13 +53,16 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 		
 		
 		String dekontNo="DEK_TEST_%s".formatted(String.valueOf(System.currentTimeMillis()));
+		
 		if (isProduction()) {
 			epatsTahakkukOde.odemeYap();
 			dekontNo=epatsTahakkukOde.getDekontNo();
+		} else {
+			selenium.switchToMainFrame();
+			epatsTahakkukOde.odemeVazgec();
+			takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
 		}
- 		
-		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
-		selenium.switchToMainFrame();
+		
 		
 		setVariable("dekontNo", dekontNo);
 	}
