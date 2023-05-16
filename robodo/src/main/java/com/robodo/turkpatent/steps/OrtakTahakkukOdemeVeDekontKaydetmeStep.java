@@ -65,6 +65,7 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 		
 		
 		setVariable("dekontNo", dekontNo);
+		selenium.sleep(60L);
 	}
 	
 	

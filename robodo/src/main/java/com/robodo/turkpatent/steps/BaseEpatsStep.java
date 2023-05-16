@@ -592,7 +592,7 @@ public class BaseEpatsStep extends BaseWebStep {
 			.findAny();
 		
 		if (opt.isEmpty()) {
-			throw new RuntimeException("% islemi icin uygun kredi karti rumuzu bulunamadi. ".formatted(islemAdimi));
+			throw new RuntimeException("%d islemi icin uygun kredi karti rumuzu bulunamadi. ".formatted(islemAdimi));
 		}
 		
 		return opt.get().getRumuz();
