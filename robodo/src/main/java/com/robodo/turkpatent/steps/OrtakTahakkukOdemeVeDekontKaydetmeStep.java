@@ -60,9 +60,9 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 		} else {
 			selenium.switchToMainFrame();
 			epatsTahakkukOde.odemeVazgec();
-			takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
 		}
 		
+		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
 		
 		setVariable("dekontNo", dekontNo);
 		//selenium.sleep(60L);
