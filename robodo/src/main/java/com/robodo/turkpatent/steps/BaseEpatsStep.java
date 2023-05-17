@@ -519,6 +519,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 
 	public void tahakkukSecVeOdemeyeGit() {
+		epatsMenu.gotoTahakkuklarim();
 		String tahakkukNo=getVariable("tahakkukNo");
 		epatsTahakkuklarim.tahakkukNoAramaSecme(tahakkukNo);
 		takeStepScreenShot(this.processInstanceStep, "Tahakkuk seçildi", false);
@@ -582,6 +583,11 @@ public class BaseEpatsStep extends BaseWebStep {
 		}
 
 		List<WebElement> cellContents = epatsIslemlerim.cellContents;
+		
+		boolean odendi = cellContents.stream().map(p->p.getText().strip()).anyMatch(p->p.equals("KRDKRT"));
+		if (!odendi) {
+			throw new RuntimeException("Tahakkuk ödenmemiştir. ");
+		}
 		
 		Optional<String> data = cellContents.stream().map(p->p.getText().strip()).filter(p->HelperUtil.isValidDekontNo(p, tahakkukNo)).findFirst();
 		

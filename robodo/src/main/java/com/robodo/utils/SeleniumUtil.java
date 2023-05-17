@@ -261,6 +261,26 @@ public class SeleniumUtil {
 		
 	}
 
+	public void focusWithTab(WebElement el) {
+		long startTs=0;
+		
+		while(true) {
+				if ((System.currentTimeMillis()-startTs) > 10000) {
+					break;
+				}
+				
+				tab();
+				
+				try {
+					getWebDriverWait().withTimeout(Duration.ofMillis(100)).until(ExpectedConditions.elementToBeClickable(el));	
+				} catch(Exception e) {
+				
+			}
+			
+		}
+		
+	}
+
 	
 
 }

@@ -27,10 +27,16 @@ public class PageEpatsIslemlerim extends PageEpatsBase {
 
 
 	public void islemAra(String tahakkukNo, String dosyaNo) {
-		selenium.setValue(elFilterTahakkukNo, tahakkukNo);
-		selenium.setValue(elFilterBasvuruNo, dosyaNo);
-		selenium.setValue(elFilterOdemeKanali, "KRDKRT");
+		selenium.focusWithTab(elFilterTahakkukNo);
+		selenium.setValue(elFilterTahakkukNo, tahakkukNo);		
 		selenium.enter();
+		waitProcessorGone();
+		
+		selenium.focusWithTab(elFilterBasvuruNo);
+		selenium.setValue(elFilterBasvuruNo, dosyaNo);
+		selenium.enter();
+		waitProcessorGone();
+		
 	}
 
 }

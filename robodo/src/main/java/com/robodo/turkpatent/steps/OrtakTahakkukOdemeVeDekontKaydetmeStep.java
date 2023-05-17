@@ -19,15 +19,14 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 	public void run() {
 		dosyaDurumGuncelle(EPATS_STATU_ODEME_YAPILIYOR);
 		sistemeGiris();
-		epatsMenu.gotoTahakkuklarim();
+		
 		tahakkukSecVeOdemeyeGit();
-		//kartGirVeOde();
+		kartGirVeOde();
 		tahakkuktanDekontSorgula();
 		dosyaDekontKaydet();
 		dosyaDurumGuncelle(EPATS_STATU_ODEME_TAMAMLANDI);
 		epatsMenu.cikis();
 		
-		//selenium.stopDriver();
 	}
 	
 
