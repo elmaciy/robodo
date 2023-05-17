@@ -4,11 +4,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.WebElement;
 
 import com.google.common.base.Splitter;
 import com.robodo.base.BaseWebStep;
@@ -32,6 +34,7 @@ import com.robodo.turkpatent.pages.PageEpatsDosyaBilgisiDigerIslemler;
 import com.robodo.turkpatent.pages.PageEpatsHizmetDokumu;
 import com.robodo.turkpatent.pages.PageEpatsHome;
 import com.robodo.turkpatent.pages.PageEpatsIslemSonucu;
+import com.robodo.turkpatent.pages.PageEpatsIslemlerim;
 import com.robodo.turkpatent.pages.PageEpatsItirazGerekceleri;
 import com.robodo.turkpatent.pages.PageEpatsItirazSahibiBilgisi;
 import com.robodo.turkpatent.pages.PageEpatsItirazaIliskinBilgiler;
@@ -76,6 +79,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	PageEpatsItirazGerekceleri epatsItirazGerekceleri;
 	PageEpatsItirazaIliskinBilgiler epatsItirazaIliskinBilgiler;
 	PageEpatsItirazaIliskinEkler epatsItirazaIliskinEkler;
+	PageEpatsIslemlerim epatsIslemlerim;
 	
 	public BaseEpatsStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
@@ -106,6 +110,7 @@ public class BaseEpatsStep extends BaseWebStep {
 		this.epatsItirazGerekceleri=new PageEpatsItirazGerekceleri(selenium);
 		this.epatsItirazaIliskinBilgiler=new PageEpatsItirazaIliskinBilgiler(selenium);
 		this.epatsItirazaIliskinEkler=new PageEpatsItirazaIliskinEkler(selenium);
+		this.epatsIslemlerim=new PageEpatsIslemlerim(selenium);
 		
 	}
 
@@ -507,7 +512,88 @@ public class BaseEpatsStep extends BaseWebStep {
 		dosyaTahakkukNoGuncelle(tahakkukNo);
 		dosyaDurumGuncelle(EPATS_STATU_ONAY_BEKLIYOR);
 	}
+	
+	
+	
+	
+	
 
+	public void tahakkukSecVeOdemeyeGit() {
+		String tahakkukNo=getVariable("tahakkukNo");
+		epatsTahakkuklarim.tahakkukNoAramaSecme(tahakkukNo);
+		takeStepScreenShot(this.processInstanceStep, "Tahakkuk seçildi", false);
+		epatsTahakkuklarim.tahakkukOde();
+	}
+	
+	public void kartGirVeOde() {
+		
+		int islemAdimi=Integer.valueOf(getVariable("islemAdimi")); 		
+		Rumuz krediKartiRumuz =getRumuzKrediKartiByIslemAdimi(islemAdimi);
+		
+		String kartNo=krediKartiRumuz.getKredikartino();
+		String kartGecerlilik=convert2SonKullanmaTarihi(krediKartiRumuz.getSonkullanimtarihi());
+		String kartCVV=krediKartiRumuz.getCcv();
+		
+		selenium.switchIframe((p)->p.getAttribute("src").contains("/estpay/pay/"));
+		
+		epatsTahakkukOde.kartBilgileriniGir(kartNo, kartGecerlilik, kartCVV);
+		//bu kisim guvenlik sebebiyle kapatildi. kerdi karti bilgisi icermektedir. 
+		//akeStepScreenShot(this.processInstanceStep, "Kart bilgileri girildi", false);
+		
+		
+		
+		
+		if (isProduction()) {
+			epatsTahakkukOde.odemeYap();
+		} else {
+			selenium.switchToMainFrame();
+			epatsTahakkukOde.odemeVazgec();
+		}
+		
+		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
+		
+	}
+	
+	private String convert2SonKullanmaTarihi(String sonkullanimtarihi) {
+		if (sonkullanimtarihi==null) {
+			return null;
+		}
+		// "2025-12-30"
+		String year=sonkullanimtarihi.substring(2,4);
+		String month=sonkullanimtarihi.substring(5,7);
+		
+		return month + year;
+	}
+	
+	
+	public void tahakkuktanDekontSorgula() {
+		epatsMenu.gotoIslemlerim();
+		
+		String tahakkukNo=getVariable("tahakkukNo");
+		String dosyaNo=getVariable("dosyaNumarasi");
+		
+		epatsIslemlerim.islemAra(tahakkukNo, dosyaNo);
+		
+		if (!isProduction()) {
+			String dummyDekontNo="DEK_TEST_%s".formatted(String.valueOf(System.currentTimeMillis()));
+
+			setVariable("dekontNo", dummyDekontNo);
+			return;
+		}
+
+		List<WebElement> cellContents = epatsIslemlerim.cellContents;
+		
+		Optional<String> data = cellContents.stream().map(p->p.getText().strip()).filter(p->HelperUtil.isValidDekontNo(p, tahakkukNo)).findFirst();
+		
+		if (data.isEmpty()) {
+			throw new RuntimeException("Dekont no bulunamamıştır. ");
+		}
+		
+		String dekontNo = data.get();
+		setVariable("dekontNo", dekontNo);
+		
+	}
+	
 
 	public void dosyaDekontKaydet() {
 		String dekontNo=getVariable("dekontNo");

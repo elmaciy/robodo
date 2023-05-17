@@ -452,6 +452,12 @@ public class HelperUtil {
 		return command!=null && command.length()>3 &&  command.length()<=1000;
 	}
 
+	public static boolean isValidDekontNo(String text, String tahakkukNo) {
+		//23137IWVH19013406-475773-2235369
+		return text!=null && text.length()>=20 && StringUtils.endsWith(text, tahakkukNo) && text.contains("-");
+		
+	}
+
 
 
 

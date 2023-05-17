@@ -21,7 +21,8 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 		sistemeGiris();
 		epatsMenu.gotoTahakkuklarim();
 		tahakkukSecVeOdemeyeGit();
-		kartGirVeOde();
+		//kartGirVeOde();
+		tahakkuktanDekontSorgula();
 		dosyaDekontKaydet();
 		dosyaDurumGuncelle(EPATS_STATU_ODEME_TAMAMLANDI);
 		epatsMenu.cikis();
@@ -29,60 +30,17 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 		//selenium.stopDriver();
 	}
 	
-	private void tahakkukSecVeOdemeyeGit() {
-		String tahakkukNo=getVariable("tahakkukNo");
-		epatsTahakkuklarim.tahakkukNoAramaSecme(tahakkukNo);
-		takeStepScreenShot(this.processInstanceStep, "Tahakkuk seçildi", false);
-		epatsTahakkuklarim.tahakkukOde();
-	}
-	
-	private void kartGirVeOde() {
-		
-		int islemAdimi=Integer.valueOf(getVariable("islemAdimi")); 		
-		Rumuz krediKartiRumuz =getRumuzKrediKartiByIslemAdimi(islemAdimi);
-		
-		String kartNo=krediKartiRumuz.getKredikartino();
-		String kartGecerlilik=convert2SonKullanmaTarihi(krediKartiRumuz.getSonkullanimtarihi());
-		String kartCVV=krediKartiRumuz.getCcv();
-		
-		selenium.switchIframe((p)->p.getAttribute("src").contains("/estpay/pay/"));
-		
-		epatsTahakkukOde.kartBilgileriniGir(kartNo, kartGecerlilik, kartCVV);
-		//bu kisim guvenlik sebebiyle kapatildi. kerdi karti bilgisi icermektedir. 
-		//akeStepScreenShot(this.processInstanceStep, "Kart bilgileri girildi", false);
-		
-		
-		String dekontNo="DEK_TEST_%s".formatted(String.valueOf(System.currentTimeMillis()));
-		
-		if (isProduction()) {
-			epatsTahakkukOde.odemeYap();
-			dekontNo=epatsTahakkukOde.getDekontNo();
-		} else {
-			selenium.switchToMainFrame();
-			epatsTahakkukOde.odemeVazgec();
-		}
-		
-		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
-		
-		setVariable("dekontNo", dekontNo);
-		//selenium.sleep(60L);
-	}
+
+
+
+
 	
 	
 
 
 
 
-	private String convert2SonKullanmaTarihi(String sonkullanimtarihi) {
-		if (sonkullanimtarihi==null) {
-			return null;
-		}
-		// "2025-12-30"
-		String year=sonkullanimtarihi.substring(2,4);
-		String month=sonkullanimtarihi.substring(5,7);
-		
-		return month + year;
-	}
+
 
 
 

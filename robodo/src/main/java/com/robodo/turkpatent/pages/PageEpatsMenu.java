@@ -45,6 +45,11 @@ public class PageEpatsMenu extends PageEpatsBase {
 		
 	}
 	
+	public void gotoIslemlerim() {
+		clickableAction("İşlemlerim");	
+		
+	}
+	
 	
 	public void cikis() {
 		clickableAction("Sistemden Çıkış");		
