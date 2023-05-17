@@ -55,7 +55,12 @@
 41. çok riskli bir hata. eğer tahakkuk no bir şekilde yanlış seçilebilir => tahakkukNoAramaSecme metoduna dikkat.
 	 burada seçmeden önce doğru satır olduğundan emin olmalı. yoksa ilk buldugu kayidi secer. bu sekilde olan tum secimlere dikkat edilmeli. 
 	 
-42. ankarapatent.api.base.url gibi parametreleri parametre ekranından al. Application properties dosyasında olmamalı. 
+
+44. onay ve gözlem ekranında resimlerin zoomlanmasına imkan ver. 
+	Ayrıca onay için gerekli / önemli parametrelerin gösterilmesi mümkün olabilir mi? 
+	Bunun için daha önceden email body oluşturma için kullandığımız parametrik text i buraya onayın başına koyabiliriz. 
+
+
 
 -------------------.
 TAMAMLANANLAR 
@@ -149,3 +154,4 @@ TAMAMLANANLAR
 52. 2 süreci de Patent gibi yeni menü akışına uyarla
 53. yeni statüleri uyarla => RPA Onayı Bekleniyor-->4, RPA Ödeme Tamamlandı --> 5, RPA hata aldı --6
 111. onay adımına süreci baştan başlatama seçeneği ekle. RESTART action
+42. ankarapatent.api.base.url gibi parametreleri parametre ekranından al. Application properties dosyasında olmamalı. 
