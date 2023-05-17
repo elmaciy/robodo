@@ -8,6 +8,7 @@ import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.turkpatent.apimodel.DosyaResponse;
+import com.robodo.turkpatent.apimodel.Rumuz;
 import com.robodo.turkpatent.apimodel.RumuzEsleme;
 import com.robodo.utils.HelperUtil;
 import com.robodo.utils.RunnerUtil;
@@ -25,7 +26,13 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 		//1: Yıllık Ücret Yenileme,  2: Tescil Sonuçlandırma, 3: Tam Marka Yenileme
 		int islemAdimi=Integer.valueOf(runnerUtil.getEnvironmentParameter("PatentYenileme.islemAdimi")); 		
 
-		RumuzEsleme rumuzEsleme =  getRumuzEslemeResponseByIslemAdimi(islemAdimi).getData().stream().filter(r->r.getTelefon()!=null && r.getEposta()!=null).findAny().get();
+		RumuzEsleme rumuzEsleme =  getRumuzEslemeResponseByIslemAdimi(islemAdimi).getData().stream().filter(
+				r->
+					r.statu==1
+					&& r.getTelefon()!=null && r.getTelefon().length()==10
+					&& r.getEposta()!=null && HelperUtil.isValidEmailAddress(r.getEposta())
+					&& isValidRumuz(r.getRumuz())
+				).findAny().get();
 
 		List<DosyaResponse> dosyalar = getRpaIslemdeDosyalarByIslemAdimi(islemAdimi);
 		
@@ -67,6 +74,23 @@ public class DiscoverOdenecekYillikPatentUcretleri extends BaseEpatsStep impleme
 		
 		return instances;
 	
+	}
+
+	private boolean isValidRumuz(Rumuz rumuz) {
+		if (rumuz==null) return false;
+		if (rumuz.parametreturu==2) {
+			return  rumuz.getStatu() ==1
+					&& rumuz.getCcv()!=null && rumuz.getCcv().length()>=3
+					&& rumuz.getKredikartino()!=null && rumuz.getKredikartino().strip().length()==16
+					&& rumuz.getSonkullanimtarihi()!=null && rumuz.getSonkullanimtarihi().length()==10;
+		} 
+		if (rumuz.parametreturu==1) {
+			return  rumuz.getStatu() ==1
+					&& rumuz.getTckimlik()!=null && rumuz.getTckimlik().length()==11
+					&& rumuz.getSifre()!=null;
+		}
+		
+		return false;
 	}
 
 

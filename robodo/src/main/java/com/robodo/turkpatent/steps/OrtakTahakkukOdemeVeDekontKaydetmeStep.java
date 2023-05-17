@@ -78,8 +78,8 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 			return null;
 		}
 		// "2025-12-30"
-		String year=sonkullanimtarihi.substring(5,7);
-		String month=sonkullanimtarihi.substring(2,4);
+		String year=sonkullanimtarihi.substring(2,4);
+		String month=sonkullanimtarihi.substring(5,7);
 		
 		return month + year;
 	}
