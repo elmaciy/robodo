@@ -4,11 +4,11 @@ import com.robodo.model.ProcessInstanceStep;
 import com.robodo.turkpatent.apimodel.Rumuz;
 import com.robodo.utils.RunnerUtil;
 
-public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
+public class EpatsOrtakDekontKaydetStep extends BaseEpatsStep {
 
 
 	
-	public OrtakTahakkukOdemeVeDekontKaydetmeStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+	public EpatsOrtakDekontKaydetStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
 	
 	}
@@ -17,15 +17,11 @@ public class OrtakTahakkukOdemeVeDekontKaydetmeStep extends BaseEpatsStep {
 	
 	@Override
 	public void run() {
-		dosyaDurumGuncelle(EPATS_STATU_ODEME_YAPILIYOR);
 		sistemeGiris();
-		
-		tahakkukSecVeOdemeyeGit();
-		kartGirVeOde();
 		tahakkuktanDekontSorgula();
 		dosyaDekontKaydet();
-		dosyaDurumGuncelle(EPATS_STATU_ODEME_TAMAMLANDI);
 		epatsMenu.cikis();
+		dosyaDurumGuncelle(EPATS_STATU_ODEME_TAMAMLANDI);
 		
 	}
 	

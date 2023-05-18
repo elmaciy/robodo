@@ -26,7 +26,7 @@ public class EpatsMarkaTescilTahakkukOlusturStep extends BaseEpatsStep {
 		basvuruYap();
 		dosyaBilgisiDogrulaDevamEt();
 		talepTuruTamSecVeDevamEt();
-		hizmetDokumuDevamEt();
+		hizmetDokumuKontrolu();
 		onizlemeKontrolveTahakkukOlustur();
 		tahakkukNumarasiAl();
 		anaSayfayaDon();

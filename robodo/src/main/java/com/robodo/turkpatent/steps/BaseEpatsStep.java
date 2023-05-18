@@ -142,16 +142,7 @@ public class BaseEpatsStep extends BaseWebStep {
 		edevletLogin.girisEdevlet(tckno, sifre);
 		takeStepScreenShot(processInstanceStep, "Sisteme giris yapildi", false, ()->waitProcessorGone());
 	}
-	
-	
-	public void dosyaAra() {
-		epatsMenu.gotoVekillikSayfam();
-		String dosyaNo=getVariable("dosyaNumarasi");
-		String basvuruTuru=getVariable("basvuruTuru");
-		epatsBenimSayfam.dosyaArama(dosyaNo,basvuruTuru);
-		takeStepScreenShot(this.processInstanceStep, "Dosya arama sonucu", false, ()->waitProcessorGone());
-		
-	}
+
 	
 	public void islemSec() {
 		String islemGrubu=getVariable("islemGrubu");
@@ -285,7 +276,7 @@ public class BaseEpatsStep extends BaseWebStep {
 		epatsTalepTuru.devamEt();
 	}
 	
-	public void hizmetDokumuDevamEt() {
+	public void hizmetDokumuKontrolu() {
 		String ankaraPatentKodu=runnerUtil.getEnvironmentParameter("ankarapatent.vergino");
 		epatsHizmetDokumu.basvuruSahibiSec(ankaraPatentKodu);
 		takeStepScreenShot(this.processInstanceStep, "Hizmet dokumu", true, ()->waitProcessorGone());
@@ -507,7 +498,7 @@ public class BaseEpatsStep extends BaseWebStep {
 	
 
 
-	public void dosyaTahakkukKaydet() {
+	public void dosyaTahakkukKaydetOnayaGonder() {
 		String tahakkukNo=getVariable("tahakkukNo");
 		dosyaTahakkukNoGuncelle(tahakkukNo);
 		dosyaDurumGuncelle(EPATS_STATU_ONAY_BEKLIYOR);
@@ -552,6 +543,8 @@ public class BaseEpatsStep extends BaseWebStep {
 		}
 		
 		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
+		
+		selenium.switchToMainFrame();
 		
 	}
 	

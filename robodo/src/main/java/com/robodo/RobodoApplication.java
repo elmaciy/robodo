@@ -117,8 +117,8 @@ public class RobodoApplication {
 			yillikPatentUcretiProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
 			yillikPatentUcretiProcess.setDiscovererClass("DiscoverOdenecekYillikPatentUcretleri");
 			yillikPatentUcretiProcess.setActive(false);
-			yillikPatentUcretiProcess.setRetryStep("OrtakRetryBildirmeStep");
-			yillikPatentUcretiProcess.setFailStep("OrtakFailBildirmeStep");
+			yillikPatentUcretiProcess.setRetryStep("EpatsOrtakRetryBildirmeStep");
+			yillikPatentUcretiProcess.setFailStep("EpatsOrtakFailBildirmeStep");
 			
 			
 
@@ -144,14 +144,23 @@ public class RobodoApplication {
 			stepPatentOde.setDescription("Tahakkuk ödeme");
 			stepPatentOde.setOrderNo("03");
 			stepPatentOde.setSingleAtATime(true);  //bu ödeme için true olacak
-			stepPatentOde.setCommands("runStepClass OrtakTahakkukOdemeVeDekontKaydetmeStep");
+			stepPatentOde.setCommands("runStepClass EpatsOrtakTahakkukOdeStep");
 			stepPatentOde.setProcessDefinition(yillikPatentUcretiProcess);
+			
+			ProcessDefinitionStep stepPatentDekontKaydet=new ProcessDefinitionStep();
+			stepPatentDekontKaydet.setCode("DEKONT_KAYDET");
+			stepPatentDekontKaydet.setDescription("Dekont Kaydetme");
+			stepPatentDekontKaydet.setOrderNo("04");
+			stepPatentDekontKaydet.setSingleAtATime(false);
+			stepPatentDekontKaydet.setCommands("runStepClass EpatsOrtakDekontKaydetStep");
+			stepPatentDekontKaydet.setProcessDefinition(yillikPatentUcretiProcess);
 			
 
 
 			yillikPatentUcretiProcess.getSteps().add(stepPatentTahakkukOlustur);
 			yillikPatentUcretiProcess.getSteps().add(stepOnay);
 			yillikPatentUcretiProcess.getSteps().add(stepPatentOde);
+			yillikPatentUcretiProcess.getSteps().add(stepPatentDekontKaydet);
 			
 			if (processDefinitionRepo.findByCode(yillikPatentUcretiProcess.getCode()).isEmpty()) {
 				processDefinitionRepo.save(yillikPatentUcretiProcess);
@@ -169,8 +178,8 @@ public class RobodoApplication {
 			markaTescilUcretiProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
 			markaTescilUcretiProcess.setDiscovererClass("DiscoverOdenecekMarkaTescilUcretleri");
 			markaTescilUcretiProcess.setActive(false);
-			markaTescilUcretiProcess.setRetryStep("OrtakRetryBildirmeStep");
-			markaTescilUcretiProcess.setFailStep("OrtakFailBildirmeStep");
+			markaTescilUcretiProcess.setRetryStep("EpatsOrtakRetryBildirmeStep");
+			markaTescilUcretiProcess.setFailStep("EpatsOrtakFailBildirmeStep");
 			
 			
 
@@ -195,14 +204,22 @@ public class RobodoApplication {
 			stepMarkaTescilOde.setDescription("Tahakkuk ödeme");
 			stepMarkaTescilOde.setOrderNo("03");
 			stepMarkaTescilOde.setSingleAtATime(true);  //bu ödeme için true olacak
-			stepMarkaTescilOde.setCommands("runStepClass OrtakTahakkukOdemeVeDekontKaydetmeStep");
+			stepMarkaTescilOde.setCommands("runStepClass EpatsOrtakTahakkukOdeStep");
 			stepMarkaTescilOde.setProcessDefinition(markaTescilUcretiProcess);
 			
+			ProcessDefinitionStep stepMarkaTescilDekontKaydet=new ProcessDefinitionStep();
+			stepMarkaTescilDekontKaydet.setCode("DEKONT_KAYDET");
+			stepMarkaTescilDekontKaydet.setDescription("Dekont Kaydetme");
+			stepMarkaTescilDekontKaydet.setOrderNo("04");
+			stepMarkaTescilDekontKaydet.setSingleAtATime(false);
+			stepMarkaTescilDekontKaydet.setCommands("runStepClass EpatsOrtakDekontKaydetStep");
+			stepMarkaTescilDekontKaydet.setProcessDefinition(markaTescilUcretiProcess);
 
 
 			markaTescilUcretiProcess.getSteps().add(stepMarkaTescilTahakkukOlustur);
 			markaTescilUcretiProcess.getSteps().add(stepMarkaTescilOnay);
 			markaTescilUcretiProcess.getSteps().add(stepMarkaTescilOde);
+			markaTescilUcretiProcess.getSteps().add(stepMarkaTescilDekontKaydet);
 			
 			if (processDefinitionRepo.findByCode(markaTescilUcretiProcess.getCode()).isEmpty()) {
 				processDefinitionRepo.save(markaTescilUcretiProcess);
@@ -220,8 +237,8 @@ public class RobodoApplication {
 			markaYenilemeProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
 			markaYenilemeProcess.setDiscovererClass("DiscoverOdenecekMarkaYenilemeUcretleri");
 			markaYenilemeProcess.setActive(false);
-			markaYenilemeProcess.setRetryStep("OrtakRetryBildirmeStep");
-			markaYenilemeProcess.setFailStep("OrtakFailBildirmeStep");
+			markaYenilemeProcess.setRetryStep("EpatsOrtakRetryBildirmeStep");
+			markaYenilemeProcess.setFailStep("EpatsOrtakFailBildirmeStep");
 
 			ProcessDefinitionStep stepMarkeYenilemeTahakkukOlustur=new ProcessDefinitionStep();
 			stepMarkeYenilemeTahakkukOlustur.setCode("MARKA_YENILEME_TAHAKKUK");
@@ -240,18 +257,28 @@ public class RobodoApplication {
 			stepMarkaYenilemeOnay.setCommands("waitHumanInteraction");
 			stepMarkaYenilemeOnay.setProcessDefinition(markaYenilemeProcess);
 			
-			ProcessDefinitionStep stepMarkaOde=new ProcessDefinitionStep();
-			stepMarkaOde.setCode("TAHAKKUK_ODE");
-			stepMarkaOde.setDescription("Tahakkuk ödeme");
-			stepMarkaOde.setOrderNo("03");
-			stepMarkaOde.setSingleAtATime(true);  //bu ödeme için true olacak
-			stepMarkaOde.setCommands("runStepClass OrtakTahakkukOdemeVeDekontKaydetmeStep");
-			stepMarkaOde.setProcessDefinition(markaYenilemeProcess);
+			ProcessDefinitionStep stepMarkaYenilemeOde=new ProcessDefinitionStep();
+			stepMarkaYenilemeOde.setCode("TAHAKKUK_ODE");
+			stepMarkaYenilemeOde.setDescription("Tahakkuk ödeme");
+			stepMarkaYenilemeOde.setOrderNo("03");
+			stepMarkaYenilemeOde.setSingleAtATime(true);  //bu ödeme için true olacak
+			stepMarkaYenilemeOde.setCommands("runStepClass EpatsOrtakTahakkukOdeStep");
+			stepMarkaYenilemeOde.setProcessDefinition(markaYenilemeProcess);
+			
+			
+			ProcessDefinitionStep stepMarkaYenilemeDekontKaydet=new ProcessDefinitionStep();
+			stepMarkaYenilemeDekontKaydet.setCode("DEKONT_KAYDET");
+			stepMarkaYenilemeDekontKaydet.setDescription("Dekont Kaydetme");
+			stepMarkaYenilemeDekontKaydet.setOrderNo("04");
+			stepMarkaYenilemeDekontKaydet.setSingleAtATime(false);
+			stepMarkaYenilemeDekontKaydet.setCommands("runStepClass EpatsOrtakDekontKaydetStep");
+			stepMarkaYenilemeDekontKaydet.setProcessDefinition(markaYenilemeProcess);
 			
 			
 			markaYenilemeProcess.getSteps().add(stepMarkeYenilemeTahakkukOlustur);
 			markaYenilemeProcess.getSteps().add(stepMarkaYenilemeOnay);
-			markaYenilemeProcess.getSteps().add(stepMarkaOde);
+			markaYenilemeProcess.getSteps().add(stepMarkaYenilemeOde);
+			markaYenilemeProcess.getSteps().add(stepMarkaYenilemeDekontKaydet);
 
 			if (processDefinitionRepo.findByCode(markaYenilemeProcess.getCode()).isEmpty()) {
 				processDefinitionRepo.save(markaYenilemeProcess);
@@ -268,8 +295,8 @@ public class RobodoApplication {
 			markaItiraz2.setSteps(new ArrayList<ProcessDefinitionStep>());
 			markaItiraz2.setDiscovererClass("DiscoverMarka2nciItiraz");
 			markaItiraz2.setActive(false);
-			markaItiraz2.setRetryStep("OrtakRetryBildirmeStep");
-			markaItiraz2.setFailStep("OrtakFailBildirmeStep");
+			markaItiraz2.setRetryStep("EpatsOrtakRetryBildirmeStep");
+			markaItiraz2.setFailStep("EpatsOrtakFailBildirmeStep");
 			
 			ProcessDefinitionStep stepMarka2nciItirazOlustur=new ProcessDefinitionStep();
 			stepMarka2nciItirazOlustur.setCode("MARKA_2NCI_ITIRAZ_TAHAKKUK");
@@ -293,14 +320,22 @@ public class RobodoApplication {
 			stepMarka2nciItirazOde.setDescription("Tahakkuk ödeme");
 			stepMarka2nciItirazOde.setOrderNo("03");
 			stepMarka2nciItirazOde.setSingleAtATime(true); //bu ödeme için true olacak
-			stepMarka2nciItirazOde.setCommands("runStepClass OrtakTahakkukOdemeVeDekontKaydetmeStep");
+			stepMarka2nciItirazOde.setCommands("runStepClass EpatsOrtakTahakkukOdeStep");
 			stepMarka2nciItirazOde.setProcessDefinition(markaItiraz2);
 
-
+			ProcessDefinitionStep stepMarkaMarka2nciItirazDekontKaydet=new ProcessDefinitionStep();
+			stepMarkaMarka2nciItirazDekontKaydet.setCode("DEKONT_KAYDET");
+			stepMarkaMarka2nciItirazDekontKaydet.setDescription("Dekont Kaydetme");
+			stepMarkaMarka2nciItirazDekontKaydet.setOrderNo("04");
+			stepMarkaMarka2nciItirazDekontKaydet.setSingleAtATime(false);
+			stepMarkaMarka2nciItirazDekontKaydet.setCommands("runStepClass EpatsOrtakDekontKaydetStep");
+			stepMarkaMarka2nciItirazDekontKaydet.setProcessDefinition(markaItiraz2);
+			
 			
 			markaItiraz2.getSteps().add(stepMarka2nciItirazOlustur);
 			markaItiraz2.getSteps().add(stepMarka2nciItirazOnay);
 			markaItiraz2.getSteps().add(stepMarka2nciItirazOde);
+			markaItiraz2.getSteps().add(stepMarkaMarka2nciItirazDekontKaydet);
 
 			if (processDefinitionRepo.findByCode(markaItiraz2.getCode()).isEmpty()) {
 				processDefinitionRepo.save(markaItiraz2);

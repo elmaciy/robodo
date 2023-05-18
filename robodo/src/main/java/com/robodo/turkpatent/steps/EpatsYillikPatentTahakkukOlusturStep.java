@@ -21,18 +21,16 @@ public class EpatsYillikPatentTahakkukOlusturStep extends BaseEpatsStep {
 		dosyaDurumGuncelle(EPATS_STATU_TAHAKKUK);
 		
 		sistemeGiris();
-		//dosyaAra();
 		islemSec();
 		basvuruYap();
 		dosyaBilgisiDigerIslemler();
-		//dosyaBilgisiDogrulaDevamEt();
-		hizmetDokumuDevamEt();
+		hizmetDokumuKontrolu();
 		onizlemeKontrolveTahakkukOlustur();
 		tahakkukNumarasiAl();
 		anaSayfayaDon();
 		epatsMenu.cikis();
 		
-		dosyaTahakkukKaydet();
+		dosyaTahakkukKaydetOnayaGonder();
 
 		
 	}

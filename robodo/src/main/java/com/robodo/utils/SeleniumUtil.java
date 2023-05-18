@@ -281,6 +281,11 @@ public class SeleniumUtil {
 		
 	}
 
+	public void reload() {
+		this.webDriver.navigate().refresh();
+		
+	}
+
 	
 
 }

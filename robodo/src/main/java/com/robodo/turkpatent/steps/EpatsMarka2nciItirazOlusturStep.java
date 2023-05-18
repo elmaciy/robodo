@@ -29,7 +29,7 @@ public class EpatsMarka2nciItirazOlusturStep extends BaseEpatsStep {
 		itirazaGerekceDosyaNumaralariEkleDevamEt();
 		itirazaIliskibBilgileriEkleDevamEt();
 		itirazaIliskinEkleriEkleDevamEt();
-		hizmetDokumuDevamEt();
+		hizmetDokumuKontrolu();
 		//bu kisimlar acilacak...
 		//onizlemeKontrolveTahakkukOlustur();
 		//tahakkukNumarasiAl();

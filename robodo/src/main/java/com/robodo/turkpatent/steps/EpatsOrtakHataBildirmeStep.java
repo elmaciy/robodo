@@ -4,11 +4,11 @@ import com.robodo.model.ProcessInstanceStep;
 import com.robodo.turkpatent.apimodel.Rumuz;
 import com.robodo.utils.RunnerUtil;
 
-public class OrtakRetryBildirmeStep extends BaseEpatsStep {
+public class EpatsOrtakHataBildirmeStep extends BaseEpatsStep {
 
 
 	
-	public OrtakRetryBildirmeStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
+	public EpatsOrtakHataBildirmeStep(RunnerUtil runnerUtil, ProcessInstanceStep processInstanceStep) {
 		super(runnerUtil, processInstanceStep);
 	
 	}
@@ -26,9 +26,7 @@ public class OrtakRetryBildirmeStep extends BaseEpatsStep {
 	
 	@Override
 	public void run() {
-		dosyaTahakkukNoGuncelle("-");
-		dosyaDekontNoGuncelle("-");
-		dosyaLinkSifirla();
+		dosyaDurumGuncelle(BaseEpatsStep.EPATS_STATU_HATA_ALDI);
 	}
 
 
