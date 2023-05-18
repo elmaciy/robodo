@@ -144,12 +144,13 @@ public class UIProcess extends UIBase {
 			return fld;
 		}).setHeader("Thread").setWidth("2em");
 		
+		/*
 		gridProcessDefinition.addColumn(p->dateFormat(p.getStarted()))
 		.setHeader("Started").setWidth("2em");
 
 		gridProcessDefinition.addColumn(p->dateFormat(p.getFinished()))
 		.setHeader("Finished").setWidth("2em");
-
+		*/
 		gridProcessDefinition.addColumn(p->p.getStatus())
 		.setHeader("Status").setWidth("2em");
 		
@@ -170,6 +171,24 @@ public class UIProcess extends UIBase {
 			return btnShowVariables;
 		})
 		.setHeader("Vars").setWidth("2em").setTextAlign(ColumnTextAlign.CENTER);
+		
+		
+		gridProcessDefinition.addComponentColumn(p-> {
+			Button btnEditApprovalMessage=new Button("", new Icon(VaadinIcon.MAILBOX));
+			btnEditApprovalMessage.addThemeVariants(ButtonVariant.LUMO_SMALL);
+			btnEditApprovalMessage.addClickListener(e -> {
+
+				acceptInputMultiLine("Approval Phrase", "Enter approval phrase", p.getApprovalPhrases(), (v)->v!=null && v.length()<=1000, (phrase, confirmed)->{
+					if (confirmed) {
+						p.setApprovalPhrases(phrase);
+						processService.saveProcessDefinition(p);
+						notifySuccess("approval phrase is updated");
+					}
+				});
+			});
+			return btnEditApprovalMessage;
+		})
+		.setHeader("Msg").setWidth("2em").setTextAlign(ColumnTextAlign.CENTER);
 		
 		gridProcessDefinition.addComponentColumn(p-> {
 			Button btnShowError=new Button("", new Icon(VaadinIcon.LIST));

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.robodo.model.ProcessDefinition;
 import com.robodo.model.ProcessInstance;
 import com.robodo.model.ProcessInstanceStep;
 import com.robodo.model.ProcessInstanceStepFile;
@@ -25,6 +26,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
@@ -149,6 +151,7 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 			});
 			
 		});
+
 		
 		
 		HorizontalLayout buttonsLayout=new HorizontalLayout(btApprove, btDecline, btRetry);
@@ -166,6 +169,16 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 		main.setSizeFull();
 		main.setAlignItems(Alignment.CENTER);
 		
+		if (isApproveable(processInstance)) {
+			ProcessDefinition processDefinition = processService.getProcessDefinitionById(processInstance.getProcessDefinitionId());
+			
+			String approvalString = HelperUtil.replaceVariables(processDefinition.getApprovalPhrases(), HelperUtil.str2HashMap(processInstance.getInstanceVariables()));
+			TextArea approval=new TextArea();
+			approval.setValue(approvalString);
+			approval.setWidth("100%");
+			approval.setHeight("5em");
+			main.add(approval);
+		}
 		
 		main.add(buttonsLayout);
 		main.add(new H3("%s (%s)".formatted(processInstance.getCode(),processInstance.getDescription())));
@@ -191,8 +204,8 @@ public class UIApprover extends UIBase   implements BeforeEnterObserver {
 	}
 
 	private boolean isRetriable(ProcessInstance processInstance) {
-		return processInstance.getStatus().equals(ProcessInstance.STATUS_COMPLETED) 
-				|| processInstance.getStatus().equals(ProcessInstance.STATUS_RUNNING);
+		return 
+				isAdmin() && processInstance.getStatus().equals(ProcessInstance.STATUS_COMPLETED);
 	}
 
 	private void retryInstance(ProcessInstance processInstance) {

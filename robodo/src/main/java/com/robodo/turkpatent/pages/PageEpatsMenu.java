@@ -53,7 +53,12 @@ public class PageEpatsMenu extends PageEpatsBase {
 	
 	public void cikis() {
 		waitProcessorGone();
-		clickableAction("Sistemden Çıkış");		
+		try {
+			clickableAction("Sistemden Çıkış");	
+		} catch (Exception e) {
+			
+		}
+			
 	}
 
 

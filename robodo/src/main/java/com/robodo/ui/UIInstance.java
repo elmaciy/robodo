@@ -166,25 +166,8 @@ public class UIInstance extends UIBase {
 		gridProcessInstance.addComponentColumn(p -> {
 			Button btnApprove = new Button("", new Icon(VaadinIcon.CHECK));
 			btnApprove.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-			if (p.getStatus().equals(ProcessInstance.STATUS_RUNNING)) {
-				Optional<ProcessInstanceStep> instanceStepOpt = p.getSteps().stream()
-						.filter(i -> i.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)).findFirst();
-				if (instanceStepOpt.isEmpty()) {
-					btnApprove.setEnabled(false);
-				} else {
-					ProcessInstanceStep instanceStep = instanceStepOpt.get();
-					boolean enabled = instanceStepOpt.get().isHumanInteractionStep() && !instanceStep.isApproved();
-					btnApprove.setEnabled(enabled);
-				}
-
-			} else {
-				btnApprove.setEnabled(false);
-			}
-
-			btnApprove.setDisableOnClick(true);
 			btnApprove.addClickListener(e -> {
-				approveProcessInstance(p);
-				btnApprove.setEnabled(true);
+				viewApprovalOfProcessInstance(p);
 			});
 			return btnApprove;
 		}).setHeader("Approve").setAutoWidth(true).setFrozenToEnd(true).setTextAlign(ColumnTextAlign.CENTER);
@@ -475,13 +458,7 @@ public class UIInstance extends UIBase {
 	}
 
 
-	private void approveProcessInstance(ProcessInstance instance) {
-		Optional<ProcessInstanceStep> stepOpt = instance.getSteps().stream()
-				.filter(p -> p.getStatus().equals(ProcessInstanceStep.STATUS_RUNNING)).findFirst();
-		if (stepOpt.isEmpty()) {
-			return;
-		}
-
+	private void viewApprovalOfProcessInstance(ProcessInstance instance) {
 		UI.getCurrent()
 				.navigate("/approve/%s/VIEW/INTERNAL/%s".formatted(HelperUtil.encrypt(instance.getCode()), "notoken"));
 	}

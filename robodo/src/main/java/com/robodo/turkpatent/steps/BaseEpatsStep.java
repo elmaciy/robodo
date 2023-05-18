@@ -544,6 +544,7 @@ public class BaseEpatsStep extends BaseWebStep {
 		
 		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
 		
+		selenium.sleep(60L);
 		selenium.switchToMainFrame();
 		
 	}

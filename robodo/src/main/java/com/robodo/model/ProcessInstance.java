@@ -294,6 +294,8 @@ public class ProcessInstance {
 		this.setStarted(null);
 		this.setFinished(null);
 		this.setStatus(ProcessInstance.STATUS_RETRY);
+		this.setQueued(null);
+		this.setAttemptNo(Integer.max(0, this.getAttemptNo()-1));
 		
 		
 		for (var step : this.getSteps()) {

@@ -140,7 +140,7 @@ public class HelperUtil {
 	}
 
 	
-	private static String replaceVariables(String inputStr, HashMap<String, String> hmVars) {
+	public static String replaceVariables(String inputStr, HashMap<String, String> hmVars) {
 		StringBuilder sb=new StringBuilder(inputStr);
 		
 		List<String> keys = hmVars.keySet().stream().collect(Collectors.toList());

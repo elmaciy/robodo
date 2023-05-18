@@ -107,6 +107,16 @@ public class RobodoApplication {
 			
 			
 			//----------------------------------------------------------------------
+			
+			String approvalStringForEpats=
+					"Sayın ilgili;"
+							+ "\n"
+							+ "\n"
+							+ " '${dosyaNumarasi}'  numaralı dosyanın, '${islemAdi}' işlemi için, '${tahakkukNo}' nolu tahakkuk kaydı oluşturulmuştur. "
+							+ "\n"
+							+ "Onayınızın ardından <${onizleme.odenecek.genelToplam}> tutarındaki ödemesi gerçekleştirilecektir."
+							+ "\n"
+							+ "İyi çalışmalar";
 
 			
 			ProcessDefinition yillikPatentUcretiProcess=new ProcessDefinition();
@@ -118,8 +128,8 @@ public class RobodoApplication {
 			yillikPatentUcretiProcess.setDiscovererClass("DiscoverOdenecekYillikPatentUcretleri");
 			yillikPatentUcretiProcess.setActive(false);
 			yillikPatentUcretiProcess.setRetryStep("EpatsOrtakRetryBildirmeStep");
-			yillikPatentUcretiProcess.setFailStep("EpatsOrtakFailBildirmeStep");
-			
+			yillikPatentUcretiProcess.setFailStep("EpatsOrtakHataBildirmeStep");
+			yillikPatentUcretiProcess.setApprovalPhrases(approvalStringForEpats);
 			
 
 			ProcessDefinitionStep stepPatentTahakkukOlustur=new ProcessDefinitionStep();
@@ -179,8 +189,8 @@ public class RobodoApplication {
 			markaTescilUcretiProcess.setDiscovererClass("DiscoverOdenecekMarkaTescilUcretleri");
 			markaTescilUcretiProcess.setActive(false);
 			markaTescilUcretiProcess.setRetryStep("EpatsOrtakRetryBildirmeStep");
-			markaTescilUcretiProcess.setFailStep("EpatsOrtakFailBildirmeStep");
-			
+			markaTescilUcretiProcess.setFailStep("EpatsOrtakHataBildirmeStep");
+			markaTescilUcretiProcess.setApprovalPhrases(approvalStringForEpats);
 			
 
 			ProcessDefinitionStep stepMarkaTescilTahakkukOlustur=new ProcessDefinitionStep();
@@ -238,7 +248,8 @@ public class RobodoApplication {
 			markaYenilemeProcess.setDiscovererClass("DiscoverOdenecekMarkaYenilemeUcretleri");
 			markaYenilemeProcess.setActive(false);
 			markaYenilemeProcess.setRetryStep("EpatsOrtakRetryBildirmeStep");
-			markaYenilemeProcess.setFailStep("EpatsOrtakFailBildirmeStep");
+			markaYenilemeProcess.setFailStep("EpatsOrtakHataBildirmeStep");
+			markaYenilemeProcess.setApprovalPhrases(approvalStringForEpats);
 
 			ProcessDefinitionStep stepMarkeYenilemeTahakkukOlustur=new ProcessDefinitionStep();
 			stepMarkeYenilemeTahakkukOlustur.setCode("MARKA_YENILEME_TAHAKKUK");
@@ -296,8 +307,9 @@ public class RobodoApplication {
 			markaItiraz2.setDiscovererClass("DiscoverMarka2nciItiraz");
 			markaItiraz2.setActive(false);
 			markaItiraz2.setRetryStep("EpatsOrtakRetryBildirmeStep");
-			markaItiraz2.setFailStep("EpatsOrtakFailBildirmeStep");
-			
+			markaItiraz2.setFailStep("EpatsOrtakHataBildirmeStep");
+			markaItiraz2.setApprovalPhrases(approvalStringForEpats);
+
 			ProcessDefinitionStep stepMarka2nciItirazOlustur=new ProcessDefinitionStep();
 			stepMarka2nciItirazOlustur.setCode("MARKA_2NCI_ITIRAZ_TAHAKKUK");
 			stepMarka2nciItirazOlustur.setDescription("Marka yayınına itirazın yeniden inceleneceği kayıtlar için tahakkuk oluşturma");
@@ -343,6 +355,13 @@ public class RobodoApplication {
 			
 			//--------------------------------------------
 			
+			String approvalStringForGoogle="Sayın ilgili;"
+					+ "\n"
+					+ "\n"
+					+ " ${keyword} kelimesi, onayınız sonrası aranacaktır, "
+					+ "\\n"
+					+ "İyi çalışmalar";
+			
 			ProcessDefinition dummyProcess=new ProcessDefinition();
 			dummyProcess.setCode("GOOGLESEARCH");
 			dummyProcess.setDescription("Get text from somewhere and search on google");
@@ -351,6 +370,7 @@ public class RobodoApplication {
 			dummyProcess.setSteps(new ArrayList<ProcessDefinitionStep>());
 			dummyProcess.setDiscovererClass("DiscoverProcessGooggleSearch");
 			dummyProcess.setActive(false);
+			dummyProcess.setApprovalPhrases(approvalStringForGoogle);
 
 
 			ProcessDefinitionStep googleSearchStep=new ProcessDefinitionStep();
@@ -367,7 +387,7 @@ public class RobodoApplication {
 			googleWaitApproval.setDescription("Wait for approval");
 			googleWaitApproval.setOrderNo("02");
 			googleWaitApproval.setSingleAtATime(false);
-			googleWaitApproval.setCommands("waitHumanInteraction SEARCH");
+			googleWaitApproval.setCommands("waitHumanInteraction");
 			googleWaitApproval.setProcessDefinition(dummyProcess);
 			
 			ProcessDefinitionStep bingSearchStep=new ProcessDefinitionStep();

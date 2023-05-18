@@ -57,8 +57,11 @@
 	 
 
 44. onay ve gözlem ekranında resimlerin zoomlanmasına imkan ver. 
-	Ayrıca onay için gerekli / önemli parametrelerin gösterilmesi mümkün olabilir mi? 
-	Bunun için daha önceden email body oluşturma için kullandığımız parametrik text i buraya onayın başına koyabiliriz. 
+
+45.daha önceden email body oluşturma için kullandığımız parametrik text i buraya onayın başına koyabiliriz. 
+
+46. ProcessDefinition daki approval phrases için GUI de güncelleme işlemi yapmasına imkan ver. 
+	
 
 
 

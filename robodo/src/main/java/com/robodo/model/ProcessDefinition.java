@@ -51,6 +51,8 @@ public class ProcessDefinition {
 	String logs;
 	@Column(columnDefinition = "mediumtext")
 	String initialInstanceVariables;
+	@Column(columnDefinition = "mediumtext")
+	String approvalPhrases;
 
 	
 	
@@ -167,6 +169,12 @@ public class ProcessDefinition {
 	}
 	public void setFailStep(String failStep) {
 		this.failStep = failStep;
+	}
+	public String getApprovalPhrases() {
+		return approvalPhrases;
+	}
+	public void setApprovalPhrases(String approvalPhrases) {
+		this.approvalPhrases = approvalPhrases;
 	}
 	@PrePersist
 	protected void onCreate() {

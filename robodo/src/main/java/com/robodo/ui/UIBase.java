@@ -267,7 +267,7 @@ public class UIBase extends AppLayout {
 	}	
 
 
-	public void acceptInput(String header, String caption, String initialValue, Predicate<String> validator, BiConsumer<String, Boolean> dataConsumer) {
+	public void acceptInputSingleLine(String header, String caption, String initialValue, Predicate<String> validator, BiConsumer<String, Boolean> dataConsumer) {
 		ConfirmDialog dialog = new ConfirmDialog();
 		dialog.setHeader(header);
 		dialog.setText(caption);
@@ -293,6 +293,41 @@ public class UIBase extends AppLayout {
 			}
 			
 			dataConsumer.accept(tf.getValue(), isValid);
+		});
+		
+		dialog.addCancelListener(event->{
+			dataConsumer.accept(null, Boolean.FALSE);
+		});
+		
+		dialog.open();
+	}	
+	
+	public void acceptInputMultiLine(String header, String caption, String initialValue, Predicate<String> validator, BiConsumer<String, Boolean> dataConsumer) {
+		ConfirmDialog dialog = new ConfirmDialog();
+		dialog.setHeader(header);
+		dialog.setText(caption);
+		dialog.setCancelable(true);
+		dialog.setCancelText("Cancel");
+		dialog.setRejectable(false);
+		dialog.setConfirmText("OK");
+		
+		TextArea ta=new TextArea();
+		ta.setValue(initialValue==null ? "" : initialValue);
+		ta.setSizeFull();
+		ta.setAutoselect(true);
+		ta.setAutofocus(true);
+		dialog.add(ta);
+
+		ta.focus();
+		
+		dialog.addConfirmListener(event -> {
+			boolean isValid = validator.test(ta.getValue());
+
+			if (!isValid) {
+				notifyError("invalid entry");
+			}
+			
+			dataConsumer.accept(ta.getValue(), isValid);
 		});
 		
 		dialog.addCancelListener(event->{
@@ -502,6 +537,9 @@ public class UIBase extends AppLayout {
 		return tf;
 	}
 	
+
+
+	
 	public void runProcessDiscoverer(ProcessDefinition processDefinition) {
 
 		String processId = "DISCOVERY.%s".formatted(processDefinition.getCode());
@@ -562,7 +600,7 @@ public class UIBase extends AppLayout {
 			
 			String initialValue="NEW_%s".formatted(String.valueOf(System.currentTimeMillis()));
 			
-			acceptInput("Variable", "Enter variable name", initialValue, (p)->HelperUtil.isValidCode(p), (parameteName, confirmed)->{
+			acceptInputSingleLine("Variable", "Enter variable name", initialValue, (p)->HelperUtil.isValidCode(p), (parameteName, confirmed)->{
 				if (confirmed) {
 					hmVars.put(parameteName,"-");
 					setVariableGridItems(gridVars, hmVars);
