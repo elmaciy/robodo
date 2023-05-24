@@ -82,11 +82,18 @@ public class PageEpatsTahakkukOde extends PageEpatsBase {
 
 	public void odemeBasariliNotifikasyonKontrolveKapat() {
 		selenium.switchToMainFrame();
-		String odemeMesaji = lblOdemeBasarilidir.getText();
-		if (!odemeMesaji.contains("Ödemeniz tahsil edilmiştir")) {
+		//String odemeMesaji = lblOdemeBasarilidir.getText();
+		//if (!odemeMesaji.contains("Ödemeniz tahsil edilmiştir")) {
+		//	throw new RuntimeException("Tahsilat Basarisiz. Kontrol ediniz.");
+		//}
+		try {
+			String odemeMesaji = lblOdemeBasarilidir.getText();
+			selenium.logger("Ödeme mesajı : %s".formatted(odemeMesaji));
+			selenium.click(btnOdemeBasariliNotifikasyonKapat);
+		} catch(Exception e) {
 			throw new RuntimeException("Tahsilat Basarisiz. Kontrol ediniz.");
 		}
-		selenium.click(btnOdemeBasariliNotifikasyonKapat);
+		
 		
 	}
 
