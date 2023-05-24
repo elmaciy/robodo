@@ -31,7 +31,15 @@ public class PageEpatsTahakkukOde extends PageEpatsBase {
 	
 	@FindBy(xpath = "//div[contains(text(),'Provizyon Numaras')]")
 	WebElement lblOdemeOnayProvizyon;
-
+	
+	@FindBy(xpath = "//h2[text()='Ödemeniz tahsil edilmiştir.']")
+	WebElement lblOdemeBasarilidir;
+	
+	@FindBy(xpath = "//button[@class='swal2-confirm swal2-styled']")
+	WebElement btnOdemeBasariliNotifikasyonKapat;
+	
+	
+	
 	public PageEpatsTahakkukOde(SeleniumUtil selenium) {
 		super(selenium);
 	}
@@ -57,13 +65,7 @@ public class PageEpatsTahakkukOde extends PageEpatsBase {
 		return dekontNo.strip();
 	}
 	
-	private void close() {
-		selenium.switchToMainFrame();
-		selenium.click(btClose);
-		selenium.sleep(3L);
-		var closeBtn=selenium.getWebDriver().findElement(By.xpath("//h2[text()='Ödemeniz tahsil edilememiştir.']/../..//button[text()='Tamam']"));
-		selenium.click(closeBtn);
-	}
+	
 
 	public void odemeYap() {
 		selenium.click(btOde);
@@ -71,7 +73,21 @@ public class PageEpatsTahakkukOde extends PageEpatsBase {
 	}
 
 	public void odemeVazgec() {
-		close();		
+		selenium.switchToMainFrame();
+		selenium.click(btClose);
+		selenium.sleep(3L);
+		var closeBtn=selenium.getWebDriver().findElement(By.xpath("//h2[text()='Ödemeniz tahsil edilememiştir.']/../..//button[text()='Tamam']"));
+		selenium.click(closeBtn);		
+	}
+
+	public void odemeBasariliNotifikasyonKontrolveKapat() {
+		selenium.switchToMainFrame();
+		String odemeMesaji = lblOdemeBasarilidir.getText();
+		if (!odemeMesaji.contains("Ödemeniz tahsil edilmiştir")) {
+			throw new RuntimeException("Tahsilat Basarisiz. Kontrol ediniz.");
+		}
+		selenium.click(btnOdemeBasariliNotifikasyonKapat);
+		
 	}
 
 }

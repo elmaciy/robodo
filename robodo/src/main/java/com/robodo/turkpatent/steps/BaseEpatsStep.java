@@ -537,16 +537,14 @@ public class BaseEpatsStep extends BaseWebStep {
 		
 		if (isProduction()) {
 			epatsTahakkukOde.odemeYap();
+			takeStepScreenShot(this.processInstanceStep, "Ödeme sonucu", false);
+			epatsTahakkukOde.odemeBasariliNotifikasyonKontrolveKapat();
 		} else {
-			selenium.switchToMainFrame();
 			epatsTahakkukOde.odemeVazgec();
 		}
 		
-		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
-		
-		selenium.sleep(60L);
 		selenium.switchToMainFrame();
-		
+		takeStepScreenShot(this.processInstanceStep, "Ödeme yapıldı ve dekont oluştu.", false);
 	}
 	
 	private String convert2SonKullanmaTarihi(String sonkullanimtarihi) {
