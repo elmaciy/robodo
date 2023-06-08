@@ -135,6 +135,12 @@ public class BaseEpatsStep extends BaseWebStep {
 		String tckno=edevletRumuz.getTckimlik();
 		String sifre=edevletRumuz.getSifre();
 		
+		sistemeGiris(islemAdimi, tckno, sifre);
+		
+	}
+	
+	public void sistemeGiris(int islemAdimi, String tckno, String sifre) {
+		
 		
 		home.navigateEdevletGiris();
 		home.clickEdevlet();
@@ -581,6 +587,8 @@ public class BaseEpatsStep extends BaseWebStep {
 			throw new RuntimeException("Tahakkuk ödenmemiştir. ");
 		}
 		
+		cellContents.stream().map(p->p.getText().strip()).forEach(p->System.err.print(p));
+		
 		Optional<String> data = cellContents.stream().map(p->p.getText().strip()).filter(p->HelperUtil.isValidDekontNo(p, tahakkukNo)).findFirst();
 		
 		if (data.isEmpty()) {
@@ -596,6 +604,10 @@ public class BaseEpatsStep extends BaseWebStep {
 	public void dosyaDekontKaydet() {
 		String dekontNo=getVariable("dekontNo");
 		dosyaDekontNoGuncelle(dekontNo);
+	}
+	
+	public void dosyaIndir() {
+		epatsIslemlerim.downloadFile();
 	}
 	
 	public  void dosyaLinkSifirla() {
@@ -682,6 +694,9 @@ public class BaseEpatsStep extends BaseWebStep {
 		return opt.get().getRumuz();
 		
 	}
+	
+	
+	
 	
 
 	
