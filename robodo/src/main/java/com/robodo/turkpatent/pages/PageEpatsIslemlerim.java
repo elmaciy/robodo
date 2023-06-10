@@ -1,8 +1,13 @@
 package com.robodo.turkpatent.pages;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -45,17 +50,65 @@ public class PageEpatsIslemlerim extends PageEpatsBase {
 		waitProcessorGone();
 		
 		selenium.focusWithTab(elDekontNo);
+		selenium.sleep(5L);
+
 		
 	}
 
 
-	public void downloadFile() {
+	public String islemPdfDosyasiIndir(Object downloadPath) {
+		waitProcessorGone();
+		String currentWindowHandle = selenium.getWindowHandle();
 		selenium.click(lnkDownload);
 		selenium.sleep(10L);
-		selenium.switchToNewTab();
-		selenium.click(selenium.getWebDriver().findElement(By.cssSelector("#download")));
-		selenium.sleep(10L);
 		
+		selenium.switchToNextNewTab(currentWindowHandle);
+		
+		
+		
+		try {
+			Robot r=new Robot();
+			
+			r.keyPress(KeyEvent.VK_CONTROL);
+			selenium.sleep(1L);
+			r.keyPress(KeyEvent.VK_S);
+			
+			r.keyRelease(KeyEvent.VK_S);
+			r.keyRelease(KeyEvent.VK_CONTROL);
+			
+			selenium.sleep(3L);
+			
+			String filePath="%s\\%s.pdf".formatted(downloadPath,System.currentTimeMillis());
+			StringSelection selection = new StringSelection(filePath);
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(selection, selection);
+			
+			
+			r.keyPress(KeyEvent.VK_CONTROL);
+			r.keyPress(KeyEvent.VK_V);	
+			r.keyRelease(KeyEvent.VK_V);
+			r.keyRelease(KeyEvent.VK_CONTROL);
+			
+			r.keyPress(KeyEvent.VK_ENTER);
+			r.keyRelease(KeyEvent.VK_ENTER);
+			
+			selenium.getWebDriver().close();
+			
+			selenium.switchToFirstTab();
+
+			return filePath;
+			
+		} catch (AWTException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+		
+		
+		
+
+
 	}
 
 }

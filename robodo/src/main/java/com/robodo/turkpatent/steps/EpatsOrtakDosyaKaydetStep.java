@@ -20,7 +20,7 @@ public class EpatsOrtakDosyaKaydetStep extends BaseEpatsStep {
 		//sistemeGiris();
 		sistemeGiris(1,"50053246498","k7e6s3k9");
 		tahakkuktanDekontSorgula();
-		dosyaIndir();
+		islemPdfDosyasiIndir();
 		epatsMenu.cikis();
 		//dosyaDurumGuncelle(EPATS_STATU_ODEME_TAMAMLANDI);
 		

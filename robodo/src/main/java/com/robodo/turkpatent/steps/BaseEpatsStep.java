@@ -606,8 +606,13 @@ public class BaseEpatsStep extends BaseWebStep {
 		dosyaDekontNoGuncelle(dekontNo);
 	}
 	
-	public void dosyaIndir() {
-		epatsIslemlerim.downloadFile();
+	public void islemPdfDosyasiIndir() {
+		String fileDownloadPath = getEnvironmentParameter("file.download.path");
+		String pdfFileName = epatsIslemlerim.islemPdfDosyasiIndir(fileDownloadPath);
+		if (pdfFileName ==null) {
+			throw new RuntimeException("Pdf download edilemedi.");
+		}
+		setVariable("pdfFileName", pdfFileName);
 	}
 	
 	public  void dosyaLinkSifirla() {
